@@ -1,0 +1,48 @@
+type User {
+  id: ID!
+  name: String!
+}
+
+interface Node {
+  id: ID!
+  name: String!
+  owner: User!
+  parent: Folder
+}
+
+type File implements Node {
+  id: ID!
+  name: String!
+  owner: User!
+  parent: Folder
+  content: String!
+}
+
+type Folder implements Node {
+  id: ID!
+  name: String!
+  owner: User!
+  parent: Folder
+  children: [Node!]!
+}
+
+enum AccessType {
+  READ
+  WRITE
+}
+
+type Access {
+  user: User!
+  target: Node!
+  type: AccessType!
+}
+
+type Query {
+  node(id: ID): Node
+}
+
+type Mutation {
+  createFolder(parentID: ID, name: String): Folder
+  writeFile(parentID: ID, name: String!, content: String!): File
+}
+
