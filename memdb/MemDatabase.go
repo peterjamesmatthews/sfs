@@ -15,30 +15,30 @@ func NewDatabase() MemDatabase {
 }
 
 func NewSeededDatabase() MemDatabase {
-	peter := model.User{ID: uuid.NewString(), Name: "Peter"}
-	users := []*model.User{&peter}
+	peter := &model.User{ID: uuid.NewString(), Name: "Peter"}
+	users := []*model.User{peter}
 
-	root := model.Folder{
+	root := &model.Folder{
 		ID:    uuid.NewString(),
-		Owner: &peter,
+		Owner: peter,
 	}
 
-	foo := model.Folder{
+	foo := &model.Folder{
 		ID:     uuid.NewString(),
 		Name:   "Foo",
-		Owner:  &peter,
-		Parent: &root,
+		Owner:  peter,
+		Parent: root,
 	}
 
-	bar := model.File{
+	bar := &model.File{
 		ID:      uuid.NewString(),
 		Name:    "Bar",
-		Owner:   &peter,
-		Parent:  &root,
+		Owner:   peter,
+		Parent:  root,
 		Content: "Hello World!",
 	}
 
 	root.Children = []model.Node{foo, bar}
 
-	return MemDatabase{root: &root, users: users}
+	return MemDatabase{root: root, users: users}
 }
