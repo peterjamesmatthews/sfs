@@ -10,20 +10,20 @@ interface Node {
   parent: Folder
 }
 
-type File implements Node {
-  id: ID!
-  name: String!
-  owner: User!
-  parent: Folder
-  content: String!
-}
-
 type Folder implements Node {
   id: ID!
   name: String!
   owner: User!
   parent: Folder
   children: [Node!]!
+}
+
+type File implements Node {
+  id: ID!
+  name: String!
+  owner: User!
+  parent: Folder
+  content: String!
 }
 
 enum AccessType {
@@ -33,8 +33,8 @@ enum AccessType {
 
 type Access {
   user: User!
-  target: Node!
   type: AccessType!
+  target: Node!
 }
 
 type Query {
@@ -42,6 +42,13 @@ type Query {
 }
 
 type Mutation {
+  renameNode(id: ID!, name: String!): Node
+  moveNode(id: ID!, parentID: ID): Node
+  shareNode(userID: ID!, type: AccessType!, targetID: ID!): Access
+
   createFolder(parentID: ID, name: String!): Folder
-  writeFile(parentID: ID, name: String!, content: String!): File
+
+  createFile(parentID: ID, name: String!, content: String): File
+  writeFile(id: ID!, content: String!): File
+
 }

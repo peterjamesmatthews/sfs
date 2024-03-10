@@ -13,6 +13,21 @@ import (
 	"pjm.dev/sfs/graph/model"
 )
 
+// RenameNode is the resolver for the renameNode field.
+func (r *mutationResolver) RenameNode(ctx context.Context, id string, name string) (model.Node, error) {
+	panic(fmt.Errorf("not implemented: RenameNode - renameNode"))
+}
+
+// MoveNode is the resolver for the moveNode field.
+func (r *mutationResolver) MoveNode(ctx context.Context, id string, parentID *string) (model.Node, error) {
+	panic(fmt.Errorf("not implemented: MoveNode - moveNode"))
+}
+
+// ShareNode is the resolver for the shareNode field.
+func (r *mutationResolver) ShareNode(ctx context.Context, userID string, typeArg model.AccessType, targetID string) (*model.Access, error) {
+	panic(fmt.Errorf("not implemented: ShareNode - shareNode"))
+}
+
 // CreateFolder is the resolver for the createFolder field.
 func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, name string) (*model.Folder, error) {
 	user, err := r.AuthN.FromContext(ctx)
@@ -48,8 +63,48 @@ func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, n
 	return &folder, nil
 }
 
+// CreateFile is the resolver for the createFile field.
+func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, name string, content *string) (*model.File, error) {
+	user, err := r.AuthN.FromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("authenticated user missing from context")
+	}
+
+	var parent model.Folder
+	if parentID != nil {
+		parent, err = r.SFS.GetFolderByID(*parentID)
+		if err != nil {
+			return nil, fmt.Errorf("parent %s not found", *parentID)
+		}
+	} else {
+		parent, err = r.SFS.GetRoot()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get root: %w", err)
+		}
+	}
+
+	if content == nil {
+		content = new(string)
+	}
+
+	file := model.File{
+		ID:      uuid.NewString(),
+		Name:    name,
+		Owner:   &user,
+		Parent:  &parent,
+		Content: *content,
+	}
+
+	file, err = r.SFS.InsertFile(file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to insert file: %w", err)
+	}
+
+	return &file, nil
+}
+
 // WriteFile is the resolver for the writeFile field.
-func (r *mutationResolver) WriteFile(ctx context.Context, parentID *string, name string, content string) (*model.File, error) {
+func (r *mutationResolver) WriteFile(ctx context.Context, id string, content *string) (*model.File, error) {
 	panic(fmt.Errorf("not implemented: WriteFile - writeFile"))
 }
 
@@ -77,5 +132,7 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }
+type (
+	mutationResolver struct{ *Resolver }
+	queryResolver    struct{ *Resolver }
+)

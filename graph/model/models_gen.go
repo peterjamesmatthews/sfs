@@ -18,8 +18,8 @@ type Node interface {
 
 type Access struct {
 	User   *User      `json:"user"`
-	Target Node       `json:"target"`
 	Type   AccessType `json:"type"`
+	Target Node       `json:"target"`
 }
 
 type File struct {
