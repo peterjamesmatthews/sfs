@@ -50,5 +50,4 @@ type Mutation {
 
   createFile(parentID: ID, name: String!, content: String): File
   writeFile(id: ID!, content: String!): File
-
 }

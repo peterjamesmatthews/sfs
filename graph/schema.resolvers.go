@@ -30,7 +30,30 @@ func (r *mutationResolver) RenameNode(ctx context.Context, id string, name strin
 
 // MoveNode is the resolver for the moveNode field.
 func (r *mutationResolver) MoveNode(ctx context.Context, id string, parentID *string) (model.Node, error) {
-	panic(fmt.Errorf("not implemented: MoveNode - moveNode"))
+	node, err := r.SFS.GetNodeByID(id)
+	if err != nil {
+		return nil, fmt.Errorf("node %s not found", id)
+	}
+
+	var parent model.Folder
+	if parentID == nil {
+		parent, err = r.SFS.GetRoot()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get root: %w", err)
+		}
+	} else {
+		parent, err = r.SFS.GetFolderByID(*parentID)
+		if err != nil {
+			return nil, fmt.Errorf("parent %s not found", *parentID)
+		}
+	}
+
+	node, err = r.SFS.MoveNode(node, parent)
+	if err != nil {
+		return nil, fmt.Errorf("failed to move node %s to parent %s", id, parent.ID)
+	}
+
+	return node, nil
 }
 
 // ShareNode is the resolver for the shareNode field.
