@@ -107,7 +107,7 @@ func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, nam
 	if parentID != nil {
 		parent, err = r.SFS.GetFolderByID(*parentID)
 		if err != nil {
-			return nil, fmt.Errorf("parent %s not found", *parentID)
+			return nil, fmt.Errorf("failed to get parent %s: %w", *parentID, err)
 		}
 	} else {
 		parent, err = r.SFS.GetRoot()
@@ -137,8 +137,20 @@ func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, nam
 }
 
 // WriteFile is the resolver for the writeFile field.
-func (r *mutationResolver) WriteFile(ctx context.Context, id string, content *string) (*model.File, error) {
-	panic(fmt.Errorf("not implemented: WriteFile - writeFile"))
+func (r *mutationResolver) WriteFile(ctx context.Context, id string, content string) (*model.File, error) {
+	file, err := r.SFS.GetFileByID(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get file %s: %w", id, err)
+	}
+
+	file.Content = content
+
+	file, err = r.SFS.WriteFile(file)
+	if err != nil {
+		return nil, fmt.Errorf("failed to write file %s: %w", id, err)
+	}
+
+	return &file, nil
 }
 
 // Node is the resolver for the node field.
