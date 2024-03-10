@@ -15,12 +15,7 @@ import (
 
 // RenameNode is the resolver for the renameNode field.
 func (r *mutationResolver) RenameNode(ctx context.Context, id string, name string) (model.Node, error) {
-	node, err := r.SFS.GetNodeByID(id)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get node %s: %w", id, err)
-	}
-
-	node, err = r.SFS.RenameNode(node)
+	node, err := r.SFS.RenameNode(id, name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to rename node %s: %w", id, err)
 	}
@@ -30,27 +25,17 @@ func (r *mutationResolver) RenameNode(ctx context.Context, id string, name strin
 
 // MoveNode is the resolver for the moveNode field.
 func (r *mutationResolver) MoveNode(ctx context.Context, id string, parentID *string) (model.Node, error) {
-	node, err := r.SFS.GetNodeByID(id)
-	if err != nil {
-		return nil, fmt.Errorf("node %s not found", id)
-	}
-
-	var parent model.Folder
 	if parentID == nil {
-		parent, err = r.SFS.GetRoot()
+		root, err := r.SFS.GetRoot()
 		if err != nil {
 			return nil, fmt.Errorf("failed to get root: %w", err)
 		}
-	} else {
-		parent, err = r.SFS.GetFolderByID(*parentID)
-		if err != nil {
-			return nil, fmt.Errorf("parent %s not found", *parentID)
-		}
+		parentID = &root.ID
 	}
 
-	node, err = r.SFS.MoveNode(node, parent)
+	node, err := r.SFS.MoveNode(id, *parentID)
 	if err != nil {
-		return nil, fmt.Errorf("failed to move node %s to parent %s", id, parent.ID)
+		return nil, fmt.Errorf("failed to move node %s to parent %s", id, *parentID)
 	}
 
 	return node, nil
@@ -73,6 +58,11 @@ func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, n
 		parent, err = r.SFS.GetFolderByID(*parentID)
 		if err != nil {
 			return nil, fmt.Errorf("parent %s not found: %w", *parentID, err)
+		}
+	} else {
+		parent, err = r.SFS.GetRoot()
+		if err != nil {
+			return nil, fmt.Errorf("failed to get root: %w", err)
 		}
 	}
 
@@ -138,14 +128,7 @@ func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, nam
 
 // WriteFile is the resolver for the writeFile field.
 func (r *mutationResolver) WriteFile(ctx context.Context, id string, content string) (*model.File, error) {
-	file, err := r.SFS.GetFileByID(id)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get file %s: %w", id, err)
-	}
-
-	file.Content = content
-
-	file, err = r.SFS.WriteFile(file)
+	file, err := r.SFS.WriteFile(id, content)
 	if err != nil {
 		return nil, fmt.Errorf("failed to write file %s: %w", id, err)
 	}

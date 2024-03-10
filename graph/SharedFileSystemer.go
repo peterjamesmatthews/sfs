@@ -4,8 +4,8 @@ import "pjm.dev/sfs/graph/model"
 
 type SharedFileSystemer interface {
 	GetNodeByID(id string) (model.Node, error)
-	RenameNode(model.Node) (model.Node, error)
-	MoveNode(model.Node, model.Folder) (model.Node, error)
+	RenameNode(id string, name string) (model.Node, error)
+	MoveNode(id string, dstID string) (model.Node, error)
 
 	GetRoot() (model.Folder, error)
 	InsertFolder(folder model.Folder) (model.Folder, error)
@@ -13,5 +13,5 @@ type SharedFileSystemer interface {
 
 	InsertFile(file model.File) (model.File, error)
 	GetFileByID(id string) (model.File, error)
-	WriteFile(file model.File) (model.File, error)
+	WriteFile(fileID string, content string) (model.File, error)
 }
