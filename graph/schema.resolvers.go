@@ -14,7 +14,7 @@ import (
 )
 
 // CreateFolder is the resolver for the createFolder field.
-func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, name *string) (*model.Folder, error) {
+func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, name string) (*model.Folder, error) {
 	user, err := r.AuthN.FromContext(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("authenticated user missing from context")
@@ -22,20 +22,19 @@ func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, n
 
 	var parent model.Folder
 	if parentID != nil {
-		var err error
 		parent, err = r.SFS.GetFolderByID(*parentID)
 		if err != nil {
-			return nil, fmt.Errorf("parent %s not found", *parentID)
+			return nil, fmt.Errorf("parent %s not found: %w", *parentID, err)
 		}
 	}
 
-	if name == nil {
+	if name == "" {
 		return nil, errors.New("missing folder name")
 	}
 
 	folder := model.Folder{
 		ID:       uuid.NewString(),
-		Name:     *name,
+		Name:     name,
 		Owner:    &user,
 		Parent:   &parent,
 		Children: []model.Node{},
@@ -78,7 +77,5 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-type (
-	mutationResolver struct{ *Resolver }
-	queryResolver    struct{ *Resolver }
-)
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }

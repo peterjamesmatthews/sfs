@@ -42,7 +42,6 @@ type Query {
 }
 
 type Mutation {
-  createFolder(parentID: ID, name: String): Folder
+  createFolder(parentID: ID, name: String!): Folder
   writeFile(parentID: ID, name: String!, content: String!): File
 }
-

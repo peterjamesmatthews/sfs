@@ -70,7 +70,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateFolder func(childComplexity int, parentID *string, name *string) int
+		CreateFolder func(childComplexity int, parentID *string, name string) int
 		WriteFile    func(childComplexity int, parentID *string, name string, content string) int
 	}
 
@@ -85,7 +85,7 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	CreateFolder(ctx context.Context, parentID *string, name *string) (*model.Folder, error)
+	CreateFolder(ctx context.Context, parentID *string, name string) (*model.Folder, error)
 	WriteFile(ctx context.Context, parentID *string, name string, content string) (*model.File, error)
 }
 type QueryResolver interface {
@@ -212,7 +212,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateFolder(childComplexity, args["parentID"].(*string), args["name"].(*string)), true
+		return e.complexity.Mutation.CreateFolder(childComplexity, args["parentID"].(*string), args["name"].(string)), true
 
 	case "Mutation.writeFile":
 		if e.complexity.Mutation.WriteFile == nil {
@@ -387,10 +387,10 @@ func (ec *executionContext) field_Mutation_createFolder_args(ctx context.Context
 		}
 	}
 	args["parentID"] = arg0
-	var arg1 *string
+	var arg1 string
 	if tmp, ok := rawArgs["name"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg1, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -1122,7 +1122,7 @@ func (ec *executionContext) _Mutation_createFolder(ctx context.Context, field gr
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateFolder(rctx, fc.Args["parentID"].(*string), fc.Args["name"].(*string))
+		return ec.resolvers.Mutation().CreateFolder(rctx, fc.Args["parentID"].(*string), fc.Args["name"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
