@@ -20,7 +20,7 @@ func main() {
 	}
 
 	var gqlHandler http.Handler
-	db := memdb.NewMemDatabase()
+	db := memdb.NewSeededDatabase()
 	resolver := graph.Resolver{AuthN: &db, SFS: &db}
 	gqlHandler = handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: &resolver}))
 	gqlHandler = db.WrapInAuthentication(gqlHandler)
