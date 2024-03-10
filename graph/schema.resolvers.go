@@ -15,7 +15,17 @@ import (
 
 // RenameNode is the resolver for the renameNode field.
 func (r *mutationResolver) RenameNode(ctx context.Context, id string, name string) (model.Node, error) {
-	panic(fmt.Errorf("not implemented: RenameNode - renameNode"))
+	node, err := r.SFS.GetNodeByID(id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get node %s: %w", id, err)
+	}
+
+	node, err = r.SFS.RenameNode(node)
+	if err != nil {
+		return nil, fmt.Errorf("failed to rename node %s: %w", id, err)
+	}
+
+	return node, nil
 }
 
 // MoveNode is the resolver for the moveNode field.
