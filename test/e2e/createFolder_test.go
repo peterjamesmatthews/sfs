@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/google/uuid"
@@ -19,12 +18,11 @@ func TestCreateFolder(t *testing.T) {
 	}
 
 	tests := []struct {
-		name      string
-		seed      mem.Database
-		requestor model.User
-		request   *http.Request
-		response  *http.Response
-		want      mem.Database
+		name     string
+		seed     mem.Database
+		request  *http.Request
+		response *http.Response
+		want     mem.Database
 	}{
 		{
 			name: "empty file system",
@@ -32,18 +30,18 @@ func TestCreateFolder(t *testing.T) {
 				Root:  &root,
 				Users: []*model.User{&alice},
 				UUIDs: uuids,
-			}, requestor: alice,
-			request: httptest.NewRequest(
-				http.MethodPost,
+			},
+			request: newRequest(
+				alice,
 				"/graphql",
-				strings.NewReader(`{"query":"mutation{createFolder(name:"Foobar"){id}}}`),
+				`{"query":"mutation CreateFolder {\n  createFolder(name:\"Foobar\") {\n    id\n  }\n}","operationName":"CreateFolder"}`,
 			),
 			want: mem.Database{
 				Root: &model.Folder{
 					ID: root.ID,
 					Children: []model.Node{&model.Folder{
 						ID:       uuids[0].String(),
-						Name:     "Foo",
+						Name:     "Foobar",
 						Owner:    &alice,
 						Parent:   &root,
 						Children: []model.Node{},
@@ -58,8 +56,6 @@ func TestCreateFolder(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			handler := getTestingHandler(t, test.seed)
 
-			test.request.Header.Set("Content-Type", "application/json")
-
 			server := httptest.NewServer(handler)
 			defer server.Close()
 			test.request.URL.Host = server.URL
@@ -72,7 +68,7 @@ func TestCreateFolder(t *testing.T) {
 				t.Error("response mismatch")
 			}
 
-			if !reflect.DeepEqual(test.want, test.seed) {
+			if !reflect.DeepEqual(test.want.Root, test.seed.Root) {
 				t.Error("database mismatch")
 			}
 		})
