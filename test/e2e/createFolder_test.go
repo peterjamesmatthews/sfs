@@ -34,7 +34,7 @@ func TestCreateFolder(t *testing.T) {
 			request: newRequest(
 				alice,
 				"/graphql",
-				`{"query":"mutation CreateFolder {\n  createFolder(name:\"Foobar\") {\n    id\n  }\n}","operationName":"CreateFolder"}`,
+				`{"query":"mutation CreateFolder { createFolder(name:\"Foobar\") { id } }","operationName":"CreateFolder"}`,
 			),
 			want: mem.Database{
 				Root: &model.Folder{
@@ -54,7 +54,7 @@ func TestCreateFolder(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			handler := getTestingHandler(t, test.seed)
+			handler := getTestingHandler(test.seed)
 
 			server := httptest.NewServer(handler)
 			defer server.Close()
