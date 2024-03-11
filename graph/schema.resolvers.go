@@ -9,7 +9,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"pjm.dev/sfs/graph/model"
 )
 
@@ -71,7 +70,7 @@ func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, n
 	}
 
 	folder := model.Folder{
-		ID:       uuid.NewString(),
+		ID:       r.UUIDGen.Generate().String(),
 		Name:     name,
 		Owner:    &user,
 		Parent:   &parent,
@@ -111,7 +110,7 @@ func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, nam
 	}
 
 	file := model.File{
-		ID:      uuid.NewString(),
+		ID:      r.UUIDGen.Generate().String(),
 		Name:    name,
 		Owner:   &user,
 		Parent:  &parent,

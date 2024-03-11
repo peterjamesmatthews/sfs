@@ -7,6 +7,7 @@ package graph
 // It serves as dependency injection for your app, add any dependencies you require here.
 
 type Resolver struct {
-	SFS   SharedFileSystemer
-	AuthN Authenticator
+	SFS     SharedFileSystemer
+	AuthN   Authenticator
+	UUIDGen UUIDGenerator
 }
