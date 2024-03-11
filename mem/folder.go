@@ -44,6 +44,7 @@ func (m *Database) InsertFolder(folder model.Folder) (model.Folder, error) {
 		return model.Folder{}, fmt.Errorf("failed to get parent %s: %w", folder.Parent.ID, err)
 	}
 
+	folder.Parent = parent
 	parent.Children = append(parent.Children, &folder)
 
 	return folder, nil
