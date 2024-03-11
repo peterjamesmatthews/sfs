@@ -5,10 +5,10 @@ import (
 	"testing"
 
 	"pjm.dev/sfs/graph"
-	"pjm.dev/sfs/memdb"
+	"pjm.dev/sfs/mem"
 )
 
-func getTestingHandler(t *testing.T, db memdb.MemDatabase) http.Handler {
+func getTestingHandler(t *testing.T, db mem.Database) http.Handler {
 	t.Helper()
 	return graph.GetGQLHandler(&db, &db, &db)
 }

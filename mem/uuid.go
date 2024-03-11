@@ -1,8 +1,8 @@
-package memdb
+package mem
 
 import "github.com/google/uuid"
 
-func (m *MemDatabase) Generate() uuid.UUID {
+func (m *Database) Generate() uuid.UUID {
 	if len(m.UUIDs) == 0 {
 		return uuid.New()
 	}

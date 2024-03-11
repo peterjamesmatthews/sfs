@@ -1,5 +1,5 @@
 // MemDatabase's implementation of the auth.Authenticator interface.
-package memdb
+package mem
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 
 var errMissingAuthorizationHeader = errors.New("missing Authorization header")
 
-func (m *MemDatabase) Authenticate(r *http.Request) (model.User, error) {
+func (m *Database) Authenticate(r *http.Request) (model.User, error) {
 	// get name header from request
 	name := r.Header.Get("Authorization")
 	if name == "" {
@@ -34,11 +34,11 @@ type userContextKeyType string
 
 const userContextKey userContextKeyType = "user"
 
-func (m *MemDatabase) WithUser(ctx context.Context, user model.User) context.Context {
+func (m *Database) WithUser(ctx context.Context, user model.User) context.Context {
 	return context.WithValue(ctx, userContextKey, user)
 }
 
-func (m *MemDatabase) FromContext(ctx context.Context) (model.User, error) {
+func (m *Database) FromContext(ctx context.Context) (model.User, error) {
 	user, ok := ctx.Value(userContextKey).(model.User)
 	if !ok {
 		return model.User{}, errors.New("user not found in context")
@@ -47,7 +47,7 @@ func (m *MemDatabase) FromContext(ctx context.Context) (model.User, error) {
 	return user, nil
 }
 
-func (m *MemDatabase) WrapInAuthentication(h http.Handler) http.Handler {
+func (m *Database) WrapInAuthentication(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// authenticate user
 		user, err := m.Authenticate(r)

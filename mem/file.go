@@ -1,4 +1,4 @@
-package memdb
+package mem
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"pjm.dev/sfs/graph/model"
 )
 
-func (m *MemDatabase) InsertFile(file model.File) (model.File, error) {
+func (m *Database) InsertFile(file model.File) (model.File, error) {
 	parent, err := m.getFolderByID(file.Parent.ID)
 	if err != nil {
 		return model.File{}, fmt.Errorf("failed to get parent %s", file.Parent.ID)
@@ -18,7 +18,7 @@ func (m *MemDatabase) InsertFile(file model.File) (model.File, error) {
 	return file, nil
 }
 
-func (m *MemDatabase) GetFileByID(id string) (model.File, error) {
+func (m *Database) GetFileByID(id string) (model.File, error) {
 	file, err := m.getFileByID(id)
 	if err != nil {
 		return model.File{}, fmt.Errorf("failed to get file %s: %w", id, err)
@@ -28,7 +28,7 @@ func (m *MemDatabase) GetFileByID(id string) (model.File, error) {
 	return *file, nil
 }
 
-func (m *MemDatabase) WriteFile(fileID string, content string) (model.File, error) {
+func (m *Database) WriteFile(fileID string, content string) (model.File, error) {
 	// get file
 	file, err := m.getFileByID(fileID)
 	if err != nil {
@@ -42,7 +42,7 @@ func (m *MemDatabase) WriteFile(fileID string, content string) (model.File, erro
 	return *file, nil
 }
 
-func (m *MemDatabase) getFileByID(id string) (*model.File, error) {
+func (m *Database) getFileByID(id string) (*model.File, error) {
 	node, err := m.getNodeByID(id)
 	if errors.Is(err, errNodeNotFound) {
 		return nil, fmt.Errorf("file %s not found: %w", id, err)
@@ -56,7 +56,7 @@ func (m *MemDatabase) getFileByID(id string) (*model.File, error) {
 	return file, nil
 }
 
-func (m *MemDatabase) getFileByName(name string) (*model.File, error) {
+func (m *Database) getFileByName(name string) (*model.File, error) {
 	var file *model.File
 
 	// get file by name
@@ -90,7 +90,7 @@ func (m *MemDatabase) getFileByName(name string) (*model.File, error) {
 	return file, nil
 }
 
-func (m *MemDatabase) insertFile(file *model.File) (*model.File, error) {
+func (m *Database) insertFile(file *model.File) (*model.File, error) {
 	file.Parent.Children = append(file.Parent.Children, file)
 	return file, nil
 }

@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"pjm.dev/sfs/graph/model"
-	"pjm.dev/sfs/memdb"
+	"pjm.dev/sfs/mem"
 )
 
 func TestCreateFolder(t *testing.T) {
@@ -20,26 +20,25 @@ func TestCreateFolder(t *testing.T) {
 
 	tests := []struct {
 		name      string
-		seed      memdb.MemDatabase
+		seed      mem.Database
 		requestor model.User
 		request   *http.Request
 		response  *http.Response
-		want      memdb.MemDatabase
+		want      mem.Database
 	}{
 		{
 			name: "empty file system",
-			seed: memdb.MemDatabase{
+			seed: mem.Database{
 				Root:  &root,
 				Users: []*model.User{&alice},
 				UUIDs: uuids,
-			},
-			requestor: alice,
+			}, requestor: alice,
 			request: httptest.NewRequest(
 				http.MethodPost,
 				"/graphql",
 				strings.NewReader(`{"query":"mutation{createFolder(name:"Foobar"){id}}}`),
 			),
-			want: memdb.MemDatabase{
+			want: mem.Database{
 				Root: &model.Folder{
 					ID: root.ID,
 					Children: []model.Node{&model.Folder{

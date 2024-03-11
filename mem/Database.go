@@ -1,11 +1,11 @@
-package memdb
+package mem
 
 import (
 	"github.com/google/uuid"
 	"pjm.dev/sfs/graph/model"
 )
 
-type MemDatabase struct {
+type Database struct {
 	Root  *model.Folder
 	Users []*model.User
 	UUIDs []uuid.UUID

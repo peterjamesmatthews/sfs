@@ -1,4 +1,4 @@
-package memdb
+package mem
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 	"pjm.dev/sfs/graph/model"
 )
 
-func (m *MemDatabase) GetRoot() (model.Folder, error) {
+func (m *Database) GetRoot() (model.Folder, error) {
 	if m.Root == nil {
 		return model.Folder{}, errors.New("nil root")
 	}
@@ -15,7 +15,7 @@ func (m *MemDatabase) GetRoot() (model.Folder, error) {
 	return *m.Root, nil
 }
 
-func (m *MemDatabase) GetFolderByID(id string) (model.Folder, error) {
+func (m *Database) GetFolderByID(id string) (model.Folder, error) {
 	folder, err := m.getFolderByID(id)
 	if err != nil {
 		return model.Folder{}, fmt.Errorf("failed to get folder %s: %w", id, err)
@@ -24,7 +24,7 @@ func (m *MemDatabase) GetFolderByID(id string) (model.Folder, error) {
 	return *folder, nil
 }
 
-func (m *MemDatabase) getFolderByID(id string) (*model.Folder, error) {
+func (m *Database) getFolderByID(id string) (*model.Folder, error) {
 	node, err := m.getNodeByID(id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get node %s: %w", id, err)
@@ -38,7 +38,7 @@ func (m *MemDatabase) getFolderByID(id string) (*model.Folder, error) {
 	return folder, nil
 }
 
-func (m *MemDatabase) InsertFolder(folder model.Folder) (model.Folder, error) {
+func (m *Database) InsertFolder(folder model.Folder) (model.Folder, error) {
 	parent, err := m.getFolderByID(folder.Parent.ID)
 	if err != nil {
 		return model.Folder{}, fmt.Errorf("failed to get parent %s: %w", folder.Parent.ID, err)

@@ -1,4 +1,4 @@
-package memdb
+package mem
 
 import (
 	"errors"
@@ -10,7 +10,7 @@ import (
 
 var errNodeNotFound = errors.New("memdb: node not found")
 
-func (m *MemDatabase) GetNodeByID(id string) (model.Node, error) {
+func (m *Database) GetNodeByID(id string) (model.Node, error) {
 	node, err := m.getNodeByID(id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get node %s: %w", id, err)
@@ -18,7 +18,7 @@ func (m *MemDatabase) GetNodeByID(id string) (model.Node, error) {
 	return node, nil
 }
 
-func (m *MemDatabase) getNodeByID(id string) (model.Node, error) {
+func (m *Database) getNodeByID(id string) (model.Node, error) {
 	if id == m.Root.ID {
 		return m.Root, nil
 	}
@@ -40,7 +40,7 @@ func (m *MemDatabase) getNodeByID(id string) (model.Node, error) {
 	return nil, errNodeNotFound
 }
 
-func (m *MemDatabase) getNodeByName(name string) (model.Node, error) {
+func (m *Database) getNodeByName(name string) (model.Node, error) {
 	if m.Root.Name == name {
 		return m.Root, nil
 	}
@@ -62,7 +62,7 @@ func (m *MemDatabase) getNodeByName(name string) (model.Node, error) {
 	return nil, errNodeNotFound
 }
 
-func (m *MemDatabase) RenameNode(id string, name string) (model.Node, error) {
+func (m *Database) RenameNode(id string, name string) (model.Node, error) {
 	// get node
 	node, err := m.getNodeByID(id)
 	if errors.Is(err, errNodeNotFound) {
@@ -83,7 +83,7 @@ func (m *MemDatabase) RenameNode(id string, name string) (model.Node, error) {
 	return node, nil
 }
 
-func (m *MemDatabase) MoveNode(id string, dstID string) (model.Node, error) {
+func (m *Database) MoveNode(id string, dstID string) (model.Node, error) {
 	// get node
 	node, err := m.getNodeByID(id)
 	if errors.Is(err, errNodeNotFound) {

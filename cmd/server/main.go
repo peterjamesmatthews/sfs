@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 	"pjm.dev/sfs/graph"
 	"pjm.dev/sfs/graph/model"
-	"pjm.dev/sfs/memdb"
+	"pjm.dev/sfs/mem"
 )
 
 const defaultPort = "8080"
@@ -28,7 +28,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
-func newSeededDatabase() memdb.MemDatabase {
+func newSeededDatabase() mem.Database {
 	peter := &model.User{ID: uuid.NewString(), Name: "Peter"}
 	users := []*model.User{peter}
 
@@ -51,5 +51,5 @@ func newSeededDatabase() memdb.MemDatabase {
 
 	root.Children = []model.Node{foo, bar}
 
-	return memdb.MemDatabase{Root: root, Users: users}
+	return mem.Database{Root: root, Users: users}
 }
