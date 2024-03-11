@@ -19,11 +19,11 @@ func (m *MemDatabase) GetNodeByID(id string) (model.Node, error) {
 }
 
 func (m *MemDatabase) getNodeByID(id string) (model.Node, error) {
-	if id == m.root.ID {
-		return m.root, nil
+	if id == m.Root.ID {
+		return m.Root, nil
 	}
 
-	nodes := m.root.Children
+	nodes := m.Root.Children
 	for _, node := range nodes {
 		if node.GetID() == id {
 			return node, nil
@@ -41,11 +41,11 @@ func (m *MemDatabase) getNodeByID(id string) (model.Node, error) {
 }
 
 func (m *MemDatabase) getNodeByName(name string) (model.Node, error) {
-	if m.root.Name == name {
-		return m.root, nil
+	if m.Root.Name == name {
+		return m.Root, nil
 	}
 
-	nodes := m.root.Children
+	nodes := m.Root.Children
 	for _, node := range nodes {
 		if node.GetName() == name {
 			return node, nil

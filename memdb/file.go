@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"pjm.dev/sfs/graph/model"
 )
 
@@ -65,10 +64,10 @@ func (m *MemDatabase) getFileByName(name string) (*model.File, error) {
 
 	if errors.Is(err, errNodeNotFound) { // node wasn't found, create file
 		file = &model.File{
-			ID:      uuid.NewString(),
+			ID:      m.Generate().String(),
 			Name:    name,
 			Owner:   nil,
-			Parent:  m.root,
+			Parent:  m.Root,
 			Content: "",
 		}
 		file, err = m.insertFile(file)

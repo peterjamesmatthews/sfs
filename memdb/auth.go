@@ -20,7 +20,7 @@ func (m *MemDatabase) Authenticate(r *http.Request) (model.User, error) {
 	}
 
 	// find user by name
-	for _, user := range m.users {
+	for _, user := range m.Users {
 		if user != nil && user.Name == name {
 			return *user, nil
 		}

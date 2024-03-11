@@ -8,11 +8,11 @@ import (
 )
 
 func (m *MemDatabase) GetRoot() (model.Folder, error) {
-	if m.root == nil {
+	if m.Root == nil {
 		return model.Folder{}, errors.New("nil root")
 	}
 
-	return *m.root, nil
+	return *m.Root, nil
 }
 
 func (m *MemDatabase) GetFolderByID(id string) (model.Folder, error) {
