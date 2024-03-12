@@ -1,0 +1,13 @@
+query {
+  node {
+    ... on Folder {
+      children {
+        ... on File {
+          owner {
+            id
+          }
+        }
+      }
+    }
+  }
+}
