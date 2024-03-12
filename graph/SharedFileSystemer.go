@@ -37,7 +37,7 @@ type SharedFileSystemer interface {
 	//
 	// # Errors
 	//  - `ErrNotFound` if the node is not found.
-	//  - `ErrUnauthorized` if the user does not have read access to the node.
+	//  - `ErrUnauthorized` if the user does not own the node or if the user does not have write access to the destination parent.
 	MoveNode(user model.User, id string, dstID string) (model.Node, error)
 
 	// GetRoot fetches the root folder of the shared file system.
@@ -58,7 +58,7 @@ type SharedFileSystemer interface {
 	//
 	// # Errors
 	//  - `ErrNotFound` if `folder`'s parent is not found.
-	//  - `ErrUnauthorized` if the user does not have write access to `folder`'s parent.
+	//  - `ErrUnauthorized` if the user does not write access to `folder`'s parent.
 	InsertFolder(user model.User, folder model.Folder) (model.Folder, error)
 
 	// GetFolderbyID fetches a folder by its id.
@@ -80,7 +80,7 @@ type SharedFileSystemer interface {
 	//
 	// # Errors
 	//  - `ErrNotFound` if `file`'s parent is not found.
-	//  - `ErrUnauthorized` if `user` does not have write access to `file`'s parent.
+	//  - `ErrUnauthorized` if `user` does not have write access to `file`'s parent
 	InsertFile(user model.User, file model.File) (model.File, error)
 
 	// GetFileByID fetches a file by its id.
@@ -91,7 +91,7 @@ type SharedFileSystemer interface {
 	//
 	// # Errors
 	// - `ErrNotFound` if `file`'s parent is not found.
-	// - `ErrUnauthorized` if `user` does not have read access to `file`'s parent.
+	// - `ErrUnauthorized` if `user` does not have read access to the file
 	GetFileByID(user model.User, id string) (model.File, error)
 
 	// WriteFile writes content to a file.
@@ -103,6 +103,6 @@ type SharedFileSystemer interface {
 	//
 	// # Errors
 	// - `ErrNotFound` if `file`'s parent is not found.
-	// - `ErrUnauthorized` if `user` does not have write access to `file`'s parent.
+	// - `ErrUnauthorized` if `user` does not have write access to the file
 	WriteFile(user model.User, fileID string, content string) (model.File, error)
 }
