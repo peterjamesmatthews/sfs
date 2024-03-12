@@ -33,7 +33,7 @@ func TestFindNicksID(t *testing.T) {
 		{User: nick, Type: model.AccessTypeRead, Target: root},
 	}
 
-	seed := mem.Database{
+	db := mem.Database{
 		Root:   root,
 		Users:  users,
 		UUIDs:  uuids,
@@ -46,7 +46,7 @@ func TestFindNicksID(t *testing.T) {
 		GQLFileToString(t, "FindNicksID.gql"),
 	)
 
-	handler := getTestingHandler(seed)
+	handler := getTestingHandler(&db)
 	server := httptest.NewServer(handler)
 	defer server.Close()
 	request.URL.Host = server.URL

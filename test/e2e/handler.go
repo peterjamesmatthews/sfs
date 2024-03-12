@@ -7,6 +7,6 @@ import (
 	"pjm.dev/sfs/mem"
 )
 
-func getTestingHandler(db mem.Database) http.Handler {
-	return graph.GetGQLHandler(&db, &db, &db)
+func getTestingHandler(db *mem.Database) http.Handler {
+	return graph.GetGQLHandler(db, db, db)
 }

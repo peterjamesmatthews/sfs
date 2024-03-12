@@ -30,6 +30,10 @@ func TestCreateFolder(t *testing.T) {
 				Root:  &root,
 				Users: []*model.User{&alice},
 				UUIDs: uuids,
+				Access: []*model.Access{
+					{User: &alice, Type: model.AccessTypeRead, Target: &root},
+					{User: &alice, Type: model.AccessTypeWrite, Target: &root},
+				},
 			},
 			request: newRequest(
 				alice,
@@ -47,14 +51,16 @@ func TestCreateFolder(t *testing.T) {
 						Children: []model.Node{},
 					}},
 				},
-				Users: []*model.User{&alice},
+				Users:  []*model.User{&alice},
+				Access: []*model.Access{{&alice, model.AccessTypeWrite, &root}},
 			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			handler := getTestingHandler(test.seed)
+			db := test.seed
+			handler := getTestingHandler(&db)
 
 			server := httptest.NewServer(handler)
 			defer server.Close()

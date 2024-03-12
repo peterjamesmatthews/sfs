@@ -1,0 +1,9 @@
+mutation {
+  createFolder(name: "Matthew's Folder") {
+    id
+    name
+    owner {
+      id
+    }
+  }
+}
