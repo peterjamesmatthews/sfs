@@ -5,16 +5,20 @@ import (
 	"fmt"
 	"slices"
 
+	"pjm.dev/sfs/graph"
 	"pjm.dev/sfs/graph/model"
 )
 
-var errNodeNotFound = errors.New("memdb: node not found")
-
-func (m *Database) GetNodeByID(id string) (model.Node, error) {
+func (m *Database) GetNodeByID(user model.User, id string) (model.Node, error) {
 	node, err := m.getNodeByID(id)
-	if err != nil {
+	if errors.Is(err, graph.ErrNotFound) {
+		return nil, err
+	} else if err != nil {
 		return nil, fmt.Errorf("failed to get node %s: %w", id, err)
 	}
+
+	// TODO verify user has read access to node
+
 	return node, nil
 }
 
@@ -37,7 +41,7 @@ func (m *Database) getNodeByID(id string) (model.Node, error) {
 		nodes = append(nodes, folder.Children...)
 	}
 
-	return nil, errNodeNotFound
+	return nil, graph.ErrNotFound
 }
 
 func (m *Database) getNodeByName(name string) (model.Node, error) {
@@ -59,15 +63,19 @@ func (m *Database) getNodeByName(name string) (model.Node, error) {
 		nodes = append(nodes, folder.Children...)
 	}
 
-	return nil, errNodeNotFound
+	return nil, graph.ErrNotFound
 }
 
-func (m *Database) RenameNode(id string, name string) (model.Node, error) {
+func (m *Database) RenameNode(user model.User, id string, name string) (model.Node, error) {
 	// get node
 	node, err := m.getNodeByID(id)
-	if errors.Is(err, errNodeNotFound) {
-		return nil, fmt.Errorf("failed to rename node %s: %w", node.GetID(), err)
+	if errors.Is(err, graph.ErrNotFound) {
+		return nil, err
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to get node %s: %w", id, err)
 	}
+
+	// TODO verify user has write access to node
 
 	// set update node's name
 	switch n := node.(type) {
@@ -83,18 +91,26 @@ func (m *Database) RenameNode(id string, name string) (model.Node, error) {
 	return node, nil
 }
 
-func (m *Database) MoveNode(id string, dstID string) (model.Node, error) {
+func (m *Database) MoveNode(user model.User, id string, dstID string) (model.Node, error) {
 	// get node
 	node, err := m.getNodeByID(id)
-	if errors.Is(err, errNodeNotFound) {
+	if errors.Is(err, graph.ErrNotFound) {
+		return nil, err
+	} else if err != nil {
 		return nil, fmt.Errorf("failed to rename node %s: %w", node.GetID(), err)
 	}
 
+	// TODO verify user owns the node
+
 	// get destination parent folder
 	dst, err := m.getFolderByID(dstID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get destination parent folder %s: %w", dstID, err)
+	if errors.Is(err, graph.ErrNotFound) {
+		return nil, err
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to rename node %s: %w", node.GetID(), err)
 	}
+
+	// TODO verify user has write access to destination parent
 
 	// get source parent folder
 	src := node.GetParent()
