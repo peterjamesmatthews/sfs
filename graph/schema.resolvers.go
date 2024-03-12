@@ -57,42 +57,8 @@ func (r *mutationResolver) ShareNode(ctx context.Context, userID string, accessT
 
 // CreateFolder is the resolver for the createFolder field.
 func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, name string) (*model.Folder, error) {
-	user, err := handleGettingUserFromContext(ctx, r.AuthN)
-	if err != nil {
-		return nil, err
-	}
-
-	var parent model.Folder
-	if parentID != nil {
-		parent, err = r.SFS.GetFolderByID(user, *parentID)
-		if err != nil {
-			return nil, fmt.Errorf("parent %s not found: %w", *parentID, err)
-		}
-	} else {
-		parent, err = r.SFS.GetRoot(user)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get root: %w", err)
-		}
-	}
-
-	if name == "" {
-		return nil, errors.New("missing folder name")
-	}
-
-	folder := model.Folder{
-		ID:       r.UUIDGen.Generate().String(),
-		Name:     name,
-		Owner:    &user,
-		Parent:   &parent,
-		Children: []model.Node{},
-	}
-
-	folder, err = r.SFS.InsertFolder(user, folder)
-	if err != nil {
-		return nil, fmt.Errorf("failed to insert folder: %w", err)
-	}
-
-	return &folder, nil
+	// TODO implement me
+	return nil, errors.ErrUnsupported
 }
 
 // CreateFile is the resolver for the createFile field.
