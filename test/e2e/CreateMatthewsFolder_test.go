@@ -48,7 +48,13 @@ func TestCreateMatthewsFolder(t *testing.T) {
 	body := recorder.Body.String()
 
 	// The folder should look something like this:
-	strings.Contains(body, uuids[1].String())
-	strings.Contains(body, "Matthew's Folder")
-	strings.Contains(body, matthew.ID)
+	if !strings.Contains(body, uuids[1].String()) {
+		t.Errorf("body doesn't contain new folder's id %s", uuids[1].String())
+	}
+	if !strings.Contains(body, "Matthew's Folder") {
+		t.Errorf("body doesn't contain new folder's name %s", "Matthew's Folder")
+	}
+	if !strings.Contains(body, matthew.ID) {
+		t.Errorf("body doesn't contain Matthew's id %s", matthew.ID)
+	}
 }

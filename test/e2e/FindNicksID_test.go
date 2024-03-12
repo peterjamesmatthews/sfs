@@ -56,6 +56,6 @@ func TestFindNicksID(t *testing.T) {
 
 	// search body for nick's id
 	if !strings.Contains(body, nick.ID) {
-		t.Errorf("Response body does not contain Nick's ID")
+		t.Errorf("Response body does not contain Nick's ID %s", nick.ID)
 	}
 }
