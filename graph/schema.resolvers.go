@@ -14,7 +14,12 @@ import (
 
 // RenameNode is the resolver for the renameNode field.
 func (r *mutationResolver) RenameNode(ctx context.Context, id string, name string) (model.Node, error) {
-	node, err := r.SFS.RenameNode(id, name)
+	user, err := handleGettingUserFromContext(ctx, r.AuthN)
+	if err != nil {
+		return nil, err
+	}
+
+	node, err := r.SFS.RenameNode(user, id, name)
 	if err != nil {
 		return nil, fmt.Errorf("failed to rename node %s: %w", id, err)
 	}
@@ -24,15 +29,20 @@ func (r *mutationResolver) RenameNode(ctx context.Context, id string, name strin
 
 // MoveNode is the resolver for the moveNode field.
 func (r *mutationResolver) MoveNode(ctx context.Context, id string, parentID *string) (model.Node, error) {
+	user, err := handleGettingUserFromContext(ctx, r.AuthN)
+	if err != nil {
+		return nil, err
+	}
+
 	if parentID == nil {
-		root, err := r.SFS.GetRoot()
+		root, err := r.SFS.GetRoot(user)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get root: %w", err)
 		}
 		parentID = &root.ID
 	}
 
-	node, err := r.SFS.MoveNode(id, *parentID)
+	node, err := r.SFS.MoveNode(user, id, *parentID)
 	if err != nil {
 		return nil, fmt.Errorf("failed to move node %s to parent %s", id, *parentID)
 	}
@@ -47,19 +57,19 @@ func (r *mutationResolver) ShareNode(ctx context.Context, userID string, accessT
 
 // CreateFolder is the resolver for the createFolder field.
 func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, name string) (*model.Folder, error) {
-	user, err := r.AuthN.FromContext(ctx)
+	user, err := handleGettingUserFromContext(ctx, r.AuthN)
 	if err != nil {
-		return nil, fmt.Errorf("authenticated user missing from context")
+		return nil, err
 	}
 
 	var parent model.Folder
 	if parentID != nil {
-		parent, err = r.SFS.GetFolderByID(*parentID)
+		parent, err = r.SFS.GetFolderByID(user, *parentID)
 		if err != nil {
 			return nil, fmt.Errorf("parent %s not found: %w", *parentID, err)
 		}
 	} else {
-		parent, err = r.SFS.GetRoot()
+		parent, err = r.SFS.GetRoot(user)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get root: %w", err)
 		}
@@ -77,7 +87,7 @@ func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, n
 		Children: []model.Node{},
 	}
 
-	folder, err = r.SFS.InsertFolder(folder)
+	folder, err = r.SFS.InsertFolder(user, folder)
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert folder: %w", err)
 	}
@@ -87,19 +97,19 @@ func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, n
 
 // CreateFile is the resolver for the createFile field.
 func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, name string, content *string) (*model.File, error) {
-	user, err := r.AuthN.FromContext(ctx)
+	user, err := handleGettingUserFromContext(ctx, r.AuthN)
 	if err != nil {
-		return nil, fmt.Errorf("authenticated user missing from context")
+		return nil, err
 	}
 
 	var parent model.Folder
 	if parentID != nil {
-		parent, err = r.SFS.GetFolderByID(*parentID)
+		parent, err = r.SFS.GetFolderByID(user, *parentID)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get parent %s: %w", *parentID, err)
 		}
 	} else {
-		parent, err = r.SFS.GetRoot()
+		parent, err = r.SFS.GetRoot(user)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get root: %w", err)
 		}
@@ -117,7 +127,7 @@ func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, nam
 		Content: *content,
 	}
 
-	file, err = r.SFS.InsertFile(file)
+	file, err = r.SFS.InsertFile(user, file)
 	if err != nil {
 		return nil, fmt.Errorf("failed to insert file: %w", err)
 	}
@@ -127,7 +137,12 @@ func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, nam
 
 // WriteFile is the resolver for the writeFile field.
 func (r *mutationResolver) WriteFile(ctx context.Context, id string, content string) (*model.File, error) {
-	file, err := r.SFS.WriteFile(id, content)
+	user, err := handleGettingUserFromContext(ctx, r.AuthN)
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := r.SFS.WriteFile(user, id, content)
 	if err != nil {
 		return nil, fmt.Errorf("failed to write file %s: %w", id, err)
 	}
@@ -137,15 +152,20 @@ func (r *mutationResolver) WriteFile(ctx context.Context, id string, content str
 
 // Node is the resolver for the node field.
 func (r *queryResolver) Node(ctx context.Context, id *string) (model.Node, error) {
+	user, err := handleGettingUserFromContext(ctx, r.AuthN)
+	if err != nil {
+		return nil, err
+	}
+
 	if id == nil {
-		root, err := r.SFS.GetRoot()
+		root, err := r.SFS.GetRoot(user)
 		if err != nil {
 			return nil, errors.New("failed to get root")
 		}
 		return root, nil
 	}
 
-	node, err := r.SFS.GetNodeByID(*id)
+	node, err := r.SFS.GetNodeByID(user, *id)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get node %s: %w", *id, err)
 	}
