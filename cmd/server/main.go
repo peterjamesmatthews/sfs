@@ -29,27 +29,38 @@ func main() {
 }
 
 func newSeededDatabase() mem.Database {
-	peter := &model.User{ID: uuid.NewString(), Name: "Peter"}
-	users := []*model.User{peter}
+	matthew := &model.User{ID: uuid.NewString(), Name: "Matthew"}
+	nick := &model.User{ID: uuid.NewString(), Name: "Nick"}
+	users := []*model.User{matthew, nick}
 
 	root := &model.Folder{}
-
-	foo := &model.Folder{
-		ID:     uuid.NewString(),
-		Name:   "Foo",
-		Owner:  peter,
-		Parent: root,
+	root.Children = []model.Node{
+		&model.Folder{
+			ID:     uuid.NewString(),
+			Name:   "Empty Folder",
+			Owner:  matthew,
+			Parent: root,
+		},
+		&model.File{
+			ID:      uuid.NewString(),
+			Name:    "Greeting",
+			Owner:   matthew,
+			Parent:  root,
+			Content: "Hello World!",
+		},
+		&model.File{
+			ID:      uuid.NewString(),
+			Name:    "Passwords",
+			Owner:   nick,
+			Parent:  root,
+			Content: "nick-is-cool",
+		},
 	}
 
-	bar := &model.File{
-		ID:      uuid.NewString(),
-		Name:    "Bar",
-		Owner:   peter,
-		Parent:  root,
-		Content: "Hello World!",
+	access := []*model.Access{
+		{User: matthew, Type: model.AccessTypeRead, Target: root},
+		{User: nick, Type: model.AccessTypeRead, Target: root},
 	}
 
-	root.Children = []model.Node{foo, bar}
-
-	return mem.Database{Root: root, Users: users}
+	return mem.Database{Root: root, Users: users, Access: access}
 }
