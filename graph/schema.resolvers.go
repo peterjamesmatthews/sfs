@@ -41,7 +41,7 @@ func (r *mutationResolver) MoveNode(ctx context.Context, id string, parentID *st
 }
 
 // ShareNode is the resolver for the shareNode field.
-func (r *mutationResolver) ShareNode(ctx context.Context, userID string, typeArg model.AccessType, targetID string) (*model.Access, error) {
+func (r *mutationResolver) ShareNode(ctx context.Context, userID string, accessType model.AccessType, targetID string) (*model.Access, error) {
 	panic(fmt.Errorf("not implemented: ShareNode - shareNode"))
 }
 

@@ -74,7 +74,7 @@ type ComplexityRoot struct {
 		CreateFolder func(childComplexity int, parentID *string, name string) int
 		MoveNode     func(childComplexity int, id string, parentID *string) int
 		RenameNode   func(childComplexity int, id string, name string) int
-		ShareNode    func(childComplexity int, userID string, typeArg model.AccessType, targetID string) int
+		ShareNode    func(childComplexity int, userID string, accessType model.AccessType, targetID string) int
 		WriteFile    func(childComplexity int, id string, content string) int
 	}
 
@@ -91,7 +91,7 @@ type ComplexityRoot struct {
 type MutationResolver interface {
 	RenameNode(ctx context.Context, id string, name string) (model.Node, error)
 	MoveNode(ctx context.Context, id string, parentID *string) (model.Node, error)
-	ShareNode(ctx context.Context, userID string, typeArg model.AccessType, targetID string) (*model.Access, error)
+	ShareNode(ctx context.Context, userID string, accessType model.AccessType, targetID string) (*model.Access, error)
 	CreateFolder(ctx context.Context, parentID *string, name string) (*model.Folder, error)
 	CreateFile(ctx context.Context, parentID *string, name string, content *string) (*model.File, error)
 	WriteFile(ctx context.Context, id string, content string) (*model.File, error)
@@ -268,7 +268,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.ShareNode(childComplexity, args["userID"].(string), args["type"].(model.AccessType), args["targetID"].(string)), true
+		return e.complexity.Mutation.ShareNode(childComplexity, args["userID"].(string), args["accessType"].(model.AccessType), args["targetID"].(string)), true
 
 	case "Mutation.writeFile":
 		if e.complexity.Mutation.WriteFile == nil {
@@ -549,14 +549,14 @@ func (ec *executionContext) field_Mutation_shareNode_args(ctx context.Context, r
 	}
 	args["userID"] = arg0
 	var arg1 model.AccessType
-	if tmp, ok := rawArgs["type"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
+	if tmp, ok := rawArgs["accessType"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accessType"))
 		arg1, err = ec.unmarshalNAccessType2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐAccessType(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["type"] = arg1
+	args["accessType"] = arg1
 	var arg2 string
 	if tmp, ok := rawArgs["targetID"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("targetID"))
@@ -1387,7 +1387,7 @@ func (ec *executionContext) _Mutation_shareNode(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ShareNode(rctx, fc.Args["userID"].(string), fc.Args["type"].(model.AccessType), fc.Args["targetID"].(string))
+		return ec.resolvers.Mutation().ShareNode(rctx, fc.Args["userID"].(string), fc.Args["accessType"].(model.AccessType), fc.Args["targetID"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

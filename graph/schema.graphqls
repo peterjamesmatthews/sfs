@@ -67,7 +67,7 @@ type Mutation {
   moveNode(id: ID!, parentID: ID): Node
 
   # shareNode grants a user access to a node.
-  shareNode(userID: ID!, type: AccessType!, targetID: ID!): Access
+  shareNode(userID: ID!, accessType: AccessType!, targetID: ID!): Access
 
   # createFolder creates a new folder under an optional parent.
   #
