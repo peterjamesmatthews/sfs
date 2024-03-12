@@ -13,7 +13,12 @@ func (m *Database) GetRoot(user model.User) (model.Folder, error) {
 		return model.Folder{}, graph.ErrNotFound
 	}
 
-	// TODO verify user has read access to root
+	// verify user has read access to root
+	if hasAccess, err := m.has(user, model.AccessTypeRead, m.Root); err != nil {
+		return model.Folder{}, fmt.Errorf("failed to check user %s has %s access on root: %w", user.ID, model.AccessTypeRead, err)
+	} else if !hasAccess {
+		return model.Folder{}, graph.ErrUnauthorized
+	}
 
 	return *m.Root, nil
 }
@@ -26,7 +31,12 @@ func (m *Database) InsertFolder(user model.User, folder model.Folder) (model.Fol
 		return model.Folder{}, fmt.Errorf("failed to get parent %s: %w", folder.Parent.ID, err)
 	}
 
-	// TODO verify user has write access to parent
+	// verify user has write access to parent
+	if hasAccess, err := m.has(user, model.AccessTypeWrite, m.Root); err != nil {
+		return model.Folder{}, fmt.Errorf("failed to check user %s has %s access on parent %s: %w", user.ID, model.AccessTypeWrite, parent.ID, err)
+	} else if !hasAccess {
+		return model.Folder{}, graph.ErrUnauthorized
+	}
 
 	folder.Parent = parent
 	parent.Children = append(parent.Children, &folder)
@@ -42,7 +52,12 @@ func (m *Database) GetFolderByID(user model.User, id string) (model.Folder, erro
 		return model.Folder{}, fmt.Errorf("failed to get folder %s: %w", folder.Parent.ID, err)
 	}
 
-	// TODO verify user has read access to folder
+	// verify user has read access to folder
+	if hasAccess, err := m.has(user, model.AccessTypeRead, m.Root); err != nil {
+		return model.Folder{}, fmt.Errorf("failed to check user %s has %s access on folder %s: %w", user.ID, model.AccessTypeRead, folder.ID, err)
+	} else if !hasAccess {
+		return model.Folder{}, graph.ErrUnauthorized
+	}
 
 	return *folder, nil
 }

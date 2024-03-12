@@ -17,7 +17,12 @@ func (m *Database) GetNodeByID(user model.User, id string) (model.Node, error) {
 		return nil, fmt.Errorf("failed to get node %s: %w", id, err)
 	}
 
-	// TODO verify user has read access to node
+	// verify user has read access to node
+	if hasAccess, err := m.has(user, model.AccessTypeRead, node); err != nil {
+		return nil, fmt.Errorf("failed to check user %s has %s access on node %s: %w", user.ID, model.AccessTypeRead, node.GetID(), err)
+	} else if !hasAccess {
+		return nil, graph.ErrUnauthorized
+	}
 
 	return node, nil
 }
@@ -75,7 +80,12 @@ func (m *Database) RenameNode(user model.User, id string, name string) (model.No
 		return nil, fmt.Errorf("failed to get node %s: %w", id, err)
 	}
 
-	// TODO verify user has write access to node
+	// verify user has write access to node
+	if hasAccess, err := m.has(user, model.AccessTypeWrite, node); err != nil {
+		return nil, fmt.Errorf("failed to check user %s has %s access on node %s: %w", user.ID, model.AccessTypeWrite, node.GetID(), err)
+	} else if !hasAccess {
+		return nil, graph.ErrUnauthorized
+	}
 
 	// set update node's name
 	switch n := node.(type) {
@@ -100,7 +110,10 @@ func (m *Database) MoveNode(user model.User, id string, dstID string) (model.Nod
 		return nil, fmt.Errorf("failed to rename node %s: %w", node.GetID(), err)
 	}
 
-	// TODO verify user owns the node
+	// verify user owns the node
+	if owns := m.owns(user, node); !owns {
+		return nil, graph.ErrUnauthorized
+	}
 
 	// get destination parent folder
 	dst, err := m.getFolderByID(dstID)
@@ -110,7 +123,12 @@ func (m *Database) MoveNode(user model.User, id string, dstID string) (model.Nod
 		return nil, fmt.Errorf("failed to rename node %s: %w", node.GetID(), err)
 	}
 
-	// TODO verify user has write access to destination parent
+	// verify user has write access to destination parent
+	if hasAccess, err := m.has(user, model.AccessTypeWrite, node); err != nil {
+		return nil, fmt.Errorf("failed to check user %s has %s access on parent %s: %w", user.ID, model.AccessTypeWrite, dst.ID, err)
+	} else if !hasAccess {
+		return nil, graph.ErrUnauthorized
+	}
 
 	// get source parent folder
 	src := node.GetParent()

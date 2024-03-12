@@ -9,6 +9,7 @@ import (
 )
 
 func (m *Database) InsertFile(user model.User, file model.File) (model.File, error) {
+	// get parent
 	parent, err := m.getFolderByID(file.Parent.ID)
 	if errors.Is(err, graph.ErrNotFound) {
 		return model.File{}, err
@@ -16,7 +17,12 @@ func (m *Database) InsertFile(user model.User, file model.File) (model.File, err
 		return model.File{}, fmt.Errorf("failed to get parent %s: %w", file.Parent.ID, err)
 	}
 
-	// TODO verify user has write access to parent
+	// verify user has write access on parent
+	if hasAccess, err := m.has(user, model.AccessTypeWrite, parent); err != nil {
+		return model.File{}, fmt.Errorf("failed to check user %s has %s access on parent %s: %w", user.ID, model.AccessTypeWrite, parent.ID, err)
+	} else if !hasAccess {
+		return model.File{}, graph.ErrUnauthorized
+	}
 
 	parent.Children = append(parent.Children, file)
 
@@ -24,6 +30,7 @@ func (m *Database) InsertFile(user model.User, file model.File) (model.File, err
 }
 
 func (m *Database) GetFileByID(user model.User, id string) (model.File, error) {
+	// get file
 	file, err := m.getFileByID(id)
 	if errors.Is(err, graph.ErrNotFound) {
 		return model.File{}, graph.ErrNotFound
@@ -31,7 +38,12 @@ func (m *Database) GetFileByID(user model.User, id string) (model.File, error) {
 		return model.File{}, fmt.Errorf("failed to get file %s: %w", id, err)
 	}
 
-	// TODO verify user has read access to file
+	// verify user has read access to file
+	if hasAccess, err := m.has(user, model.AccessTypeRead, file); err != nil {
+		return model.File{}, fmt.Errorf("failed to check user %s has %s access on file %s: %w", user.ID, model.AccessTypeRead, file.ID, err)
+	} else if !hasAccess {
+		return model.File{}, graph.ErrUnauthorized
+	}
 
 	return *file, nil
 }
@@ -45,7 +57,12 @@ func (m *Database) WriteFile(user model.User, fileID string, content string) (mo
 		return model.File{}, fmt.Errorf("failed to get file %s: %w", fileID, err)
 	}
 
-	// TODO verify user has write access to file
+	// verify user has write access to file
+	if hasAccess, err := m.has(user, model.AccessTypeWrite, file); err != nil {
+		return model.File{}, fmt.Errorf("failed to check user %s has %s access on file %s: %w", user.ID, model.AccessTypeWrite, file.ID, err)
+	} else if !hasAccess {
+		return model.File{}, graph.ErrUnauthorized
+	}
 
 	// write file's content
 	file.Content = content
