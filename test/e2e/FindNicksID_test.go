@@ -1,7 +1,6 @@
 package e2e
 
 import (
-	"io"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -53,14 +52,7 @@ func TestFindNicksID(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	handler.ServeHTTP(recorder, request)
-	response := recorder.Result()
-
-	// read response body:
-	bytes, err := io.ReadAll(response.Body)
-	if err != nil {
-		t.Fatalf("Failed to read response body: %v", err)
-	}
-	body := string(bytes)
+	body := recorder.Body.String()
 
 	// search body for nick's id
 	if !strings.Contains(body, nick.ID) {
