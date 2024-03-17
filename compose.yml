@@ -7,7 +7,7 @@ services:
     profiles: [ develop ]
     image: sfs.server.debug:latest
     build:
-      context: .
+      context: ./server
       target: debug
     ports:
       - "80:8080"
