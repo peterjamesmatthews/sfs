@@ -5,11 +5,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch Server",
+      "name": "Attach Server",
       "type": "go",
-      "request": "launch",
-      "mode": "auto",
-      "program": "${workspaceFolder}/cmd/server/main.go"
-    }
+      "request": "attach",
+      "mode": "remote",
+      "host": "127.0.0.1",
+      "port": 9090,
+      "debugAdapter": "legacy",
+    },
   ]
 }
