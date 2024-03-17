@@ -3,6 +3,15 @@ version: "3"
 name: sfs
 
 services:
+  application:
+    profiles: [ develop ]
+    image: sfs.app.debug:latest
+    build:
+      context: ./app
+      target: debug
+    ports:
+      - "5173:5173"
+
   server:
     profiles: [ develop ]
     image: sfs.server.debug:latest
@@ -10,5 +19,5 @@ services:
       context: ./server
       target: debug
     ports:
-      - "80:8080"
+      - "8080:8080"
       - "9090:9090"
