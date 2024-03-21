@@ -1,0 +1,9 @@
+name: sfs
+
+services:
+  app:
+    build: app
+    volumes:
+      - ./app:/app
+    ports:
+      - "5173:5173"
