@@ -1,7 +1,7 @@
 FROM golang:1.21-bullseye
 
 # set working directory
-WORKDIR /home/server
+WORKDIR /sfs/server
 
 # expose port
 EXPOSE 8080

@@ -1,7 +1,7 @@
 FROM node:21-bullseye-slim
 
 # set working directory
-WORKDIR /home/app
+WORKDIR /sfs/app
 
 # expose port
 EXPOSE 5173
