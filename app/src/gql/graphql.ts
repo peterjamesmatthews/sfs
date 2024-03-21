@@ -1,117 +1,123 @@
 /* eslint-disable */
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Exact<T extends { [key: string]: unknown }> = {
+	[K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+	[SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+	[SubKey in K]: Maybe<T[SubKey]>;
+};
+export type MakeEmpty<
+	T extends { [key: string]: unknown },
+	K extends keyof T,
+> = { [_ in K]?: never };
+export type Incremental<T> =
+	| T
+	| {
+			[P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never;
+	  };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
+	ID: { input: string; output: string };
+	String: { input: string; output: string };
+	Boolean: { input: boolean; output: boolean };
+	Int: { input: number; output: number };
+	Float: { input: number; output: number };
 };
 
 export type Access = {
-  __typename?: 'Access';
-  target: Node;
-  type: AccessType;
-  user: User;
+	__typename?: "Access";
+	target: Node;
+	type: AccessType;
+	user: User;
 };
 
 export enum AccessType {
-  Read = 'READ',
-  Write = 'WRITE'
+	Read = "READ",
+	Write = "WRITE",
 }
 
 export type File = Node & {
-  __typename?: 'File';
-  content: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  owner: User;
-  parent?: Maybe<Folder>;
+	__typename?: "File";
+	content: Scalars["String"]["output"];
+	id: Scalars["ID"]["output"];
+	name: Scalars["String"]["output"];
+	owner: User;
+	parent?: Maybe<Folder>;
 };
 
 export type Folder = Node & {
-  __typename?: 'Folder';
-  children: Array<Node>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  owner: User;
-  parent?: Maybe<Folder>;
+	__typename?: "Folder";
+	children: Array<Node>;
+	id: Scalars["ID"]["output"];
+	name: Scalars["String"]["output"];
+	owner: User;
+	parent?: Maybe<Folder>;
 };
 
 export type Mutation = {
-  __typename?: 'Mutation';
-  createFile?: Maybe<File>;
-  createFolder?: Maybe<Folder>;
-  moveNode?: Maybe<Node>;
-  renameNode?: Maybe<Node>;
-  shareNode?: Maybe<Access>;
-  writeFile?: Maybe<File>;
+	__typename?: "Mutation";
+	createFile?: Maybe<File>;
+	createFolder?: Maybe<Folder>;
+	moveNode?: Maybe<Node>;
+	renameNode?: Maybe<Node>;
+	shareNode?: Maybe<Access>;
+	writeFile?: Maybe<File>;
 };
-
 
 export type MutationCreateFileArgs = {
-  content?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  parentID?: InputMaybe<Scalars['ID']['input']>;
+	content?: InputMaybe<Scalars["String"]["input"]>;
+	name: Scalars["String"]["input"];
+	parentID?: InputMaybe<Scalars["ID"]["input"]>;
 };
-
 
 export type MutationCreateFolderArgs = {
-  name: Scalars['String']['input'];
-  parentID?: InputMaybe<Scalars['ID']['input']>;
+	name: Scalars["String"]["input"];
+	parentID?: InputMaybe<Scalars["ID"]["input"]>;
 };
-
 
 export type MutationMoveNodeArgs = {
-  id: Scalars['ID']['input'];
-  parentID?: InputMaybe<Scalars['ID']['input']>;
+	id: Scalars["ID"]["input"];
+	parentID?: InputMaybe<Scalars["ID"]["input"]>;
 };
-
 
 export type MutationRenameNodeArgs = {
-  id: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
+	id: Scalars["ID"]["input"];
+	name: Scalars["String"]["input"];
 };
-
 
 export type MutationShareNodeArgs = {
-  accessType: AccessType;
-  targetID: Scalars['ID']['input'];
-  userID: Scalars['ID']['input'];
+	accessType: AccessType;
+	targetID: Scalars["ID"]["input"];
+	userID: Scalars["ID"]["input"];
 };
 
-
 export type MutationWriteFileArgs = {
-  content: Scalars['String']['input'];
-  id: Scalars['ID']['input'];
+	content: Scalars["String"]["input"];
+	id: Scalars["ID"]["input"];
 };
 
 export type Node = {
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  owner: User;
-  parent?: Maybe<Folder>;
+	id: Scalars["ID"]["output"];
+	name: Scalars["String"]["output"];
+	owner: User;
+	parent?: Maybe<Folder>;
 };
 
 export type Query = {
-  __typename?: 'Query';
-  node?: Maybe<Node>;
+	__typename?: "Query";
+	node?: Maybe<Node>;
 };
 
-
 export type QueryNodeArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
+	id?: InputMaybe<Scalars["ID"]["input"]>;
 };
 
 export type User = {
-  __typename?: 'User';
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
+	__typename?: "User";
+	id: Scalars["ID"]["output"];
+	name: Scalars["String"]["output"];
 };
