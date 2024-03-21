@@ -1,6 +1,6 @@
 .PHONY: develop
 develop:
-	docker compose up -d 
+	docker compose up -d --build
 
 .PHONY: clean
 clean:
