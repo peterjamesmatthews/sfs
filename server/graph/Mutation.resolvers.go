@@ -6,6 +6,7 @@ package graph
 
 import (
 	"context"
+	"errors"
 	"fmt"
 )
 
@@ -59,8 +60,17 @@ func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, n
 		return nil, err
 	}
 
+	if name == "" {
+		return nil, errors.New("missing folder name")
+	}
+
 	var parent Folder
-	if parentID == nil {
+	if parentID != nil {
+		parent, err = r.SFS.GetFolderByID(user, *parentID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get parent %s: %w", *parentID, err)
+		}
+	} else {
 		parent, err = r.SFS.GetRoot(user)
 		if err != nil {
 			return nil, fmt.Errorf("failed to get root: %w", err)
