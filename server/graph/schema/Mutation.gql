@@ -1,0 +1,26 @@
+# Mutation is the root mutation type.
+#
+# It defines the interface in which clients will mutate the shared file system with.
+type Mutation {
+  # renameNode changes the name of a node.
+  renameNode(id: ID!, name: String!): Node
+
+  # moveNode changes the parent of a node.
+  moveNode(id: ID!, parentID: ID): Node
+
+  # shareNode grants a user access to a node.
+  shareNode(userID: ID!, accessType: AccessType!, targetID: ID!): Access
+
+  # createFolder creates a new folder under an optional parent.
+  #
+  # If no parent is provided, the folder is created under the root.
+  createFolder(parentID: ID, name: String!): Folder
+
+  # createFile creates a new file under an optional parent.
+  #
+  # If no parent is provided, the file is created under the root.
+  createFile(parentID: ID, name: String!, content: String): File
+
+  # writeFile updates the contents of a file.
+  writeFile(id: ID!, content: String!): File
+}

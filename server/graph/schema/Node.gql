@@ -1,0 +1,7 @@
+# Node is the interface for something in the file system.
+interface Node {
+  id: ID!
+  name: String!
+  owner: User!
+  parent: Folder
+}

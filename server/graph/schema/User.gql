@@ -1,0 +1,5 @@
+# User represents a user of the shared file system
+type User {
+  id: ID!
+  name: String!
+}
