@@ -16,7 +16,7 @@ func TestCreateMatthewsFolder(t *testing.T) {
 		uuids = append(uuids, uuid.New())
 	}
 
-	matthew := &graph.User{ID: uuids[0].String(), Name: "Matthew"}
+	matthew := &graph.User{ID: uuid.NewString(), Name: "Matthew"}
 	users := []*graph.User{matthew}
 	root := &graph.Folder{}
 	root.Children = []graph.Node{}
@@ -48,8 +48,8 @@ func TestCreateMatthewsFolder(t *testing.T) {
 	body := recorder.Body.String()
 
 	// The folder should look something like this:
-	if !strings.Contains(body, uuids[1].String()) {
-		t.Errorf("body doesn't contain new folder's id %s", uuids[1].String())
+	if !strings.Contains(body, uuids[0].String()) {
+		t.Errorf("body doesn't contain new folder's id %s", uuids[0].String())
 	}
 	if !strings.Contains(body, "Matthew's Folder") {
 		t.Errorf("body doesn't contain new folder's name %s", "Matthew's Folder")
