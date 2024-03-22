@@ -11,16 +11,12 @@ import (
 )
 
 func TestFindNicksID(t *testing.T) {
-	uuids := []uuid.UUID{}
-	for i := 0; i < 100; i++ {
-		uuids = append(uuids, uuid.New())
-	}
-	nick := &graph.User{ID: uuids[0].String(), Name: "Nick"}
+	nick := &graph.User{ID: uuid.NewString(), Name: "Nick"}
 	users := []*graph.User{nick}
 	root := &graph.Folder{}
 	root.Children = []graph.Node{
 		&graph.File{
-			ID:      uuids[1].String(),
+			ID:      uuid.NewString(),
 			Name:    "Nick's File",
 			Owner:   nick,
 			Parent:  root,
@@ -35,7 +31,6 @@ func TestFindNicksID(t *testing.T) {
 	db := mem.Database{
 		Root:   root,
 		Users:  users,
-		UUIDs:  uuids,
 		Access: access,
 	}
 
