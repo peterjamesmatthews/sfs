@@ -1,6 +1,6 @@
 module pjm.dev/sfs
 
-go 1.21.7
+go 1.21
 
 require (
 	github.com/99designs/gqlgen v0.17.44
