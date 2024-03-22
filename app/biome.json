@@ -7,7 +7,9 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true
-		},
-		"ignore": ["gql"]
+		}
+	},
+	"files": {
+		"ignore": ["node_modules", "gql"]
 	}
 }
