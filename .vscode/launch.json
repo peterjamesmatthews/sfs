@@ -1,0 +1,16 @@
+{
+	"configurations": [
+		{
+			"debugAdapter": "legacy",
+			"host": "127.0.0.1",
+			"mode": "remote",
+			"name": "Server",
+			"port": 4000,
+			"remotePath": "/sfs/server",
+			"request": "attach",
+			"type": "go",
+			"cwd": "${workspaceFolder}/server"
+		}
+	],
+	"version": "0.2.0"
+}

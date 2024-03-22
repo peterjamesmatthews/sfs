@@ -5,12 +5,18 @@ services:
     build: app
     volumes:
       - ./app:/sfs/app
-      - /sfs/app/node_modules
+      - app_node_modules:/sfs/app/node_modules/
     ports:
       - "5173:5173"
   server:
     build: server
     volumes:
       - ./server:/sfs/server
+      - server_debug_bins:/sfs/server/__debug_bins/
     ports:
       - "8080:8080"
+      - "4000:4000"
+
+volumes:
+  app_node_modules:
+  server_debug_bins:
