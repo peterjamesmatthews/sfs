@@ -5,5 +5,9 @@ import GQLCodegen from "vite-plugin-graphql-codegen";
 // https://vitejs.dev/config/
 export default defineConfig({
 	plugins: [react(), GQLCodegen()],
-	server: { host: true },
+	server: {
+		host: true,
+		cors: true,
+		proxy: { "/graphql": "http://server:8080/" },
+	},
 });
