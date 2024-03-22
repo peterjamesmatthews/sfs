@@ -21,7 +21,11 @@ func main() {
 	}
 
 	db := newSeededDatabase()
-	http.Handle("/graphql", graph.GetGQLHandler(&db, &db, &db))
+
+	gqlHandler := graph.GetGQLHandler(&db, &db, &db)
+	gqlHandler = WrapHandler(gqlHandler, &LoggingHandler{}, &CORSHandler{})
+
+	http.Handle("/graphql", gqlHandler)
 	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
 
 	log.Printf("serving http://localhost:%s/graphql", port)
