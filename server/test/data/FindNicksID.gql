@@ -1,1 +1,11 @@
-# TODO
+query {
+  node {
+    ... on Folder {
+      children {
+        owner {
+          id
+        }
+      }
+    }
+  }
+}
