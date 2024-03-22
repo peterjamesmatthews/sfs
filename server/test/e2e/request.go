@@ -7,10 +7,10 @@ import (
 	"strconv"
 	"strings"
 
-	"pjm.dev/sfs/graph/model"
+	"pjm.dev/sfs/graph"
 )
 
-func newRequest(requestor model.User, path string, query string) *http.Request {
+func newRequest(requestor graph.User, path string, query string) *http.Request {
 	return &http.Request{
 		Method: http.MethodPost,
 		URL: &url.URL{

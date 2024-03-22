@@ -6,10 +6,9 @@ import (
 	"slices"
 
 	"pjm.dev/sfs/graph"
-	"pjm.dev/sfs/graph/model"
 )
 
-func (m *Database) GetNodeByID(user model.User, id string) (model.Node, error) {
+func (m *Database) GetNodeByID(user graph.User, id string) (graph.Node, error) {
 	node, err := m.getNodeByID(id)
 	if errors.Is(err, graph.ErrNotFound) {
 		return nil, err
@@ -18,8 +17,8 @@ func (m *Database) GetNodeByID(user model.User, id string) (model.Node, error) {
 	}
 
 	// verify user has read access to node
-	if hasAccess, err := m.has(user, model.AccessTypeRead, node); err != nil {
-		return nil, fmt.Errorf("failed to check user %s has %s access on node %s: %w", user.ID, model.AccessTypeRead, node.GetID(), err)
+	if hasAccess, err := m.has(user, graph.AccessTypeRead, node); err != nil {
+		return nil, fmt.Errorf("failed to check user %s has %s access on node %s: %w", user.ID, graph.AccessTypeRead, node.GetID(), err)
 	} else if !hasAccess {
 		return nil, graph.ErrUnauthorized
 	}
@@ -27,7 +26,7 @@ func (m *Database) GetNodeByID(user model.User, id string) (model.Node, error) {
 	return node, nil
 }
 
-func (m *Database) getNodeByID(id string) (model.Node, error) {
+func (m *Database) getNodeByID(id string) (graph.Node, error) {
 	if id == m.Root.ID {
 		return m.Root, nil
 	}
@@ -38,7 +37,7 @@ func (m *Database) getNodeByID(id string) (model.Node, error) {
 			return node, nil
 		}
 
-		folder, ok := node.(*model.Folder)
+		folder, ok := node.(*graph.Folder)
 		if !ok {
 			continue
 		}
@@ -49,7 +48,7 @@ func (m *Database) getNodeByID(id string) (model.Node, error) {
 	return nil, graph.ErrNotFound
 }
 
-func (m *Database) getNodeByName(name string) (model.Node, error) {
+func (m *Database) getNodeByName(name string) (graph.Node, error) {
 	if m.Root.Name == name {
 		return m.Root, nil
 	}
@@ -60,7 +59,7 @@ func (m *Database) getNodeByName(name string) (model.Node, error) {
 			return node, nil
 		}
 
-		folder, ok := node.(*model.Folder)
+		folder, ok := node.(*graph.Folder)
 		if !ok {
 			continue
 		}
@@ -71,7 +70,7 @@ func (m *Database) getNodeByName(name string) (model.Node, error) {
 	return nil, graph.ErrNotFound
 }
 
-func (m *Database) RenameNode(user model.User, id string, name string) (model.Node, error) {
+func (m *Database) RenameNode(user graph.User, id string, name string) (graph.Node, error) {
 	// get node
 	node, err := m.getNodeByID(id)
 	if errors.Is(err, graph.ErrNotFound) {
@@ -81,18 +80,18 @@ func (m *Database) RenameNode(user model.User, id string, name string) (model.No
 	}
 
 	// verify user has write access to node
-	if hasAccess, err := m.has(user, model.AccessTypeWrite, node); err != nil {
-		return nil, fmt.Errorf("failed to check user %s has %s access on node %s: %w", user.ID, model.AccessTypeWrite, node.GetID(), err)
+	if hasAccess, err := m.has(user, graph.AccessTypeWrite, node); err != nil {
+		return nil, fmt.Errorf("failed to check user %s has %s access on node %s: %w", user.ID, graph.AccessTypeWrite, node.GetID(), err)
 	} else if !hasAccess {
 		return nil, graph.ErrUnauthorized
 	}
 
 	// set update node's name
 	switch n := node.(type) {
-	case *model.Folder:
+	case *graph.Folder:
 		n.Name = name
 		node = *n
-	case *model.File:
+	case *graph.File:
 		n.Name = name
 		node = *n
 	}
@@ -101,7 +100,7 @@ func (m *Database) RenameNode(user model.User, id string, name string) (model.No
 	return node, nil
 }
 
-func (m *Database) MoveNode(user model.User, id string, dstID string) (model.Node, error) {
+func (m *Database) MoveNode(user graph.User, id string, dstID string) (graph.Node, error) {
 	// get node
 	node, err := m.getNodeByID(id)
 	if errors.Is(err, graph.ErrNotFound) {
@@ -124,8 +123,8 @@ func (m *Database) MoveNode(user model.User, id string, dstID string) (model.Nod
 	}
 
 	// verify user has write access to destination parent
-	if hasAccess, err := m.has(user, model.AccessTypeWrite, node); err != nil {
-		return nil, fmt.Errorf("failed to check user %s has %s access on parent %s: %w", user.ID, model.AccessTypeWrite, dst.ID, err)
+	if hasAccess, err := m.has(user, graph.AccessTypeWrite, node); err != nil {
+		return nil, fmt.Errorf("failed to check user %s has %s access on parent %s: %w", user.ID, graph.AccessTypeWrite, dst.ID, err)
 	} else if !hasAccess {
 		return nil, graph.ErrUnauthorized
 	}
@@ -134,16 +133,16 @@ func (m *Database) MoveNode(user model.User, id string, dstID string) (model.Nod
 	src := node.GetParent()
 
 	// remove node from src's children
-	src.Children = slices.DeleteFunc(src.Children, func(child model.Node) bool {
+	src.Children = slices.DeleteFunc(src.Children, func(child graph.Node) bool {
 		return child.GetID() == node.GetID()
 	})
 
 	// set node's parent to dst
 	switch n := node.(type) {
-	case *model.Folder:
+	case *graph.Folder:
 		n.Parent = dst
 		node = *n
-	case *model.File:
+	case *graph.File:
 		n.Parent = dst
 		node = *n
 	}

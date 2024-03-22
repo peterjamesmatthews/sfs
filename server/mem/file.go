@@ -5,23 +5,22 @@ import (
 	"fmt"
 
 	"pjm.dev/sfs/graph"
-	"pjm.dev/sfs/graph/model"
 )
 
-func (m *Database) InsertFile(user model.User, file model.File) (model.File, error) {
+func (m *Database) InsertFile(user graph.User, file graph.File) (graph.File, error) {
 	// get parent
 	parent, err := m.getFolderByID(file.Parent.ID)
 	if errors.Is(err, graph.ErrNotFound) {
-		return model.File{}, err
+		return graph.File{}, err
 	} else if err != nil {
-		return model.File{}, fmt.Errorf("failed to get parent %s: %w", file.Parent.ID, err)
+		return graph.File{}, fmt.Errorf("failed to get parent %s: %w", file.Parent.ID, err)
 	}
 
 	// verify user has write access on parent
-	if hasAccess, err := m.has(user, model.AccessTypeWrite, parent); err != nil {
-		return model.File{}, fmt.Errorf("failed to check user %s has %s access on parent %s: %w", user.ID, model.AccessTypeWrite, parent.ID, err)
+	if hasAccess, err := m.has(user, graph.AccessTypeWrite, parent); err != nil {
+		return graph.File{}, fmt.Errorf("failed to check user %s has %s access on parent %s: %w", user.ID, graph.AccessTypeWrite, parent.ID, err)
 	} else if !hasAccess {
-		return model.File{}, graph.ErrUnauthorized
+		return graph.File{}, graph.ErrUnauthorized
 	}
 
 	parent.Children = append(parent.Children, file)
@@ -29,39 +28,39 @@ func (m *Database) InsertFile(user model.User, file model.File) (model.File, err
 	return file, nil
 }
 
-func (m *Database) GetFileByID(user model.User, id string) (model.File, error) {
+func (m *Database) GetFileByID(user graph.User, id string) (graph.File, error) {
 	// get file
 	file, err := m.getFileByID(id)
 	if errors.Is(err, graph.ErrNotFound) {
-		return model.File{}, graph.ErrNotFound
+		return graph.File{}, graph.ErrNotFound
 	} else if err != nil {
-		return model.File{}, fmt.Errorf("failed to get file %s: %w", id, err)
+		return graph.File{}, fmt.Errorf("failed to get file %s: %w", id, err)
 	}
 
 	// verify user has read access to file
-	if hasAccess, err := m.has(user, model.AccessTypeRead, file); err != nil {
-		return model.File{}, fmt.Errorf("failed to check user %s has %s access on file %s: %w", user.ID, model.AccessTypeRead, file.ID, err)
+	if hasAccess, err := m.has(user, graph.AccessTypeRead, file); err != nil {
+		return graph.File{}, fmt.Errorf("failed to check user %s has %s access on file %s: %w", user.ID, graph.AccessTypeRead, file.ID, err)
 	} else if !hasAccess {
-		return model.File{}, graph.ErrUnauthorized
+		return graph.File{}, graph.ErrUnauthorized
 	}
 
 	return *file, nil
 }
 
-func (m *Database) WriteFile(user model.User, fileID string, content string) (model.File, error) {
+func (m *Database) WriteFile(user graph.User, fileID string, content string) (graph.File, error) {
 	// get file
 	file, err := m.getFileByID(fileID)
 	if errors.Is(err, graph.ErrNotFound) {
-		return model.File{}, graph.ErrNotFound
+		return graph.File{}, graph.ErrNotFound
 	} else if err != nil {
-		return model.File{}, fmt.Errorf("failed to get file %s: %w", fileID, err)
+		return graph.File{}, fmt.Errorf("failed to get file %s: %w", fileID, err)
 	}
 
 	// verify user has write access to file
-	if hasAccess, err := m.has(user, model.AccessTypeWrite, file); err != nil {
-		return model.File{}, fmt.Errorf("failed to check user %s has %s access on file %s: %w", user.ID, model.AccessTypeWrite, file.ID, err)
+	if hasAccess, err := m.has(user, graph.AccessTypeWrite, file); err != nil {
+		return graph.File{}, fmt.Errorf("failed to check user %s has %s access on file %s: %w", user.ID, graph.AccessTypeWrite, file.ID, err)
 	} else if !hasAccess {
-		return model.File{}, graph.ErrUnauthorized
+		return graph.File{}, graph.ErrUnauthorized
 	}
 
 	// write file's content
@@ -71,7 +70,7 @@ func (m *Database) WriteFile(user model.User, fileID string, content string) (mo
 	return *file, nil
 }
 
-func (m *Database) getFileByID(id string) (*model.File, error) {
+func (m *Database) getFileByID(id string) (*graph.File, error) {
 	node, err := m.getNodeByID(id)
 	if errors.Is(err, graph.ErrNotFound) {
 		return nil, err
@@ -79,7 +78,7 @@ func (m *Database) getFileByID(id string) (*model.File, error) {
 		return nil, fmt.Errorf("failed to get file %s: %w", id, err)
 	}
 
-	file, ok := node.(*model.File)
+	file, ok := node.(*graph.File)
 	if !ok {
 		return nil, fmt.Errorf("node %s is not a file", id)
 	}
@@ -87,14 +86,14 @@ func (m *Database) getFileByID(id string) (*model.File, error) {
 	return file, nil
 }
 
-func (m *Database) getFileByName(name string) (*model.File, error) {
-	var file *model.File
+func (m *Database) getFileByName(name string) (*graph.File, error) {
+	var file *graph.File
 
 	// get file by name
 	node, err := m.getNodeByName(name)
 
 	if errors.Is(err, graph.ErrNotFound) { // node wasn't found, create file
-		file = &model.File{
+		file = &graph.File{
 			ID:      m.Generate().String(),
 			Name:    name,
 			Owner:   nil,
@@ -111,7 +110,7 @@ func (m *Database) getFileByName(name string) (*model.File, error) {
 	}
 
 	// try casting node to file
-	file, ok := node.(*model.File)
+	file, ok := node.(*graph.File)
 	if !ok {
 		return nil, fmt.Errorf("node named %s is not a file", name)
 	} else if file == nil {
@@ -121,7 +120,7 @@ func (m *Database) getFileByName(name string) (*model.File, error) {
 	return file, nil
 }
 
-func (m *Database) insertFile(file *model.File) (*model.File, error) {
+func (m *Database) insertFile(file *graph.File) (*graph.File, error) {
 	file.Parent.Children = append(file.Parent.Children, file)
 	return file, nil
 }

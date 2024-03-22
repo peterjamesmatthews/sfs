@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"pjm.dev/sfs/graph/model"
+	"pjm.dev/sfs/graph"
 	"pjm.dev/sfs/mem"
 )
 
@@ -15,11 +15,11 @@ func TestFindNicksID(t *testing.T) {
 	for i := 0; i < 100; i++ {
 		uuids = append(uuids, uuid.New())
 	}
-	nick := &model.User{ID: uuids[0].String(), Name: "Nick"}
-	users := []*model.User{nick}
-	root := &model.Folder{}
-	root.Children = []model.Node{
-		&model.File{
+	nick := &graph.User{ID: uuids[0].String(), Name: "Nick"}
+	users := []*graph.User{nick}
+	root := &graph.Folder{}
+	root.Children = []graph.Node{
+		&graph.File{
 			ID:      uuids[1].String(),
 			Name:    "Nick's File",
 			Owner:   nick,
@@ -28,8 +28,8 @@ func TestFindNicksID(t *testing.T) {
 		},
 	}
 
-	access := []*model.Access{
-		{User: nick, Type: model.AccessTypeRead, Target: root},
+	access := []*graph.Access{
+		{User: nick, Type: graph.AccessTypeRead, Target: root},
 	}
 
 	db := mem.Database{

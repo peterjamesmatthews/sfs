@@ -5,14 +5,13 @@ import (
 	"fmt"
 
 	"pjm.dev/sfs/graph"
-	"pjm.dev/sfs/graph/model"
 )
 
-func (m *Database) owns(user model.User, node model.Node) bool {
+func (m *Database) owns(user graph.User, node graph.Node) bool {
 	return user.ID == node.GetOwner().ID
 }
 
-func (m *Database) has(user model.User, accessType model.AccessType, node model.Node) (bool, error) {
+func (m *Database) has(user graph.User, accessType graph.AccessType, node graph.Node) (bool, error) {
 	_, err := m.getAccess(user, accessType, node)
 	if err == nil {
 		return true, nil
@@ -29,7 +28,7 @@ func (m *Database) has(user model.User, accessType model.AccessType, node model.
 	return m.has(user, accessType, node.GetParent())
 }
 
-func (m *Database) getAccess(user model.User, accessType model.AccessType, node model.Node) (*model.Access, error) {
+func (m *Database) getAccess(user graph.User, accessType graph.AccessType, node graph.Node) (*graph.Access, error) {
 	for _, a := range m.Access {
 		if a.User.ID != user.ID {
 			continue

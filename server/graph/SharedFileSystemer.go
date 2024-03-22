@@ -1,9 +1,5 @@
 package graph
 
-import (
-	"pjm.dev/sfs/graph/model"
-)
-
 type SharedFileSystemer interface {
 	// GetNodeByID fetches a node by its id.
 	//
@@ -14,7 +10,7 @@ type SharedFileSystemer interface {
 	// # Errors
 	//  - `ErrNotFound` if the node is not found.
 	//  - `ErrUnauthorized` if `user` does not have read access to the node.
-	GetNodeByID(user model.User, id string) (model.Node, error)
+	GetNodeByID(user User, id string) (Node, error)
 
 	// RenameNode renames a node.
 	//
@@ -26,7 +22,7 @@ type SharedFileSystemer interface {
 	// # Errors
 	//  - `ErrNotFound` if the node is not found.
 	//  - `ErrUnauthorized` if `user` does not have write access to the node.
-	RenameNode(user model.User, id string, name string) (model.Node, error)
+	RenameNode(user User, id string, name string) (Node, error)
 
 	// MoveNode moves a node to a new parent.
 	//
@@ -38,7 +34,7 @@ type SharedFileSystemer interface {
 	// # Errors
 	//  - `ErrNotFound` if the node is not found.
 	//  - `ErrUnauthorized` if the user does not own the node or if the user does not have write access to the destination parent.
-	MoveNode(user model.User, id string, dstID string) (model.Node, error)
+	MoveNode(user User, id string, dstID string) (Node, error)
 
 	// GetRoot fetches the root folder of the shared file system.
 	//
@@ -48,7 +44,7 @@ type SharedFileSystemer interface {
 	// # Errors
 	//  - `ErrNotFound` if the shared file system doesn't have a root.
 	//  - `ErrUnauthorized` if the user does not have read access to the root.
-	GetRoot(user model.User) (model.Folder, error)
+	GetRoot(user User) (Folder, error)
 
 	// InsertFolder inserts a folder into the shared file system.
 	//
@@ -59,7 +55,7 @@ type SharedFileSystemer interface {
 	// # Errors
 	//  - `ErrNotFound` if `folder`'s parent is not found.
 	//  - `ErrUnauthorized` if the user does not write access to `folder`'s parent.
-	InsertFolder(user model.User, folder model.Folder) (model.Folder, error)
+	InsertFolder(user User, folder Folder) (Folder, error)
 
 	// GetFolderbyID fetches a folder by its id.
 	//
@@ -70,7 +66,7 @@ type SharedFileSystemer interface {
 	// # Errors
 	//  - `ErrNotFound` if `folder`'s parent is not found.
 	//  - `ErrUnauthorized` if the user does not have read access to the folder.
-	GetFolderByID(user model.User, id string) (model.Folder, error)
+	GetFolderByID(user User, id string) (Folder, error)
 
 	// InsertFile inserts a file into the shared file system.
 	//
@@ -81,7 +77,7 @@ type SharedFileSystemer interface {
 	// # Errors
 	//  - `ErrNotFound` if `file`'s parent is not found.
 	//  - `ErrUnauthorized` if `user` does not have write access to `file`'s parent
-	InsertFile(user model.User, file model.File) (model.File, error)
+	InsertFile(user User, file File) (File, error)
 
 	// GetFileByID fetches a file by its id.
 	//
@@ -92,7 +88,7 @@ type SharedFileSystemer interface {
 	// # Errors
 	// - `ErrNotFound` if `file`'s parent is not found.
 	// - `ErrUnauthorized` if `user` does not have read access to the file
-	GetFileByID(user model.User, id string) (model.File, error)
+	GetFileByID(user User, id string) (File, error)
 
 	// WriteFile writes content to a file.
 	//
@@ -104,5 +100,5 @@ type SharedFileSystemer interface {
 	// # Errors
 	// - `ErrNotFound` if `file`'s parent is not found.
 	// - `ErrUnauthorized` if `user` does not have write access to the file
-	WriteFile(user model.User, fileID string, content string) (model.File, error)
+	WriteFile(user User, fileID string, content string) (File, error)
 }

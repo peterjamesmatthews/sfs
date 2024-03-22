@@ -8,12 +8,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
-	"pjm.dev/sfs/graph/model"
 )
 
 // RenameNode is the resolver for the renameNode field.
-func (r *mutationResolver) RenameNode(ctx context.Context, id string, name string) (model.Node, error) {
+func (r *mutationResolver) RenameNode(ctx context.Context, id string, name string) (Node, error) {
 	user, err := handleGettingUserFromContext(ctx, r.AuthN)
 	if err != nil {
 		return nil, err
@@ -28,7 +26,7 @@ func (r *mutationResolver) RenameNode(ctx context.Context, id string, name strin
 }
 
 // MoveNode is the resolver for the moveNode field.
-func (r *mutationResolver) MoveNode(ctx context.Context, id string, parentID *string) (model.Node, error) {
+func (r *mutationResolver) MoveNode(ctx context.Context, id string, parentID *string) (Node, error) {
 	user, err := handleGettingUserFromContext(ctx, r.AuthN)
 	if err != nil {
 		return nil, err
@@ -51,24 +49,24 @@ func (r *mutationResolver) MoveNode(ctx context.Context, id string, parentID *st
 }
 
 // ShareNode is the resolver for the shareNode field.
-func (r *mutationResolver) ShareNode(ctx context.Context, userID string, accessType model.AccessType, targetID string) (*model.Access, error) {
+func (r *mutationResolver) ShareNode(ctx context.Context, userID string, accessType AccessType, targetID string) (*Access, error) {
 	panic(fmt.Errorf("not implemented: ShareNode - shareNode"))
 }
 
 // CreateFolder is the resolver for the createFolder field.
-func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, name string) (*model.Folder, error) {
+func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, name string) (*Folder, error) {
 	// TODO implement me
 	return nil, errors.ErrUnsupported
 }
 
 // CreateFile is the resolver for the createFile field.
-func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, name string, content *string) (*model.File, error) {
+func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, name string, content *string) (*File, error) {
 	user, err := handleGettingUserFromContext(ctx, r.AuthN)
 	if err != nil {
 		return nil, err
 	}
 
-	var parent model.Folder
+	var parent Folder
 	if parentID != nil {
 		parent, err = r.SFS.GetFolderByID(user, *parentID)
 		if err != nil {
@@ -85,7 +83,7 @@ func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, nam
 		content = new(string)
 	}
 
-	file := model.File{
+	file := File{
 		ID:      r.UUIDGen.Generate().String(),
 		Name:    name,
 		Owner:   &user,
@@ -102,7 +100,7 @@ func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, nam
 }
 
 // WriteFile is the resolver for the writeFile field.
-func (r *mutationResolver) WriteFile(ctx context.Context, id string, content string) (*model.File, error) {
+func (r *mutationResolver) WriteFile(ctx context.Context, id string, content string) (*File, error) {
 	user, err := handleGettingUserFromContext(ctx, r.AuthN)
 	if err != nil {
 		return nil, err
@@ -117,7 +115,7 @@ func (r *mutationResolver) WriteFile(ctx context.Context, id string, content str
 }
 
 // Node is the resolver for the node field.
-func (r *queryResolver) Node(ctx context.Context, id *string) (model.Node, error) {
+func (r *queryResolver) Node(ctx context.Context, id *string) (Node, error) {
 	user, err := handleGettingUserFromContext(ctx, r.AuthN)
 	if err != nil {
 		return nil, err
@@ -145,7 +143,5 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
-type (
-	mutationResolver struct{ *Resolver }
-	queryResolver    struct{ *Resolver }
-)
+type mutationResolver struct{ *Resolver }
+type queryResolver struct{ *Resolver }

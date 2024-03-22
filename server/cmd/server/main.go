@@ -8,7 +8,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/google/uuid"
 	"pjm.dev/sfs/graph"
-	"pjm.dev/sfs/graph/model"
 	"pjm.dev/sfs/mem"
 )
 
@@ -33,26 +32,26 @@ func main() {
 }
 
 func newSeededDatabase() mem.Database {
-	matthew := &model.User{ID: uuid.NewString(), Name: "Matthew"}
-	nick := &model.User{ID: uuid.NewString(), Name: "Nick"}
-	users := []*model.User{matthew, nick}
+	matthew := &graph.User{ID: uuid.NewString(), Name: "Matthew"}
+	nick := &graph.User{ID: uuid.NewString(), Name: "Nick"}
+	users := []*graph.User{matthew, nick}
 
-	root := &model.Folder{}
-	root.Children = []model.Node{
-		&model.Folder{
+	root := &graph.Folder{}
+	root.Children = []graph.Node{
+		&graph.Folder{
 			ID:     uuid.NewString(),
 			Name:   "Empty Folder",
 			Owner:  matthew,
 			Parent: root,
 		},
-		&model.File{
+		&graph.File{
 			ID:      uuid.NewString(),
 			Name:    "Greeting",
 			Owner:   matthew,
 			Parent:  root,
 			Content: "Hello World!",
 		},
-		&model.File{
+		&graph.File{
 			ID:      uuid.NewString(),
 			Name:    "Passwords",
 			Owner:   nick,
@@ -61,9 +60,9 @@ func newSeededDatabase() mem.Database {
 		},
 	}
 
-	access := []*model.Access{
-		{User: matthew, Type: model.AccessTypeRead, Target: root},
-		{User: nick, Type: model.AccessTypeRead, Target: root},
+	access := []*graph.Access{
+		{User: matthew, Type: graph.AccessTypeRead, Target: root},
+		{User: nick, Type: graph.AccessTypeRead, Target: root},
 	}
 
 	return mem.Database{Root: root, Users: users, Access: access}

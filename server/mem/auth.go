@@ -7,14 +7,13 @@ import (
 	"net/http"
 
 	"pjm.dev/sfs/graph"
-	"pjm.dev/sfs/graph/model"
 )
 
-func (m *Database) Authenticate(r *http.Request) (model.User, error) {
+func (m *Database) Authenticate(r *http.Request) (graph.User, error) {
 	// get name header from request
 	name := r.Header.Get("Authorization")
 	if name == "" {
-		return model.User{}, graph.ErrUnauthorized
+		return graph.User{}, graph.ErrUnauthorized
 	}
 
 	// find user by name
@@ -25,21 +24,21 @@ func (m *Database) Authenticate(r *http.Request) (model.User, error) {
 	}
 
 	// user not found
-	return model.User{}, graph.ErrNotFound
+	return graph.User{}, graph.ErrNotFound
 }
 
 type userContextKeyType string
 
 const userContextKey userContextKeyType = "user"
 
-func (m *Database) WithUser(ctx context.Context, user model.User) context.Context {
+func (m *Database) WithUser(ctx context.Context, user graph.User) context.Context {
 	return context.WithValue(ctx, userContextKey, user)
 }
 
-func (m *Database) FromContext(ctx context.Context) (model.User, error) {
-	user, ok := ctx.Value(userContextKey).(model.User)
+func (m *Database) FromContext(ctx context.Context) (graph.User, error) {
+	user, ok := ctx.Value(userContextKey).(graph.User)
 	if !ok {
-		return model.User{}, graph.ErrUnauthorized
+		return graph.User{}, graph.ErrUnauthorized
 	}
 
 	return user, nil

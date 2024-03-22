@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"pjm.dev/sfs/graph/model"
+	"pjm.dev/sfs/graph"
 	"pjm.dev/sfs/mem"
 )
 
@@ -28,11 +28,11 @@ func TestCreateFolder(t *testing.T) {
 			name: "empty file system",
 			seed: mem.Database{
 				Root:  &root,
-				Users: []*model.User{&alice},
+				Users: []*graph.User{&alice},
 				UUIDs: uuids,
-				Access: []*model.Access{
-					{User: &alice, Type: model.AccessTypeRead, Target: &root},
-					{User: &alice, Type: model.AccessTypeWrite, Target: &root},
+				Access: []*graph.Access{
+					{User: &alice, Type: graph.AccessTypeRead, Target: &root},
+					{User: &alice, Type: graph.AccessTypeWrite, Target: &root},
 				},
 			},
 			request: newRequest(
@@ -41,18 +41,18 @@ func TestCreateFolder(t *testing.T) {
 				`{"query":"mutation CreateFolder { createFolder(name:\"Foobar\") { id } }","operationName":"CreateFolder"}`,
 			),
 			want: mem.Database{
-				Root: &model.Folder{
+				Root: &graph.Folder{
 					ID: root.ID,
-					Children: []model.Node{&model.Folder{
+					Children: []graph.Node{&graph.Folder{
 						ID:       uuids[0].String(),
 						Name:     "Foobar",
 						Owner:    &alice,
 						Parent:   &root,
-						Children: []model.Node{},
+						Children: []graph.Node{},
 					}},
 				},
-				Users:  []*model.User{&alice},
-				Access: []*model.Access{{&alice, model.AccessTypeWrite, &root}},
+				Users:  []*graph.User{&alice},
+				Access: []*graph.Access{{&alice, graph.AccessTypeWrite, &root}},
 			},
 		},
 	}

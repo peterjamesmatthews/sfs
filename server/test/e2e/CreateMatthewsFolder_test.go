@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"pjm.dev/sfs/graph/model"
+	"pjm.dev/sfs/graph"
 	"pjm.dev/sfs/mem"
 )
 
@@ -16,13 +16,13 @@ func TestCreateMatthewsFolder(t *testing.T) {
 		uuids = append(uuids, uuid.New())
 	}
 
-	matthew := &model.User{ID: uuids[0].String(), Name: "Matthew"}
-	users := []*model.User{matthew}
-	root := &model.Folder{}
-	root.Children = []model.Node{}
-	access := []*model.Access{
-		{User: matthew, Type: model.AccessTypeRead, Target: root},
-		{User: matthew, Type: model.AccessTypeWrite, Target: root},
+	matthew := &graph.User{ID: uuids[0].String(), Name: "Matthew"}
+	users := []*graph.User{matthew}
+	root := &graph.Folder{}
+	root.Children = []graph.Node{}
+	access := []*graph.Access{
+		{User: matthew, Type: graph.AccessTypeRead, Target: root},
+		{User: matthew, Type: graph.AccessTypeWrite, Target: root},
 	}
 
 	db := &mem.Database{

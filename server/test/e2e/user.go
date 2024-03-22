@@ -2,10 +2,10 @@ package e2e
 
 import (
 	"github.com/google/uuid"
-	"pjm.dev/sfs/graph/model"
+	"pjm.dev/sfs/graph"
 )
 
-var alice = model.User{
+var alice = graph.User{
 	ID:   uuid.NewString(),
 	Name: "Alice",
 }

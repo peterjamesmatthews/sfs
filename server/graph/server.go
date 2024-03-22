@@ -16,7 +16,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/introspection"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
-	"pjm.dev/sfs/graph/model"
 )
 
 // region    ************************** generated!.gotpl **************************
@@ -74,7 +73,7 @@ type ComplexityRoot struct {
 		CreateFolder func(childComplexity int, parentID *string, name string) int
 		MoveNode     func(childComplexity int, id string, parentID *string) int
 		RenameNode   func(childComplexity int, id string, name string) int
-		ShareNode    func(childComplexity int, userID string, accessType model.AccessType, targetID string) int
+		ShareNode    func(childComplexity int, userID string, accessType AccessType, targetID string) int
 		WriteFile    func(childComplexity int, id string, content string) int
 	}
 
@@ -89,15 +88,15 @@ type ComplexityRoot struct {
 }
 
 type MutationResolver interface {
-	RenameNode(ctx context.Context, id string, name string) (model.Node, error)
-	MoveNode(ctx context.Context, id string, parentID *string) (model.Node, error)
-	ShareNode(ctx context.Context, userID string, accessType model.AccessType, targetID string) (*model.Access, error)
-	CreateFolder(ctx context.Context, parentID *string, name string) (*model.Folder, error)
-	CreateFile(ctx context.Context, parentID *string, name string, content *string) (*model.File, error)
-	WriteFile(ctx context.Context, id string, content string) (*model.File, error)
+	RenameNode(ctx context.Context, id string, name string) (Node, error)
+	MoveNode(ctx context.Context, id string, parentID *string) (Node, error)
+	ShareNode(ctx context.Context, userID string, accessType AccessType, targetID string) (*Access, error)
+	CreateFolder(ctx context.Context, parentID *string, name string) (*Folder, error)
+	CreateFile(ctx context.Context, parentID *string, name string, content *string) (*File, error)
+	WriteFile(ctx context.Context, id string, content string) (*File, error)
 }
 type QueryResolver interface {
-	Node(ctx context.Context, id *string) (model.Node, error)
+	Node(ctx context.Context, id *string) (Node, error)
 }
 
 type executableSchema struct {
@@ -268,7 +267,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.ShareNode(childComplexity, args["userID"].(string), args["accessType"].(model.AccessType), args["targetID"].(string)), true
+		return e.complexity.Mutation.ShareNode(childComplexity, args["userID"].(string), args["accessType"].(AccessType), args["targetID"].(string)), true
 
 	case "Mutation.writeFile":
 		if e.complexity.Mutation.WriteFile == nil {
@@ -548,10 +547,10 @@ func (ec *executionContext) field_Mutation_shareNode_args(ctx context.Context, r
 		}
 	}
 	args["userID"] = arg0
-	var arg1 model.AccessType
+	var arg1 AccessType
 	if tmp, ok := rawArgs["accessType"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("accessType"))
-		arg1, err = ec.unmarshalNAccessType2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐAccessType(ctx, tmp)
+		arg1, err = ec.unmarshalNAccessType2pjmᚗdevᚋsfsᚋgraphᚐAccessType(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -661,7 +660,7 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Access_user(ctx context.Context, field graphql.CollectedField, obj *model.Access) (ret graphql.Marshaler) {
+func (ec *executionContext) _Access_user(ctx context.Context, field graphql.CollectedField, obj *Access) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Access_user(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -687,9 +686,9 @@ func (ec *executionContext) _Access_user(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖpjmᚗdevᚋsfsᚋgraphᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Access_user(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -711,7 +710,7 @@ func (ec *executionContext) fieldContext_Access_user(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Access_type(ctx context.Context, field graphql.CollectedField, obj *model.Access) (ret graphql.Marshaler) {
+func (ec *executionContext) _Access_type(ctx context.Context, field graphql.CollectedField, obj *Access) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Access_type(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -737,9 +736,9 @@ func (ec *executionContext) _Access_type(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(model.AccessType)
+	res := resTmp.(AccessType)
 	fc.Result = res
-	return ec.marshalNAccessType2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐAccessType(ctx, field.Selections, res)
+	return ec.marshalNAccessType2pjmᚗdevᚋsfsᚋgraphᚐAccessType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Access_type(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -755,7 +754,7 @@ func (ec *executionContext) fieldContext_Access_type(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Access_target(ctx context.Context, field graphql.CollectedField, obj *model.Access) (ret graphql.Marshaler) {
+func (ec *executionContext) _Access_target(ctx context.Context, field graphql.CollectedField, obj *Access) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Access_target(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -781,9 +780,9 @@ func (ec *executionContext) _Access_target(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(model.Node)
+	res := resTmp.(Node)
 	fc.Result = res
-	return ec.marshalNNode2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+	return ec.marshalNNode2pjmᚗdevᚋsfsᚋgraphᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Access_target(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -799,7 +798,7 @@ func (ec *executionContext) fieldContext_Access_target(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _File_id(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+func (ec *executionContext) _File_id(ctx context.Context, field graphql.CollectedField, obj *File) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_File_id(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -843,7 +842,7 @@ func (ec *executionContext) fieldContext_File_id(ctx context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _File_name(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+func (ec *executionContext) _File_name(ctx context.Context, field graphql.CollectedField, obj *File) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_File_name(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -887,7 +886,7 @@ func (ec *executionContext) fieldContext_File_name(ctx context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _File_owner(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+func (ec *executionContext) _File_owner(ctx context.Context, field graphql.CollectedField, obj *File) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_File_owner(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -913,9 +912,9 @@ func (ec *executionContext) _File_owner(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖpjmᚗdevᚋsfsᚋgraphᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_File_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -937,7 +936,7 @@ func (ec *executionContext) fieldContext_File_owner(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _File_parent(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+func (ec *executionContext) _File_parent(ctx context.Context, field graphql.CollectedField, obj *File) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_File_parent(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -960,9 +959,9 @@ func (ec *executionContext) _File_parent(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Folder)
+	res := resTmp.(*Folder)
 	fc.Result = res
-	return ec.marshalOFolder2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐFolder(ctx, field.Selections, res)
+	return ec.marshalOFolder2ᚖpjmᚗdevᚋsfsᚋgraphᚐFolder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_File_parent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -990,7 +989,7 @@ func (ec *executionContext) fieldContext_File_parent(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _File_content(ctx context.Context, field graphql.CollectedField, obj *model.File) (ret graphql.Marshaler) {
+func (ec *executionContext) _File_content(ctx context.Context, field graphql.CollectedField, obj *File) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_File_content(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1034,7 +1033,7 @@ func (ec *executionContext) fieldContext_File_content(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Folder_id(ctx context.Context, field graphql.CollectedField, obj *model.Folder) (ret graphql.Marshaler) {
+func (ec *executionContext) _Folder_id(ctx context.Context, field graphql.CollectedField, obj *Folder) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Folder_id(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1078,7 +1077,7 @@ func (ec *executionContext) fieldContext_Folder_id(ctx context.Context, field gr
 	return fc, nil
 }
 
-func (ec *executionContext) _Folder_name(ctx context.Context, field graphql.CollectedField, obj *model.Folder) (ret graphql.Marshaler) {
+func (ec *executionContext) _Folder_name(ctx context.Context, field graphql.CollectedField, obj *Folder) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Folder_name(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1122,7 +1121,7 @@ func (ec *executionContext) fieldContext_Folder_name(ctx context.Context, field 
 	return fc, nil
 }
 
-func (ec *executionContext) _Folder_owner(ctx context.Context, field graphql.CollectedField, obj *model.Folder) (ret graphql.Marshaler) {
+func (ec *executionContext) _Folder_owner(ctx context.Context, field graphql.CollectedField, obj *Folder) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Folder_owner(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1148,9 +1147,9 @@ func (ec *executionContext) _Folder_owner(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*model.User)
+	res := resTmp.(*User)
 	fc.Result = res
-	return ec.marshalNUser2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐUser(ctx, field.Selections, res)
+	return ec.marshalNUser2ᚖpjmᚗdevᚋsfsᚋgraphᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Folder_owner(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1172,7 +1171,7 @@ func (ec *executionContext) fieldContext_Folder_owner(ctx context.Context, field
 	return fc, nil
 }
 
-func (ec *executionContext) _Folder_parent(ctx context.Context, field graphql.CollectedField, obj *model.Folder) (ret graphql.Marshaler) {
+func (ec *executionContext) _Folder_parent(ctx context.Context, field graphql.CollectedField, obj *Folder) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Folder_parent(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1195,9 +1194,9 @@ func (ec *executionContext) _Folder_parent(ctx context.Context, field graphql.Co
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Folder)
+	res := resTmp.(*Folder)
 	fc.Result = res
-	return ec.marshalOFolder2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐFolder(ctx, field.Selections, res)
+	return ec.marshalOFolder2ᚖpjmᚗdevᚋsfsᚋgraphᚐFolder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Folder_parent(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1225,7 +1224,7 @@ func (ec *executionContext) fieldContext_Folder_parent(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Folder_children(ctx context.Context, field graphql.CollectedField, obj *model.Folder) (ret graphql.Marshaler) {
+func (ec *executionContext) _Folder_children(ctx context.Context, field graphql.CollectedField, obj *Folder) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Folder_children(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1251,9 +1250,9 @@ func (ec *executionContext) _Folder_children(ctx context.Context, field graphql.
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]model.Node)
+	res := resTmp.([]Node)
 	fc.Result = res
-	return ec.marshalNNode2ᚕpjmᚗdevᚋsfsᚋgraphᚋmodelᚐNodeᚄ(ctx, field.Selections, res)
+	return ec.marshalNNode2ᚕpjmᚗdevᚋsfsᚋgraphᚐNodeᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Folder_children(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1292,9 +1291,9 @@ func (ec *executionContext) _Mutation_renameNode(ctx context.Context, field grap
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(model.Node)
+	res := resTmp.(Node)
 	fc.Result = res
-	return ec.marshalONode2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+	return ec.marshalONode2pjmᚗdevᚋsfsᚋgraphᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_renameNode(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1344,9 +1343,9 @@ func (ec *executionContext) _Mutation_moveNode(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(model.Node)
+	res := resTmp.(Node)
 	fc.Result = res
-	return ec.marshalONode2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+	return ec.marshalONode2pjmᚗdevᚋsfsᚋgraphᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_moveNode(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1387,7 +1386,7 @@ func (ec *executionContext) _Mutation_shareNode(ctx context.Context, field graph
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ShareNode(rctx, fc.Args["userID"].(string), fc.Args["accessType"].(model.AccessType), fc.Args["targetID"].(string))
+		return ec.resolvers.Mutation().ShareNode(rctx, fc.Args["userID"].(string), fc.Args["accessType"].(AccessType), fc.Args["targetID"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1396,9 +1395,9 @@ func (ec *executionContext) _Mutation_shareNode(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Access)
+	res := resTmp.(*Access)
 	fc.Result = res
-	return ec.marshalOAccess2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐAccess(ctx, field.Selections, res)
+	return ec.marshalOAccess2ᚖpjmᚗdevᚋsfsᚋgraphᚐAccess(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_shareNode(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1456,9 +1455,9 @@ func (ec *executionContext) _Mutation_createFolder(ctx context.Context, field gr
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.Folder)
+	res := resTmp.(*Folder)
 	fc.Result = res
-	return ec.marshalOFolder2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐFolder(ctx, field.Selections, res)
+	return ec.marshalOFolder2ᚖpjmᚗdevᚋsfsᚋgraphᚐFolder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createFolder(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1520,9 +1519,9 @@ func (ec *executionContext) _Mutation_createFile(ctx context.Context, field grap
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.File)
+	res := resTmp.(*File)
 	fc.Result = res
-	return ec.marshalOFile2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐFile(ctx, field.Selections, res)
+	return ec.marshalOFile2ᚖpjmᚗdevᚋsfsᚋgraphᚐFile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_createFile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1584,9 +1583,9 @@ func (ec *executionContext) _Mutation_writeFile(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*model.File)
+	res := resTmp.(*File)
 	fc.Result = res
-	return ec.marshalOFile2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐFile(ctx, field.Selections, res)
+	return ec.marshalOFile2ᚖpjmᚗdevᚋsfsᚋgraphᚐFile(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Mutation_writeFile(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1648,9 +1647,9 @@ func (ec *executionContext) _Query_node(ctx context.Context, field graphql.Colle
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(model.Node)
+	res := resTmp.(Node)
 	fc.Result = res
-	return ec.marshalONode2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐNode(ctx, field.Selections, res)
+	return ec.marshalONode2pjmᚗdevᚋsfsᚋgraphᚐNode(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1806,7 +1805,7 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_id(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -1850,7 +1849,7 @@ func (ec *executionContext) fieldContext_User_id(ctx context.Context, field grap
 	return fc, nil
 }
 
-func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_name(ctx context.Context, field graphql.CollectedField, obj *User) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_User_name(ctx, field)
 	if err != nil {
 		return graphql.Null
@@ -3671,20 +3670,20 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    ************************** interface.gotpl ***************************
 
-func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj model.Node) graphql.Marshaler {
+func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj Node) graphql.Marshaler {
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case model.Folder:
+	case Folder:
 		return ec._Folder(ctx, sel, &obj)
-	case *model.Folder:
+	case *Folder:
 		if obj == nil {
 			return graphql.Null
 		}
 		return ec._Folder(ctx, sel, obj)
-	case model.File:
+	case File:
 		return ec._File(ctx, sel, &obj)
-	case *model.File:
+	case *File:
 		if obj == nil {
 			return graphql.Null
 		}
@@ -3700,7 +3699,7 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 
 var accessImplementors = []string{"Access"}
 
-func (ec *executionContext) _Access(ctx context.Context, sel ast.SelectionSet, obj *model.Access) graphql.Marshaler {
+func (ec *executionContext) _Access(ctx context.Context, sel ast.SelectionSet, obj *Access) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, accessImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -3749,7 +3748,7 @@ func (ec *executionContext) _Access(ctx context.Context, sel ast.SelectionSet, o
 
 var fileImplementors = []string{"File", "Node"}
 
-func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj *model.File) graphql.Marshaler {
+func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj *File) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, fileImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -3805,7 +3804,7 @@ func (ec *executionContext) _File(ctx context.Context, sel ast.SelectionSet, obj
 
 var folderImplementors = []string{"Folder", "Node"}
 
-func (ec *executionContext) _Folder(ctx context.Context, sel ast.SelectionSet, obj *model.Folder) graphql.Marshaler {
+func (ec *executionContext) _Folder(ctx context.Context, sel ast.SelectionSet, obj *Folder) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, folderImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -3996,7 +3995,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 
 var userImplementors = []string{"User"}
 
-func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *model.User) graphql.Marshaler {
+func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj *User) graphql.Marshaler {
 	fields := graphql.CollectFields(ec.OperationContext, sel, userImplementors)
 
 	out := graphql.NewFieldSet(fields)
@@ -4364,13 +4363,13 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) unmarshalNAccessType2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐAccessType(ctx context.Context, v interface{}) (model.AccessType, error) {
-	var res model.AccessType
+func (ec *executionContext) unmarshalNAccessType2pjmᚗdevᚋsfsᚋgraphᚐAccessType(ctx context.Context, v interface{}) (AccessType, error) {
+	var res AccessType
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNAccessType2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐAccessType(ctx context.Context, sel ast.SelectionSet, v model.AccessType) graphql.Marshaler {
+func (ec *executionContext) marshalNAccessType2pjmᚗdevᚋsfsᚋgraphᚐAccessType(ctx context.Context, sel ast.SelectionSet, v AccessType) graphql.Marshaler {
 	return v
 }
 
@@ -4404,7 +4403,7 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
-func (ec *executionContext) marshalNNode2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐNode(ctx context.Context, sel ast.SelectionSet, v model.Node) graphql.Marshaler {
+func (ec *executionContext) marshalNNode2pjmᚗdevᚋsfsᚋgraphᚐNode(ctx context.Context, sel ast.SelectionSet, v Node) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -4414,7 +4413,7 @@ func (ec *executionContext) marshalNNode2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐNode(
 	return ec._Node(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNNode2ᚕpjmᚗdevᚋsfsᚋgraphᚋmodelᚐNodeᚄ(ctx context.Context, sel ast.SelectionSet, v []model.Node) graphql.Marshaler {
+func (ec *executionContext) marshalNNode2ᚕpjmᚗdevᚋsfsᚋgraphᚐNodeᚄ(ctx context.Context, sel ast.SelectionSet, v []Node) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -4438,7 +4437,7 @@ func (ec *executionContext) marshalNNode2ᚕpjmᚗdevᚋsfsᚋgraphᚋmodelᚐNo
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNNode2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐNode(ctx, sel, v[i])
+			ret[i] = ec.marshalNNode2pjmᚗdevᚋsfsᚋgraphᚐNode(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -4473,7 +4472,7 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNUser2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖpjmᚗdevᚋsfsᚋgraphᚐUser(ctx context.Context, sel ast.SelectionSet, v *User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -4736,7 +4735,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) marshalOAccess2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐAccess(ctx context.Context, sel ast.SelectionSet, v *model.Access) graphql.Marshaler {
+func (ec *executionContext) marshalOAccess2ᚖpjmᚗdevᚋsfsᚋgraphᚐAccess(ctx context.Context, sel ast.SelectionSet, v *Access) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4769,14 +4768,14 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) marshalOFile2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐFile(ctx context.Context, sel ast.SelectionSet, v *model.File) graphql.Marshaler {
+func (ec *executionContext) marshalOFile2ᚖpjmᚗdevᚋsfsᚋgraphᚐFile(ctx context.Context, sel ast.SelectionSet, v *File) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._File(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOFolder2ᚖpjmᚗdevᚋsfsᚋgraphᚋmodelᚐFolder(ctx context.Context, sel ast.SelectionSet, v *model.Folder) graphql.Marshaler {
+func (ec *executionContext) marshalOFolder2ᚖpjmᚗdevᚋsfsᚋgraphᚐFolder(ctx context.Context, sel ast.SelectionSet, v *Folder) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -4799,7 +4798,7 @@ func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalONode2pjmᚗdevᚋsfsᚋgraphᚋmodelᚐNode(ctx context.Context, sel ast.SelectionSet, v model.Node) graphql.Marshaler {
+func (ec *executionContext) marshalONode2pjmᚗdevᚋsfsᚋgraphᚐNode(ctx context.Context, sel ast.SelectionSet, v Node) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

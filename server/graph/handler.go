@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
-	"pjm.dev/sfs/graph/model"
 )
 
 func GetGQLHandler(authN Authenticator, sfs SharedFileSystemer, uuidGen UUIDGenerator) http.Handler {
@@ -30,12 +29,12 @@ func GetGQLHandler(authN Authenticator, sfs SharedFileSystemer, uuidGen UUIDGene
 	return gqlHandler
 }
 
-func handleGettingUserFromContext(ctx context.Context, authN Authenticator) (model.User, error) {
+func handleGettingUserFromContext(ctx context.Context, authN Authenticator) (User, error) {
 	user, err := authN.FromContext(ctx)
 	if errors.Is(err, ErrUnauthorized) {
-		return model.User{}, err
+		return User{}, err
 	} else if err != nil {
-		return model.User{}, fmt.Errorf("failed to get authenticated user: %w", err)
+		return User{}, fmt.Errorf("failed to get authenticated user: %w", err)
 	}
 	return user, nil
 }

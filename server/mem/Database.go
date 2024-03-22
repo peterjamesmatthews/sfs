@@ -2,12 +2,12 @@ package mem
 
 import (
 	"github.com/google/uuid"
-	"pjm.dev/sfs/graph/model"
+	"pjm.dev/sfs/graph"
 )
 
 type Database struct {
-	Root   *model.Folder
-	Users  []*model.User
+	Root   *graph.Folder
+	Users  []*graph.User
 	UUIDs  []uuid.UUID
-	Access []*model.Access
+	Access []*graph.Access
 }

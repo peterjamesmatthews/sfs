@@ -3,8 +3,6 @@ package graph
 import (
 	"context"
 	"net/http"
-
-	"pjm.dev/sfs/graph/model"
 )
 
 type Authenticator interface {
@@ -18,7 +16,7 @@ type Authenticator interface {
 	//
 	// # Errors
 	//  - `ErrUnauthorized` if an authenticated user cannot be determined.
-	Authenticate(*http.Request) (model.User, error)
+	Authenticate(*http.Request) (User, error)
 
 	// WithUser wraps a user in a context.
 	//
@@ -28,7 +26,7 @@ type Authenticator interface {
 	//
 	// # Returns
 	//  - A new context with the user wrapped in it.
-	WithUser(context.Context, model.User) context.Context
+	WithUser(context.Context, User) context.Context
 
 	// FromContext extracts a user from a context.
 	//
@@ -40,7 +38,7 @@ type Authenticator interface {
 	//
 	// # Errors
 	//  - `ErrUnauthorized` if the user is not found in the context.
-	FromContext(context.Context) (model.User, error)
+	FromContext(context.Context) (User, error)
 
 	// WrapInAuthentication wraps a handler in an authentication layer.
 	//

@@ -2,7 +2,7 @@ package e2e
 
 import (
 	"github.com/google/uuid"
-	"pjm.dev/sfs/graph/model"
+	"pjm.dev/sfs/graph"
 )
 
-var root = model.Folder{ID: uuid.NewString()}
+var root = graph.Folder{ID: uuid.NewString()}
