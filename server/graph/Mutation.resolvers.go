@@ -114,34 +114,7 @@ func (r *mutationResolver) WriteFile(ctx context.Context, id string, content str
 	return &file, nil
 }
 
-// Node is the resolver for the node field.
-func (r *queryResolver) Node(ctx context.Context, id *string) (Node, error) {
-	user, err := handleGettingUserFromContext(ctx, r.AuthN)
-	if err != nil {
-		return nil, err
-	}
-
-	if id == nil {
-		root, err := r.SFS.GetRoot(user)
-		if err != nil {
-			return nil, errors.New("failed to get root")
-		}
-		return root, nil
-	}
-
-	node, err := r.SFS.GetNodeByID(user, *id)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get node %s: %w", *id, err)
-	}
-
-	return node, nil
-}
-
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
-// Query returns QueryResolver implementation.
-func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
-
 type mutationResolver struct{ *Resolver }
-type queryResolver struct{ *Resolver }

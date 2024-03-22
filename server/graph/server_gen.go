@@ -410,7 +410,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema.graphqls"
+//go:embed "schema/Access.gql" "schema/File.gql" "schema/Folder.gql" "schema/Mutation.gql" "schema/Node.gql" "schema/Query.gql" "schema/User.gql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -422,7 +422,13 @@ func sourceData(filename string) string {
 }
 
 var sources = []*ast.Source{
-	{Name: "schema.graphqls", Input: sourceData("schema.graphqls"), BuiltIn: false},
+	{Name: "schema/Access.gql", Input: sourceData("schema/Access.gql"), BuiltIn: false},
+	{Name: "schema/File.gql", Input: sourceData("schema/File.gql"), BuiltIn: false},
+	{Name: "schema/Folder.gql", Input: sourceData("schema/Folder.gql"), BuiltIn: false},
+	{Name: "schema/Mutation.gql", Input: sourceData("schema/Mutation.gql"), BuiltIn: false},
+	{Name: "schema/Node.gql", Input: sourceData("schema/Node.gql"), BuiltIn: false},
+	{Name: "schema/Query.gql", Input: sourceData("schema/Query.gql"), BuiltIn: false},
+	{Name: "schema/User.gql", Input: sourceData("schema/User.gql"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -3674,13 +3680,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case Folder:
-		return ec._Folder(ctx, sel, &obj)
-	case *Folder:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._Folder(ctx, sel, obj)
 	case File:
 		return ec._File(ctx, sel, &obj)
 	case *File:
@@ -3688,6 +3687,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._File(ctx, sel, obj)
+	case Folder:
+		return ec._Folder(ctx, sel, &obj)
+	case *Folder:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Folder(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}

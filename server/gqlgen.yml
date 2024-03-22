@@ -1,10 +1,10 @@
 # Where are all the schema files located? globs are supported eg  src/**/*.graphqls
 schema:
-  - graph/*.graphqls
+  - graph/schema/*.gql
 
 # Where should the generated server code go?
 exec:
-  filename: graph/server.go
+  filename: graph/server_gen.go
   package: graph
 
 # Uncomment to enable federation
