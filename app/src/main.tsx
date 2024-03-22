@@ -7,7 +7,7 @@ const root = document.getElementById("root");
 if (root == null) throw new Error("no root");
 
 ReactDOM.createRoot(root).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+	<React.StrictMode>
+		<App />
+	</React.StrictMode>,
 );
