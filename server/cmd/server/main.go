@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/google/uuid"
 	"pjm.dev/sfs/graph"
 	"pjm.dev/sfs/graph/model"
@@ -21,6 +22,7 @@ func main() {
 
 	db := newSeededDatabase()
 	http.Handle("/graphql", graph.GetGQLHandler(&db, &db, &db))
+	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
 
 	log.Printf("serving http://localhost:%s/graphql", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
