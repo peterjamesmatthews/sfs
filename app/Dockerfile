@@ -15,8 +15,5 @@ COPY package*.json ./
 # install dependencies
 RUN npm install
 
-# copy source code
-COPY . .
-
 # start app
 CMD npm run dev

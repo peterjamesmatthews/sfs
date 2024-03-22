@@ -15,8 +15,5 @@ COPY go.mod go.sum ./
 # install dependencies
 RUN go mod download
 
-# copy source code
-COPY . .
-
 # start server
 CMD go run ./cmd/server
