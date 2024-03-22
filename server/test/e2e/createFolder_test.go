@@ -43,16 +43,20 @@ func TestCreateFolder(t *testing.T) {
 			want: mem.Database{
 				Root: &graph.Folder{
 					ID: root.ID,
-					Children: []graph.Node{&graph.Folder{
-						ID:       uuids[0].String(),
-						Name:     "Foobar",
-						Owner:    &alice,
-						Parent:   &root,
-						Children: []graph.Node{},
-					}},
+					Children: []graph.Node{
+						&graph.Folder{
+							ID:     uuids[0].String(),
+							Name:   "Foobar",
+							Owner:  &alice,
+							Parent: &root,
+						},
+					},
 				},
-				Users:  []*graph.User{&alice},
-				Access: []*graph.Access{{&alice, graph.AccessTypeWrite, &root}},
+				Users: []*graph.User{&alice},
+				Access: []*graph.Access{
+					{User: &alice, Type: graph.AccessTypeRead, Target: &root},
+					{User: &alice, Type: graph.AccessTypeWrite, Target: &root},
+				},
 			},
 		},
 	}
