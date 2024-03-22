@@ -6,7 +6,6 @@ package graph
 
 import (
 	"context"
-	"errors"
 	"fmt"
 )
 
@@ -55,8 +54,32 @@ func (r *mutationResolver) ShareNode(ctx context.Context, userID string, accessT
 
 // CreateFolder is the resolver for the createFolder field.
 func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, name string) (*Folder, error) {
-	// TODO implement me
-	return nil, errors.ErrUnsupported
+	user, err := handleGettingUserFromContext(ctx, r.AuthN)
+	if err != nil {
+		return nil, err
+	}
+
+	var parent Folder
+	if parentID == nil {
+		parent, err = r.SFS.GetRoot(user)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get root: %w", err)
+		}
+	}
+
+	folder := Folder{
+		ID:     r.UUIDGen.Generate().String(),
+		Name:   name,
+		Owner:  &user,
+		Parent: &parent,
+	}
+
+	folder, err = r.SFS.InsertFolder(user, folder)
+	if err != nil {
+		return nil, fmt.Errorf("failed to insert folder: %w", err)
+	}
+
+	return &folder, nil
 }
 
 // CreateFile is the resolver for the createFile field.
