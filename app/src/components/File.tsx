@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { gql } from "../gql";
+import Typography from "@mui/material/Typography";
 
 const GET_FILE_BY_ID = gql(`
 query GetFileByID($id: ID!) {
@@ -30,5 +31,5 @@ export default function File({ id }: FileProps) {
 	if (!data?.getFileById) return <>File {id} not found</>;
 
 	const file = data.getFileById;
-	return <>{file.name}</>;
+	return <Typography>{file.name}</Typography>;
 }

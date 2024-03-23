@@ -2,6 +2,9 @@ import { useQuery } from "@apollo/client";
 import { gql } from "../gql/gql";
 import File from "./File";
 import Folder from "./Folder";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListSubheader from "@mui/material/ListSubheader";
 
 const GET_ROOT = gql(`
 query GetRoot {
@@ -23,17 +26,17 @@ export default function Root() {
 	const children = data.getRoot.children;
 	return (
 		<>
-			<ul>
+			<List subheader={<ListSubheader>/</ListSubheader>}>
 				{children.map((child) => (
-					<li key={child.id}>
+					<ListItem key={child.id}>
 						{child.__typename === "Folder" ? (
 							<Folder id={child.id} />
 						) : (
 							<File id={child.id} />
 						)}
-					</li>
+					</ListItem>
 				))}
-			</ul>
+			</List>
 		</>
 	);
 }

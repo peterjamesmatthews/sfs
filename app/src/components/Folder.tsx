@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { gql } from "../gql";
+import Typography from "@mui/material/Typography";
 
 const GET_FOLDER = gql(`
 query GetFolderByID($id: ID!) {
@@ -33,5 +34,5 @@ export default function Folder({ id }: FolderProps) {
 	if (!data?.getFolderById) return <>Folder {id} not found</>;
 
 	const folder = data.getFolderById;
-	return <>{folder.name}</>;
+	return <Typography>{folder.name}</Typography>;
 }
