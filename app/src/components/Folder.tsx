@@ -1,26 +1,13 @@
 import { useQuery } from "@apollo/client";
-import { gql } from "../gql";
 import Typography from "@mui/material/Typography";
-
-const GET_FOLDER = gql(`
-query GetFolderByID($id: ID!) {
-  getFolderById(id: $id) {
-    ... on Folder {
-      name
-      owner { id }
-      parent { id }
-      children { id }
-    }
-  }
-}
-`);
+import GetFolderById from "../graphql/query/GetFolderById";
 
 type FolderProps = {
 	id: string;
 };
 
 export default function Folder({ id }: FolderProps) {
-	const { loading, error, data } = useQuery(GET_FOLDER, {
+	const { loading, error, data } = useQuery(GetFolderById, {
 		variables: { id },
 	});
 

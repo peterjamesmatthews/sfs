@@ -1,23 +1,13 @@
 import { useQuery } from "@apollo/client";
-import { gql } from "../gql";
 import Typography from "@mui/material/Typography";
-
-const GET_FILE_BY_ID = gql(`
-query GetFileByID($id: ID!) {
-  getFileById(id: $id) {
-    name
-    owner { id }
-    parent { id }
-  }
-}
-`);
+import GetFileById from "../graphql/query/GetFileById";
 
 type FileProps = {
 	id: string;
 };
 
 export default function File({ id }: FileProps) {
-	const { loading, error, data } = useQuery(GET_FILE_BY_ID, {
+	const { loading, error, data } = useQuery(GetFileById, {
 		variables: { id },
 	});
 

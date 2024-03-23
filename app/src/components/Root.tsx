@@ -1,23 +1,13 @@
 import { useQuery } from "@apollo/client";
-import { gql } from "../gql/gql";
 import File from "./File";
 import Folder from "./Folder";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListSubheader from "@mui/material/ListSubheader";
-
-const GET_ROOT = gql(`
-query GetRoot {
-  getRoot {
-    children {
-      id
-    }
-  }
-}
-`);
+import GetRoot from "../graphql/query/GetRoot";
 
 export default function Root() {
-	const { loading, error, data } = useQuery(GET_ROOT);
+	const { loading, error, data } = useQuery(GetRoot);
 
 	if (loading) return <>Loading root...</>;
 	if (error) return <>Error getting root: {error.message}</>;
