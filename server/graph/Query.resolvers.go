@@ -6,31 +6,67 @@ package graph
 
 import (
 	"context"
-	"errors"
 	"fmt"
 )
 
-// Node is the resolver for the node field.
-func (r *queryResolver) Node(ctx context.Context, id *string) (Node, error) {
+// GetRoot is the resolver for the getRoot field.
+func (r *queryResolver) GetRoot(ctx context.Context) (*Folder, error) {
 	user, err := handleGettingUserFromContext(ctx, r.AuthN)
 	if err != nil {
 		return nil, err
 	}
 
-	if id == nil {
-		root, err := r.SFS.GetRoot(user)
-		if err != nil {
-			return nil, errors.New("failed to get root")
-		}
-		return root, nil
+	root, err := r.SFS.GetRoot(user)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get root: %w", err)
 	}
 
-	node, err := r.SFS.GetNodeByID(user, *id)
+	return &root, nil
+}
+
+// GetNodeByID is the resolver for the getNodeById field.
+func (r *queryResolver) GetNodeByID(ctx context.Context, id string) (Node, error) {
+	user, err := handleGettingUserFromContext(ctx, r.AuthN)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get node %s: %w", *id, err)
+		return nil, err
+	}
+
+	node, err := r.SFS.GetNodeByID(user, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get node by id: %w", err)
 	}
 
 	return node, nil
+}
+
+// GetFileByID is the resolver for the getFileById field.
+func (r *queryResolver) GetFileByID(ctx context.Context, id string) (*File, error) {
+	user, err := handleGettingUserFromContext(ctx, r.AuthN)
+	if err != nil {
+		return nil, err
+	}
+
+	file, err := r.SFS.GetFileByID(user, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get file by id: %w", err)
+	}
+
+	return &file, nil
+}
+
+// GetFolderByID is the resolver for the getFolderById field.
+func (r *queryResolver) GetFolderByID(ctx context.Context, id string) (*Folder, error) {
+	user, err := handleGettingUserFromContext(ctx, r.AuthN)
+	if err != nil {
+		return nil, err
+	}
+
+	folder, err := r.SFS.GetFolderByID(user, id)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get folder by id: %w", err)
+	}
+
+	return &folder, nil
 }
 
 // Query returns QueryResolver implementation.

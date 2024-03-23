@@ -2,8 +2,8 @@ import { useQuery } from "@apollo/client";
 import { gql } from "../gql";
 
 const GET_FOLDER = gql(`
-query FolderByID($id: ID) {
-  node(id: $id) {
+query GetFolderByID($id: ID!) {
+  getFolderById(id: $id) {
     ... on Folder {
       name
       owner { id }
@@ -27,12 +27,11 @@ export default function Folder({ id }: FolderProps) {
 	if (error)
 		return (
 			<>
-				Error folder {id}: {error.message}
+				Error getting folder {id}: {error.message}
 			</>
 		);
-	if (data === undefined || !data.node) return <>Folder {id} not found</>;
-	if (data.node.__typename !== "Folder") return <>Node {id} is not a folder</>;
+	if (!data?.getFolderById) return <>Folder {id} not found</>;
 
-	const folder = data.node;
+	const folder = data.getFolderById;
 	return <>{folder.name}</>;
 }

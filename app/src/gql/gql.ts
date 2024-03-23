@@ -13,9 +13,9 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\nquery FileByID($id: ID) {\n  node(id: $id) {\n    ... on File {\n      name\n      owner { id }\n      parent { id }\n      content\n    }\n  }\n}\n": types.FileByIdDocument,
-    "\nquery FolderByID($id: ID) {\n  node(id: $id) {\n    ... on Folder {\n      name\n      owner { id }\n      parent { id }\n      children { id }\n    }\n  }\n}\n": types.FolderByIdDocument,
-    "\nquery Node {\n  node {\n    ... on Folder {\n      children {\n        id\n      }\n    }\n  }\n}\n": types.NodeDocument,
+    "\nquery GetFileByID($id: ID!) {\n  getFileById(id: $id) {\n    name\n    owner { id }\n    parent { id }\n  }\n}\n": types.GetFileByIdDocument,
+    "\nquery GetFolderByID($id: ID!) {\n  getFolderById(id: $id) {\n    ... on Folder {\n      name\n      owner { id }\n      parent { id }\n      children { id }\n    }\n  }\n}\n": types.GetFolderByIdDocument,
+    "\nquery GetRoot {\n  getRoot {\n    children {\n      id\n    }\n  }\n}\n": types.GetRootDocument,
 };
 
 /**
@@ -35,15 +35,15 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\nquery FileByID($id: ID) {\n  node(id: $id) {\n    ... on File {\n      name\n      owner { id }\n      parent { id }\n      content\n    }\n  }\n}\n"): (typeof documents)["\nquery FileByID($id: ID) {\n  node(id: $id) {\n    ... on File {\n      name\n      owner { id }\n      parent { id }\n      content\n    }\n  }\n}\n"];
+export function gql(source: "\nquery GetFileByID($id: ID!) {\n  getFileById(id: $id) {\n    name\n    owner { id }\n    parent { id }\n  }\n}\n"): (typeof documents)["\nquery GetFileByID($id: ID!) {\n  getFileById(id: $id) {\n    name\n    owner { id }\n    parent { id }\n  }\n}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\nquery FolderByID($id: ID) {\n  node(id: $id) {\n    ... on Folder {\n      name\n      owner { id }\n      parent { id }\n      children { id }\n    }\n  }\n}\n"): (typeof documents)["\nquery FolderByID($id: ID) {\n  node(id: $id) {\n    ... on Folder {\n      name\n      owner { id }\n      parent { id }\n      children { id }\n    }\n  }\n}\n"];
+export function gql(source: "\nquery GetFolderByID($id: ID!) {\n  getFolderById(id: $id) {\n    ... on Folder {\n      name\n      owner { id }\n      parent { id }\n      children { id }\n    }\n  }\n}\n"): (typeof documents)["\nquery GetFolderByID($id: ID!) {\n  getFolderById(id: $id) {\n    ... on Folder {\n      name\n      owner { id }\n      parent { id }\n      children { id }\n    }\n  }\n}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\nquery Node {\n  node {\n    ... on Folder {\n      children {\n        id\n      }\n    }\n  }\n}\n"): (typeof documents)["\nquery Node {\n  node {\n    ... on Folder {\n      children {\n        id\n      }\n    }\n  }\n}\n"];
+export function gql(source: "\nquery GetRoot {\n  getRoot {\n    children {\n      id\n    }\n  }\n}\n"): (typeof documents)["\nquery GetRoot {\n  getRoot {\n    children {\n      id\n    }\n  }\n}\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

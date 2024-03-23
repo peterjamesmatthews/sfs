@@ -4,30 +4,23 @@ import File from "./File";
 import Folder from "./Folder";
 
 const GET_ROOT = gql(`
-query Node {
-  node {
-    ... on Folder {
-      children {
-        id
-      }
+query GetRoot {
+  getRoot {
+    children {
+      id
     }
   }
 }
 `);
 
 export default function Root() {
-	const getRoot = useQuery(GET_ROOT);
+	const { loading, error, data } = useQuery(GET_ROOT);
 
-	if (getRoot.loading) return <>Loading...</>;
-	if (getRoot.error) return <>Error: {getRoot.error.message}</>;
-	if (getRoot.data === undefined) return <>No data</>;
-	if (getRoot.data.node === undefined || getRoot.data.node === null)
-		return <>No root</>;
-	if (getRoot.data.node.__typename !== "Folder")
-		return <>Root is not a folder</>;
+	if (loading) return <>Loading root...</>;
+	if (error) return <>Error getting root: {error.message}</>;
+	if (!data?.getRoot) return <>Root not found</>;
 
-	const children = getRoot.data.node.children;
-
+	const children = data.getRoot.children;
 	return (
 		<>
 			<ul>

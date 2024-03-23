@@ -2,14 +2,11 @@ import { useQuery } from "@apollo/client";
 import { gql } from "../gql";
 
 const GET_FILE_BY_ID = gql(`
-query FileByID($id: ID) {
-  node(id: $id) {
-    ... on File {
-      name
-      owner { id }
-      parent { id }
-      content
-    }
+query GetFileByID($id: ID!) {
+  getFileById(id: $id) {
+    name
+    owner { id }
+    parent { id }
   }
 }
 `);
@@ -27,12 +24,11 @@ export default function File({ id }: FileProps) {
 	if (error)
 		return (
 			<>
-				Error file {id}: {error.message}
+				Error getting file {id}: {error.message}
 			</>
 		);
-	if (data === undefined || !data.node) return <>File {id} not found</>;
-	if (data.node.__typename !== "File") return <>Node {id} is not a file</>;
+	if (!data?.getFileById) return <>File {id} not found</>;
 
-	const file = data.node;
+	const file = data.getFileById;
 	return <>{file.name}</>;
 }

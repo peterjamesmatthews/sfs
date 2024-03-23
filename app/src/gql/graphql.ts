@@ -103,12 +103,25 @@ export type Node = {
 
 export type Query = {
   __typename?: 'Query';
-  node?: Maybe<Node>;
+  getFileById?: Maybe<File>;
+  getFolderById?: Maybe<Folder>;
+  getNodeById?: Maybe<Node>;
+  getRoot: Folder;
 };
 
 
-export type QueryNodeArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
+export type QueryGetFileByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetFolderByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGetNodeByIdArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type User = {
@@ -117,26 +130,26 @@ export type User = {
   name: Scalars['String']['output'];
 };
 
-export type FileByIdQueryVariables = Exact<{
-  id?: InputMaybe<Scalars['ID']['input']>;
+export type GetFileByIdQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
 }>;
 
 
-export type FileByIdQuery = { __typename?: 'Query', node?: { __typename?: 'File', name: string, content: string, owner: { __typename?: 'User', id: string }, parent?: { __typename?: 'Folder', id: string } | null } | { __typename?: 'Folder' } | null };
+export type GetFileByIdQuery = { __typename?: 'Query', getFileById?: { __typename?: 'File', name: string, owner: { __typename?: 'User', id: string }, parent?: { __typename?: 'Folder', id: string } | null } | null };
 
-export type FolderByIdQueryVariables = Exact<{
-  id?: InputMaybe<Scalars['ID']['input']>;
+export type GetFolderByIdQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
 }>;
 
 
-export type FolderByIdQuery = { __typename?: 'Query', node?: { __typename?: 'File' } | { __typename?: 'Folder', name: string, owner: { __typename?: 'User', id: string }, parent?: { __typename?: 'Folder', id: string } | null, children: Array<{ __typename?: 'File', id: string } | { __typename?: 'Folder', id: string }> } | null };
+export type GetFolderByIdQuery = { __typename?: 'Query', getFolderById?: { __typename?: 'Folder', name: string, owner: { __typename?: 'User', id: string }, parent?: { __typename?: 'Folder', id: string } | null, children: Array<{ __typename?: 'File', id: string } | { __typename?: 'Folder', id: string }> } | null };
 
-export type NodeQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type NodeQuery = { __typename?: 'Query', node?: { __typename?: 'File' } | { __typename?: 'Folder', children: Array<{ __typename?: 'File', id: string } | { __typename?: 'Folder', id: string }> } | null };
+export type GetRootQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export const FileByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FileByID"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"File"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"content"}}]}}]}}]}}]} as unknown as DocumentNode<FileByIdQuery, FileByIdQueryVariables>;
-export const FolderByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FolderByID"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Folder"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"children"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<FolderByIdQuery, FolderByIdQueryVariables>;
-export const NodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Folder"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"children"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<NodeQuery, NodeQueryVariables>;
+export type GetRootQuery = { __typename?: 'Query', getRoot: { __typename?: 'Folder', children: Array<{ __typename?: 'File', id: string } | { __typename?: 'Folder', id: string }> } };
+
+
+export const GetFileByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetFileByID"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getFileById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<GetFileByIdQuery, GetFileByIdQueryVariables>;
+export const GetFolderByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetFolderByID"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getFolderById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Folder"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"children"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetFolderByIdQuery, GetFolderByIdQueryVariables>;
+export const GetRootDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRoot"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getRoot"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"children"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<GetRootQuery, GetRootQueryVariables>;

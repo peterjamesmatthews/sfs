@@ -40,10 +40,6 @@ type SharedFileSystemer interface {
 	//
 	// # Arguments
 	//  - user: The user who is fetching the root folder.
-	//
-	// # Errors
-	//  - `ErrNotFound` if the shared file system doesn't have a root.
-	//  - `ErrUnauthorized` if the user does not have read access to the root.
 	GetRoot(user User) (Folder, error)
 
 	// InsertFolder inserts a folder into the shared file system.
