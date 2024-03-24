@@ -12,6 +12,17 @@ type SharedFileSystemer interface {
 	//  - `ErrUnauthorized` if `user` does not have read access to the node.
 	GetNodeByID(user User, id string) (Node, error)
 
+	// GetNodeByURI fetches a node by its uri.
+	//
+	// # Arguments
+	//  - user: The user who is fetching the node.
+	//  - uri: a '/' separated path of node names.
+	//
+	// # Errors
+	//  - `ErrNotFound` if the node is not found.
+	//  - `ErrUnauthorized` if `user` does not have read access to any of the nodes in the uri.
+	GetNodeByURI(user User, uri string) (Node, error)
+
 	// RenameNode renames a node.
 	//
 	// # Arguments

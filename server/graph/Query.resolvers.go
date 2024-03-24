@@ -39,6 +39,21 @@ func (r *queryResolver) GetNodeByID(ctx context.Context, id string) (Node, error
 	return node, nil
 }
 
+// GetNodeByURI is the resolver for the getNodeByURI field.
+func (r *queryResolver) GetNodeByURI(ctx context.Context, uri string) (Node, error) {
+	user, err := handleGettingUserFromContext(ctx, r.AuthN)
+	if err != nil {
+		return nil, err
+	}
+
+	node, err := r.SFS.GetNodeByURI(user, uri)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get node at uri: %w", err)
+	}
+
+	return node, nil
+}
+
 // GetFileByID is the resolver for the getFileById field.
 func (r *queryResolver) GetFileByID(ctx context.Context, id string) (*File, error) {
 	user, err := handleGettingUserFromContext(ctx, r.AuthN)

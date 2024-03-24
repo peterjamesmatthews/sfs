@@ -1,4 +1,4 @@
-import { gql } from "../generated/gql";
+import { gql } from "../generated";
 
 export default gql(`
 query GetRoot {

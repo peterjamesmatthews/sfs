@@ -1,15 +1,9 @@
-import { Link, createBrowserRouter } from "react-router-dom";
-import Root from "../components/Root";
-import { Typography } from "@mui/material";
+import { createBrowserRouter } from 'react-router-dom';
+import Node from '../components/Node';
 
 export default createBrowserRouter([
-	{
-		path: "/",
-		element: <Root />,
-		errorElement: (
-			<Typography>
-				404 Not Found (<Link to="/">Return to root</Link>)
-			</Typography>
-		),
-	},
+  {
+    path: "*",
+    element: <Node  />,
+  },
 ]);

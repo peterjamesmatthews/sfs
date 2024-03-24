@@ -48,28 +48,6 @@ func (m *Database) getNodeByID(id string) (graph.Node, error) {
 	return nil, graph.ErrNotFound
 }
 
-func (m *Database) getNodeByName(name string) (graph.Node, error) {
-	if m.Root.Name == name {
-		return m.Root, nil
-	}
-
-	nodes := m.Root.Children
-	for _, node := range nodes {
-		if node.GetName() == name {
-			return node, nil
-		}
-
-		folder, ok := node.(*graph.Folder)
-		if !ok {
-			continue
-		}
-
-		nodes = append(nodes, folder.Children...)
-	}
-
-	return nil, graph.ErrNotFound
-}
-
 func (m *Database) RenameNode(user graph.User, id string, name string) (graph.Node, error) {
 	// get node
 	node, err := m.getNodeByID(id)
@@ -151,5 +129,76 @@ func (m *Database) MoveNode(user graph.User, id string, dstID string) (graph.Nod
 	dst.Children = append(dst.Children, node)
 
 	// return moved node
+	return node, nil
+}
+
+// GetNodeByURI fetches a node by its uri.
+//
+// # Arguments
+//   - user: The user who is fetching the node.
+//   - uri: a '/' separated path of node names.
+//
+// # Errors
+//   - `ErrNotFound` if the node is not found.
+//   - `ErrUnauthorized` if `user` does not have read access to any of the nodes in the uri.
+func (m *Database) GetNodeByURI(user graph.User, uri string) (graph.Node, error) {
+	target := URI{uri: uri}
+	names := target.GetNames()
+
+	// check each name in the uri for read access, return the last node
+	var current = RootURI
+	var node graph.Node
+	var err error
+	for _, name := range names {
+		if name == RootName {
+			node = m.Root
+		} else {
+			current = current.AddNames(name)
+			node, err = m.getNodeByURI(current)
+			if err != nil {
+				return nil, fmt.Errorf("failed to get node at uri %s: %w", uri, err)
+			}
+		}
+
+		hasAccess, err := m.has(user, graph.AccessTypeRead, node)
+		if err != nil {
+			return nil, fmt.Errorf("failed to check if user %s has %s access to node at uri %s: %w", user.ID, graph.AccessTypeRead, uri, err)
+		} else if !hasAccess {
+			return nil, graph.ErrUnauthorized
+		}
+	}
+
+	if node == nil {
+		return nil, graph.ErrNotFound
+	}
+
+	return node, nil
+}
+
+func (m *Database) getNodeByURI(uri URI) (graph.Node, error) {
+	if !uri.IsAbsolute() {
+		return nil, errors.ErrUnsupported
+	}
+
+	names := uri.GetNames()
+	names = names[1:] // remove root name
+
+	// start from root
+	node := m.Root
+	for _, name := range names {
+		found := false
+		var child graph.Node
+		for _, child = range node.Children {
+			if child.GetName() == name {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			return nil, graph.ErrNotFound
+		}
+	}
+
 	return node, nil
 }

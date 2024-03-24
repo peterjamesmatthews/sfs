@@ -32,12 +32,35 @@ func main() {
 }
 
 func newSeededDatabase() mem.Database {
+	// init root user (owner of root folder)
+	rootUser := &graph.User{ID: uuid.NewString(), Name: ""}
+
+	// init users
+	amos := &graph.User{ID: uuid.NewString(), Name: "Amos"}
 	matthew := &graph.User{ID: uuid.NewString(), Name: "Matthew"}
 	nick := &graph.User{ID: uuid.NewString(), Name: "Nick"}
-	users := []*graph.User{matthew, nick}
+	users := []*graph.User{amos, matthew, nick}
 
-	root := &graph.Folder{}
-	root.Children = []graph.Node{
+	// init root
+	root := &graph.Folder{
+		ID:    uuid.NewString(),
+		Name:  "",
+		Owner: rootUser,
+	}
+
+	// init access
+	access := []*graph.Access{}
+
+	// grant all users read access to root
+	for _, user := range users {
+		access = append(access, &graph.Access{User: user, Type: graph.AccessTypeRead, Target: root})
+	}
+
+	// init root's children
+	root.Children = []graph.Node{}
+
+	// add matthew's nodes
+	root.Children = append(root.Children,
 		&graph.Folder{
 			ID:     uuid.NewString(),
 			Name:   "Empty Folder",
@@ -51,6 +74,10 @@ func newSeededDatabase() mem.Database {
 			Parent:  root,
 			Content: "Hello World!",
 		},
+	)
+
+	// add nick's nodes
+	root.Children = append(root.Children,
 		&graph.File{
 			ID:      uuid.NewString(),
 			Name:    "Passwords",
@@ -58,11 +85,16 @@ func newSeededDatabase() mem.Database {
 			Parent:  root,
 			Content: "nick-is-cool",
 		},
+	)
+
+	// give all node owners read access to their nodes
+	for _, node := range root.Children {
+		access = append(access, &graph.Access{User: node.GetOwner(), Type: graph.AccessTypeRead, Target: node})
 	}
 
-	access := []*graph.Access{
-		{User: matthew, Type: graph.AccessTypeRead, Target: root},
-		{User: nick, Type: graph.AccessTypeRead, Target: root},
+	// give amos read access to all nodes
+	for _, node := range root.Children {
+		access = append(access, &graph.Access{User: amos, Type: graph.AccessTypeRead, Target: node})
 	}
 
 	return mem.Database{Root: root, Users: users, Access: access}

@@ -6,6 +6,8 @@ type Query {
 
   getNodeById(id: ID!): Node
 
+  getNodeByURI(uri: String!): Node
+
   getFileById(id: ID!): File
 
   getFolderById(id: ID!): Folder

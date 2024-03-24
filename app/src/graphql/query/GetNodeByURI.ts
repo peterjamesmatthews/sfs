@@ -1,8 +1,9 @@
 import { gql } from "../generated";
 
 export default gql(`
-query GetFileByID($id: ID!) {
-  getFileById(id: $id) {
+query GetNodeByURI($uri: String!) {
+  getNodeByURI(uri: $uri) {
+    id
     name
     owner { id }
     parent { id }
