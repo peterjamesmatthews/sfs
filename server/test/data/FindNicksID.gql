@@ -1,10 +1,8 @@
 query {
-  node {
-    ... on Folder {
-      children {
-        owner {
-          id
-        }
+  getRoot {
+    children {
+      owner {
+        id
       }
     }
   }
