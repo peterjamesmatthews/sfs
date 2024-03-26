@@ -7,7 +7,7 @@ query GetFolderByID($id: ID!) {
       name
       owner { id }
       parent { id }
-      children { id }
+      children { id name }
     }
   }
 }

@@ -6,6 +6,7 @@ query GetFileByID($id: ID!) {
     name
     owner { id }
     parent { id }
+    content
   }
 }
 `);

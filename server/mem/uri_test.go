@@ -21,6 +21,11 @@ func TestGetNames(t *testing.T) {
 			uri:  URI{uri: "/foo/bar"},
 			want: []string{RootName, "foo", "bar"},
 		},
+		{
+			name: "/foo/bar/",
+			uri:  URI{uri: "/foo/bar/"},
+			want: []string{RootName, "foo", "bar"},
+		},
 	}
 
 	for _, test := range tests {

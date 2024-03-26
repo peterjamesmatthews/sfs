@@ -9,7 +9,7 @@ import (
 )
 
 func (m *Database) GetNodeByID(user graph.User, id string) (graph.Node, error) {
-	node, err := m.getNodeByID(id)
+	node, err := m.getNodeByID(id, m.Root.Children)
 	if errors.Is(err, graph.ErrNotFound) {
 		return nil, err
 	} else if err != nil {
@@ -26,23 +26,19 @@ func (m *Database) GetNodeByID(user graph.User, id string) (graph.Node, error) {
 	return node, nil
 }
 
-func (m *Database) getNodeByID(id string) (graph.Node, error) {
-	if id == m.Root.ID {
-		return m.Root, nil
-	}
-
-	nodes := m.Root.Children
+func (m *Database) getNodeByID(id string, nodes []graph.Node) (graph.Node, error) {
 	for _, node := range nodes {
 		if node.GetID() == id {
 			return node, nil
 		}
 
 		folder, ok := node.(*graph.Folder)
-		if !ok {
-			continue
+		if ok {
+			foundNode, err := m.getNodeByID(id, folder.Children)
+			if err == nil {
+				return foundNode, nil
+			}
 		}
-
-		nodes = append(nodes, folder.Children...)
 	}
 
 	return nil, graph.ErrNotFound
@@ -50,7 +46,7 @@ func (m *Database) getNodeByID(id string) (graph.Node, error) {
 
 func (m *Database) RenameNode(user graph.User, id string, name string) (graph.Node, error) {
 	// get node
-	node, err := m.getNodeByID(id)
+	node, err := m.getNodeByID(id, m.Root.Children)
 	if errors.Is(err, graph.ErrNotFound) {
 		return nil, err
 	} else if err != nil {
@@ -80,7 +76,7 @@ func (m *Database) RenameNode(user graph.User, id string, name string) (graph.No
 
 func (m *Database) MoveNode(user graph.User, id string, dstID string) (graph.Node, error) {
 	// get node
-	node, err := m.getNodeByID(id)
+	node, err := m.getNodeByID(id, m.Root.Children)
 	if errors.Is(err, graph.ErrNotFound) {
 		return nil, err
 	} else if err != nil {

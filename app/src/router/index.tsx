@@ -1,9 +1,9 @@
-import { createBrowserRouter } from 'react-router-dom';
-import Node from '../components/Node';
+import { createBrowserRouter } from "react-router-dom";
+import App from "../components/App";
 
 export default createBrowserRouter([
-  {
-    path: "*",
-    element: <Node  />,
-  },
+	{
+		path: "*",
+		element: <App />,
+	},
 ]);

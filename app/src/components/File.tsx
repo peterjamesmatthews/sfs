@@ -4,6 +4,7 @@ import GetFileById from "../graphql/query/GetFileById";
 
 type FileProps = {
 	id: string;
+	uri: string;
 };
 
 export default function File({ id }: FileProps) {
@@ -21,5 +22,9 @@ export default function File({ id }: FileProps) {
 	if (!data?.getFileById) return <>File {id} not found</>;
 
 	const file = data.getFileById;
-	return <Typography>{file.name}</Typography>;
+	return (
+		<Typography>
+			{file.name}: {file.content}
+		</Typography>
+	);
 }

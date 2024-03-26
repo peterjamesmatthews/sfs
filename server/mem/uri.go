@@ -23,7 +23,11 @@ func (u URI) GetNames() []string {
 		return []string{RootName}
 	}
 
-	return strings.Split(u.uri, URIDelimiter)
+	names := strings.Split(u.uri, URIDelimiter)
+	if len(names) > 1 && names[len(names)-1] == "" {
+		return names[:len(names)-1]
+	}
+	return names
 }
 
 // AddNames returns a new URI with the given names appended to the end.

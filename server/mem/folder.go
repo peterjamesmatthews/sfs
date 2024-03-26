@@ -44,6 +44,10 @@ func (m *Database) InsertFolder(user graph.User, folder graph.Folder) (graph.Fol
 }
 
 func (m *Database) GetFolderByID(user graph.User, id string) (graph.Folder, error) {
+	if id == m.Root.ID {
+		return *m.Root, nil
+	}
+
 	folder, err := m.getFolderByID(id)
 	if errors.Is(err, graph.ErrNotFound) {
 		return graph.Folder{}, err
@@ -62,7 +66,7 @@ func (m *Database) GetFolderByID(user graph.User, id string) (graph.Folder, erro
 }
 
 func (m *Database) getFolderByID(id string) (*graph.Folder, error) {
-	node, err := m.getNodeByID(id)
+	node, err := m.getNodeByID(id, m.Root.Children)
 	if errors.Is(err, graph.ErrNotFound) {
 		return nil, err
 	} else if err != nil {

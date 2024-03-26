@@ -37,9 +37,9 @@ func newSeededDatabase() mem.Database {
 
 	// init users
 	amos := &graph.User{ID: uuid.NewString(), Name: "Amos"}
-	matthew := &graph.User{ID: uuid.NewString(), Name: "Matthew"}
+	jack := &graph.User{ID: uuid.NewString(), Name: "Jack"}
 	nick := &graph.User{ID: uuid.NewString(), Name: "Nick"}
-	users := []*graph.User{amos, matthew, nick}
+	users := []*graph.User{amos, jack, nick}
 
 	// init root
 	root := &graph.Folder{
@@ -63,33 +63,57 @@ func newSeededDatabase() mem.Database {
 	root.Children = append(root.Children,
 		&graph.Folder{
 			ID:     uuid.NewString(),
-			Name:   "Empty Folder",
-			Owner:  matthew,
+			Name:   "EmptyFolder",
+			Owner:  jack,
 			Parent: root,
 		},
 		&graph.File{
 			ID:      uuid.NewString(),
 			Name:    "Greeting",
-			Owner:   matthew,
+			Owner:   jack,
 			Parent:  root,
 			Content: "Hello World!",
 		},
 	)
 
 	// add nick's nodes
-	root.Children = append(root.Children,
-		&graph.File{
-			ID:      uuid.NewString(),
-			Name:    "Passwords",
-			Owner:   nick,
-			Parent:  root,
-			Content: "nick-is-cool",
-		},
-	)
+	nicksPasswords := &graph.Folder{
+		ID:     uuid.NewString(),
+		Name:   "FolderForPasswords",
+		Owner:  nick,
+		Parent: root,
+	}
+
+	root.Children = append(root.Children, nicksPasswords)
+
+	nicksWarning := &graph.Folder{
+		ID:     uuid.NewString(),
+		Name:   "WARNING_SUPER_SECRET_PASSWORDS",
+		Owner:  nick,
+		Parent: nicksPasswords,
+	}
+
+	nicksPasswords.Children = append(nicksPasswords.Children, nicksWarning)
+
+	passwords := &graph.File{
+		ID:      uuid.NewString(),
+		Name:    "Passwords",
+		Owner:   nick,
+		Parent:  nicksWarning,
+		Content: "nick-is-super-cool",
+	}
+
+	nicksWarning.Children = append(nicksWarning.Children, passwords)
 
 	// give all node owners read access to their nodes
 	for _, node := range root.Children {
 		access = append(access, &graph.Access{User: node.GetOwner(), Type: graph.AccessTypeRead, Target: node})
+	}
+
+	// give nick read access to all of his deep nodes
+	nicksDeepNodes := []graph.Node{nicksWarning, passwords}
+	for _, node := range nicksDeepNodes {
+		access = append(access, &graph.Access{User: nick, Type: graph.AccessTypeRead, Target: node})
 	}
 
 	// give amos read access to all nodes

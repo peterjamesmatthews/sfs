@@ -71,7 +71,7 @@ func (m *Database) WriteFile(user graph.User, fileID string, content string) (gr
 }
 
 func (m *Database) getFileByID(id string) (*graph.File, error) {
-	node, err := m.getNodeByID(id)
+	node, err := m.getNodeByID(id, m.Root.Children)
 	if errors.Is(err, graph.ErrNotFound) {
 		return nil, err
 	} else if err != nil {
