@@ -184,20 +184,28 @@ func (m *Database) getNodeByURI(uri URI) (graph.Node, error) {
 	names = names[1:] // remove root name
 
 	// start from root
-	node := m.Root
-	for _, name := range names {
-		found := false
-		var child graph.Node
-		for _, child = range node.Children {
-			if child.GetName() == name {
-				found = true
-				break
+	var node graph.Node
+	folder := m.Root
+	for i, name := range names {
+		for _, child := range folder.Children {
+			if child.GetName() != name {
+				continue
 			}
-		}
 
-		if !found {
-			return nil, graph.ErrNotFound
+			if i == len(names)-1 {
+				return child, nil
+			}
+
+			if _, ok := child.(*graph.File); ok {
+				continue
+			}
+
+			folder = child.(*graph.Folder)
 		}
+	}
+
+	if node == nil {
+		return nil, graph.ErrNotFound
 	}
 
 	return node, nil
