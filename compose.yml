@@ -7,7 +7,7 @@ services:
       - ./app:/sfs/app
       - app_node_modules:/sfs/app/node_modules/
     ports:
-      - "5173:5173"
+      - "80:5173"
   server:
     build: server
     volumes:
