@@ -7,9 +7,7 @@ const config: CodegenConfig = {
 	generates: {
 		"src/graphql/generated/": {
 			preset: "client",
-			presetConfig: {
-				gqlTagName: "gql",
-			},
+			presetConfig: { gqlTagName: "gql" },
 		},
 	},
 };
