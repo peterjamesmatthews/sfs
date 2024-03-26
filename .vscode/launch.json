@@ -1,31 +1,32 @@
 {
 	"configurations": [
 		{
-			"name": "Application [Firefox]",
-			"reAttach": true,
-			"request": "launch",
-			"type": "firefox",
-			"url": "http://localhost:5173",
-			"webRoot": "${workspaceFolder}/app"
-		},
-		{
-			"name": "Application [Chrome]",
+			"name": "Launch Application",
 			"request": "launch",
 			"type": "chrome",
-			"url": "http://localhost:5173",
+			"url": "http://localhost",
 			"webRoot": "${workspaceFolder}/app"
 		},
 		{
-			"cwd": "${workspaceFolder}/server",
-			"debugAdapter": "legacy",
-			"host": "127.0.0.1",
-			"mode": "remote",
-			"name": "Server",
-			"port": 4000,
-			"remotePath": "/sfs/server",
+			"name": "Attach Server",
+			"type": "go",
 			"request": "attach",
-			"type": "go"
+			"mode": "remote",
+			"port": 4000,
+			"host": "localhost",
+			"substitutePath": [
+				{
+					"from": "${workspaceFolder}/server",
+					"to": "/sfs/server"
+				}
+			]
+		},
+		{
+			"name": "Launch Server",
+			"type": "go",
+			"request": "launch",
+			"mode": "auto",
+			"program": "${workspaceFolder}/server/cmd/server"
 		}
-	],
-	"version": "0.2.0"
+	]
 }
