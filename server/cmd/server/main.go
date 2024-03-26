@@ -33,7 +33,7 @@ func main() {
 
 func newSeededDatabase() mem.Database {
 	// init root user (owner of root folder)
-	rootUser := &graph.User{ID: uuid.NewString(), Name: ""}
+	rootUser := &graph.User{ID: uuid.NewString(), Name: mem.RootName}
 
 	// init users
 	amos := &graph.User{ID: uuid.NewString(), Name: "Amos"}
@@ -44,7 +44,7 @@ func newSeededDatabase() mem.Database {
 	// init root
 	root := &graph.Folder{
 		ID:    uuid.NewString(),
-		Name:  "",
+		Name:  mem.RootName,
 		Owner: rootUser,
 	}
 
