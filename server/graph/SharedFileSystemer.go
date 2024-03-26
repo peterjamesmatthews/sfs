@@ -108,4 +108,6 @@ type SharedFileSystemer interface {
 	// - `ErrNotFound` if `file`'s parent is not found.
 	// - `ErrUnauthorized` if `user` does not have write access to the file
 	WriteFile(user User, fileID string, content string) (File, error)
+
+	GetUserByID(id string) (User, error)
 }
