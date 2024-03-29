@@ -4,4 +4,4 @@ develop:
 
 .PHONY: clean
 clean:
-	docker compose down 
+	docker compose down -v
