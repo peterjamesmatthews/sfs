@@ -19,7 +19,7 @@ services:
       - .env
     hostname: ${SERVER_HOSTNAME}
     ports:
-      - ${SERVER_WEB_PORT}:${SERVER_WEB_PORT}
+      - ${SERVER_PORT}:${SERVER_PORT}
       - ${SERVER_DEBUG_PORT}:${SERVER_DEBUG_PORT}
     volumes:
       - ./server:/sfs/server

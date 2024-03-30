@@ -1,34 +1,29 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/google/uuid"
+	"github.com/sethvargo/go-envconfig"
+	"pjm.dev/sfs/env"
 	"pjm.dev/sfs/graph"
 	"pjm.dev/sfs/mem"
 )
 
 func main() {
-	hostname, ok := os.LookupEnv("SERVER_HOSTNAME")
-	if !ok {
-		hostname = "localhost"
+	ctx := context.Background()
+
+	var config env.Config
+	err := envconfig.Process(ctx, &config)
+	if err != nil {
+		log.Fatalf("failed to process config: %v", err)
 	}
 
-	port, ok := os.LookupEnv("SERVER_SERVER_PORT")
-	if !ok {
-		port = "8080"
-	}
-
-	endpoint, ok := os.LookupEnv("SERVER_GRAPH_ENDPOINT")
-	if !ok {
-		endpoint = "graph"
-	}
-
-	pattern := fmt.Sprintf("/%s", endpoint)
+	pattern := fmt.Sprintf("/%s", config.Server.Endpoint)
 
 	db := newSeededDatabase()
 	gqlHandler := graph.GetGQLHandler(&db, &db, &db)
@@ -37,8 +32,8 @@ func main() {
 	http.Handle(pattern, gqlHandler)
 	http.Handle("/", playground.Handler("GraphQL playground", pattern))
 
-	log.Printf("serving GraphQL at http://%s:%s%s", hostname, port, pattern)
-	log.Fatal(http.ListenAndServe(hostname+":"+port, nil))
+	log.Printf("serving GraphQL at http://%s:%s%s", config.Server.Hostname, config.Server.Port, pattern)
+	log.Fatal(http.ListenAndServe(config.Server.Hostname+":"+config.Server.Port, nil))
 }
 
 func newSeededDatabase() mem.Database {

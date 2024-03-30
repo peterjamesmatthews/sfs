@@ -5,6 +5,7 @@ go 1.21
 require (
 	github.com/99designs/gqlgen v0.17.44
 	github.com/google/uuid v1.6.0
+	github.com/sethvargo/go-envconfig v1.0.0
 	github.com/vektah/gqlparser/v2 v2.5.11
 )
 
