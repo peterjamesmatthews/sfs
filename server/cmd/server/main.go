@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -11,24 +12,33 @@ import (
 	"pjm.dev/sfs/mem"
 )
 
-const defaultPort = "8080"
-
 func main() {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
+	hostname, ok := os.LookupEnv("SERVER_HOSTNAME")
+	if !ok {
+		hostname = "localhost"
 	}
 
-	db := newSeededDatabase()
+	port, ok := os.LookupEnv("SERVER_SERVER_PORT")
+	if !ok {
+		port = "8080"
+	}
 
+	endpoint, ok := os.LookupEnv("SERVER_GRAPH_ENDPOINT")
+	if !ok {
+		endpoint = "graph"
+	}
+
+	pattern := fmt.Sprintf("/%s", endpoint)
+
+	db := newSeededDatabase()
 	gqlHandler := graph.GetGQLHandler(&db, &db, &db)
 	gqlHandler = WrapHandler(gqlHandler, &LoggingHandler{}, &CORSHandler{})
 
-	http.Handle("/graphql", gqlHandler)
-	http.Handle("/", playground.Handler("GraphQL playground", "/graphql"))
+	http.Handle(pattern, gqlHandler)
+	http.Handle("/", playground.Handler("GraphQL playground", pattern))
 
-	log.Printf("serving http://localhost:%s/graphql", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	log.Printf("serving GraphQL at http://%s:%s%s", hostname, port, pattern)
+	log.Fatal(http.ListenAndServe(hostname+":"+port, nil))
 }
 
 func newSeededDatabase() mem.Database {

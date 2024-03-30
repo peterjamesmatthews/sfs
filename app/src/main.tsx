@@ -9,8 +9,10 @@ import router from "./router/index.tsx";
 const root = document.getElementById("root");
 if (root == null) throw new Error("no root");
 
+console.log(import.meta.env);
+
 const client = new ApolloClient({
-	uri: "/graphql",
+	uri: "/graph",
 	cache: new InMemoryCache(),
 	headers: { Authorization: "Nick" },
 });

@@ -1,22 +1,29 @@
+---
 name: sfs
-
 services:
   app:
     build: app
+    container_name: app
+    env_file:
+      - .env
+    hostname: ${APP_HOSTNAME}
+    ports:
+      - 80:${APP_PORT}
     volumes:
       - ./app:/sfs/app
       - app_node_modules:/sfs/app/node_modules/
-    ports:
-      - "80:5173"
   server:
     build: server
+    container_name: server
+    env_file:
+      - .env
+    hostname: ${SERVER_HOSTNAME}
+    ports:
+      - ${SERVER_WEB_PORT}:${SERVER_WEB_PORT}
+      - ${SERVER_DEBUG_PORT}:${SERVER_DEBUG_PORT}
     volumes:
       - ./server:/sfs/server
       - server_debug_bins:/sfs/server/__debug_bins/
-    ports:
-      - "8080:8080"
-      - "4000:4000"
-
 volumes:
-  app_node_modules:
-  server_debug_bins:
+  app_node_modules: null
+  server_debug_bins: null
