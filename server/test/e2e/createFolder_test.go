@@ -78,7 +78,7 @@ func TestCreateFolder(t *testing.T) {
 				t.Error("response mismatch")
 			}
 
-			if !reflect.DeepEqual(test.want.Root, test.seed.Root) {
+			if !reflect.DeepEqual(db.Root, test.want.Root) {
 				t.Error("database mismatch")
 			}
 		})

@@ -66,6 +66,10 @@ func (m *Database) GetFolderByID(user graph.User, id string) (graph.Folder, erro
 }
 
 func (m *Database) getFolderByID(id string) (*graph.Folder, error) {
+	if id == m.Root.ID {
+		return m.Root, nil
+	}
+
 	node, err := m.getNodeByID(id, m.Root.Children)
 	if errors.Is(err, graph.ErrNotFound) {
 		return nil, err
