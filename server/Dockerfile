@@ -25,11 +25,13 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # start server
-CMD dlv debug ./cmd/server \
-  --headless \
-  --listen :4000 \
-  --accept-multiclient \
-  --continue \
-  --api-version 2 \
-  --log \
-  --output ./__debug_bins/server
+CMD go run ./cmd/server 
+
+# CMD dlv debug ./cmd/server \
+#   --headless \
+#   --listen :4000 \
+#   --accept-multiclient \
+#   --continue \
+#   --api-version 2 \
+#   --log \
+#   --output ./__debug_bins/server

@@ -3,13 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
-	"net/http"
 
-	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/google/uuid"
 	"github.com/sethvargo/go-envconfig"
+	"pjm.dev/sfs/db"
 	"pjm.dev/sfs/env"
 	"pjm.dev/sfs/graph"
 	"pjm.dev/sfs/mem"
@@ -19,33 +17,39 @@ func main() {
 	// init context
 	ctx := context.Background()
 
+	// init logging
+	log.Default().SetFlags(0)
+
 	// init config
 	var config env.Config
 	err := envconfig.Process(ctx, &config)
 	if err != nil {
-		log.Fatalf("failed to process config: %v", err)
+		log.Fatalf("failed to process config from environment: %v", err)
 	}
 
 	// pretty print config
 	configBytes, err := json.MarshalIndent(config, "", "\t")
 	if err != nil {
-		log.Fatalf("failed to marshal server config: %v", err)
+		log.Fatalf("failed to marshal config: %v", err)
 	}
-	log.Printf("starting server with config: %v", string(configBytes))
+	log.Printf("initializing with config: %v", string(configBytes))
 
 	// init db from config
-	db := newSeededDatabase()
+	_, err = db.Initialize(config.Database)
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
 
-	// init server from config
-	pattern := fmt.Sprintf("/%s", config.Server.GraphEndpoint)
-	gqlHandler := graph.GetGQLHandler(&db, &db, &db)
-	gqlHandler = WrapHandler(gqlHandler, &LoggingHandler{}, &CORSHandler{})
-	http.Handle(pattern, gqlHandler)
-	http.Handle("/", playground.Handler("GraphQL playground", pattern))
+	// // init server from config
+	// pattern := fmt.Sprintf("/%s", config.Server.GraphEndpoint)
+	// gqlHandler := graph.GetGQLHandler(&db, &db, &db)
+	// gqlHandler = WrapHandler(gqlHandler, &LoggingHandler{}, &CORSHandler{})
+	// http.Handle(pattern, gqlHandler)
+	// http.Handle("/", playground.Handler("GraphQL playground", pattern))
 
-	// start serving
-	log.Printf("serving GraphQL at http://%s:%s%s", config.Server.Hostname, config.Server.Port, pattern)
-	log.Fatal(http.ListenAndServe(config.Server.Hostname+":"+config.Server.Port, nil))
+	// // start serving
+	// log.Printf("serving GraphQL at http://%s:%s%s", config.Server.Hostname, config.Server.Port, pattern)
+	// log.Fatal(http.ListenAndServe(config.Server.Hostname+":"+config.Server.Port, nil))
 }
 
 func newSeededDatabase() mem.Database {
