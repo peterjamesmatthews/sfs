@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,23 +16,34 @@ import (
 )
 
 func main() {
+	// init context
 	ctx := context.Background()
 
+	// init config
 	var config env.Config
 	err := envconfig.Process(ctx, &config)
 	if err != nil {
 		log.Fatalf("failed to process config: %v", err)
 	}
 
-	pattern := fmt.Sprintf("/%s", config.Server.Endpoint)
+	// pretty print config
+	configBytes, err := json.MarshalIndent(config, "", "\t")
+	if err != nil {
+		log.Fatalf("failed to marshal server config: %v", err)
+	}
+	log.Printf("starting server with config: %v", string(configBytes))
 
+	// init db from config
 	db := newSeededDatabase()
+
+	// init server from config
+	pattern := fmt.Sprintf("/%s", config.Server.GraphEndpoint)
 	gqlHandler := graph.GetGQLHandler(&db, &db, &db)
 	gqlHandler = WrapHandler(gqlHandler, &LoggingHandler{}, &CORSHandler{})
-
 	http.Handle(pattern, gqlHandler)
 	http.Handle("/", playground.Handler("GraphQL playground", pattern))
 
+	// start serving
 	log.Printf("serving GraphQL at http://%s:%s%s", config.Server.Hostname, config.Server.Port, pattern)
 	log.Fatal(http.ListenAndServe(config.Server.Hostname+":"+config.Server.Port, nil))
 }

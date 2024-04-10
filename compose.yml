@@ -28,9 +28,11 @@ services:
 
   database:
     image: postgres:bullseye
-    container_name: database
-    env_file:
-      - .env
+    container_name: ${DATABASE_HOSTNAME}
+    environment:
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
     ports:
       - 5432:${DATABASE_PORT}
 
