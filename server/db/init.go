@@ -1,7 +1,6 @@
 package db
 
 import (
-	"errors"
 	"fmt"
 
 	"gorm.io/driver/postgres"
@@ -26,7 +25,7 @@ func Initialize(config env.DatabaseConfig) (*gorm.DB, error) {
 		return nil, fmt.Errorf("failed to seed\n%v", err)
 	}
 
-	return nil, errors.New("db.Initialize is not implemented")
+	return db, nil
 }
 
 func connect(config env.DatabaseConfig) (*gorm.DB, error) {
@@ -49,9 +48,15 @@ func connect(config env.DatabaseConfig) (*gorm.DB, error) {
 }
 
 func migrate(db *gorm.DB) error {
-	return errors.New("db.migrate is not implemented")
+	models := getModels()
+
+	if err := db.AutoMigrate(models...); err != nil {
+		return fmt.Errorf("failed to migrate\n%w", err)
+	}
+
+	return nil
 }
 
 func seed(db *gorm.DB) error {
-	return errors.New("db.seed is not implemented")
+	return nil
 }

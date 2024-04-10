@@ -35,7 +35,10 @@ services:
       - POSTGRES_DB=${DATABASE_NAME}
     ports:
       - 5432:${DATABASE_PORT}
+    volumes:
+      - database_data:/var/lib/postgresql/data
 
 volumes:
   app_node_modules: null
   server_debug_bins: null
+  database_data: null

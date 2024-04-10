@@ -3,8 +3,11 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
+	"net/http"
 
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/google/uuid"
 	"github.com/sethvargo/go-envconfig"
 	"pjm.dev/sfs/db"
@@ -40,16 +43,19 @@ func main() {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	// // init server from config
-	// pattern := fmt.Sprintf("/%s", config.Server.GraphEndpoint)
-	// gqlHandler := graph.GetGQLHandler(&db, &db, &db)
-	// gqlHandler = WrapHandler(gqlHandler, &LoggingHandler{}, &CORSHandler{})
-	// http.Handle(pattern, gqlHandler)
-	// http.Handle("/", playground.Handler("GraphQL playground", pattern))
+	// TODO impl with db package
+	db := newSeededDatabase()
 
-	// // start serving
-	// log.Printf("serving GraphQL at http://%s:%s%s", config.Server.Hostname, config.Server.Port, pattern)
-	// log.Fatal(http.ListenAndServe(config.Server.Hostname+":"+config.Server.Port, nil))
+	// init server from config
+	pattern := fmt.Sprintf("/%s", config.Server.GraphEndpoint)
+	gqlHandler := graph.GetGQLHandler(&db, &db, &db)
+	gqlHandler = WrapHandler(gqlHandler, &LoggingHandler{}, &CORSHandler{})
+	http.Handle(pattern, gqlHandler)
+	http.Handle("/", playground.Handler("GraphQL playground", pattern))
+
+	// start serving
+	log.Printf("serving GraphQL at http://%s:%s%s", config.Server.Hostname, config.Server.Port, pattern)
+	log.Fatal(http.ListenAndServe(config.Server.Hostname+":"+config.Server.Port, nil))
 }
 
 func newSeededDatabase() mem.Database {
