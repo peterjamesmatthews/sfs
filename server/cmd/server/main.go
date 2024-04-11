@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -15,36 +14,30 @@ import (
 )
 
 func main() {
-	// init context
+	// initialize context
 	ctx := context.Background()
 
-	// init logging
+	// initialize logging
 	log.Default().SetFlags(0)
 
-	// init config
+	// initialize config
 	config, err := config.New(ctx)
 	if err != nil {
 		log.Fatalf("failed to initialize config: %v", err)
 	}
+	log.Printf("initializing with config: %s", config)
 
-	// pretty print config
-	configBytes, err := json.MarshalIndent(config, "", "\t")
-	if err != nil {
-		log.Fatalf("failed to marshal config: %v", err)
-	}
-	log.Printf("initializing with config: %v", string(configBytes))
-
-	// init db from config
+	// initialize db
 	db, err := db.New(config.Database)
 	if err != nil {
 		log.Fatalf("failed to initialize database: %v", err)
 	}
 
-	// init app
+	// initialize app
 	app := app.New(db)
 	gqlHandler := graph.GetGQLHandler(app, app, app)
 
-	// init server from config
+	// initialize server
 	pattern := fmt.Sprintf("/%s", config.Server.GraphEndpoint)
 	gqlHandler = WrapHandler(gqlHandler, &LoggingHandler{}, &CORSHandler{})
 	http.Handle(pattern, gqlHandler)
