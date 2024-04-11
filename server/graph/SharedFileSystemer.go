@@ -1,17 +1,6 @@
 package graph
 
 type SharedFileSystemer interface {
-	// GetNodeByID fetches a node by its id.
-	//
-	// # Arguments
-	//  - user: The user who is fetching the node.
-	//  - id: The id of the node to fetch.
-	//
-	// # Errors
-	//  - `ErrNotFound` if the node is not found.
-	//  - `ErrUnauthorized` if `user` does not have read access to the node.
-	GetNodeByID(user User, id string) (Node, error)
-
 	// GetNodeByURI fetches a node by its uri.
 	//
 	// # Arguments
@@ -85,17 +74,6 @@ type SharedFileSystemer interface {
 	//  - `ErrNotFound` if `file`'s parent is not found.
 	//  - `ErrUnauthorized` if `user` does not have write access to `file`'s parent
 	InsertFile(user User, file File) (File, error)
-
-	// GetFileByID fetches a file by its id.
-	//
-	// # Arguments
-	//  - user: The user who is fetching the file.
-	//  - id: The id of the file to fetch.
-	//
-	// # Errors
-	// - `ErrNotFound` if `file`'s parent is not found.
-	// - `ErrUnauthorized` if `user` does not have read access to the file
-	GetFileByID(user User, id string) (File, error)
 
 	// WriteFile writes content to a file.
 	//

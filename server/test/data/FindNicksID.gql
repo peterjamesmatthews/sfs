@@ -1,8 +1,10 @@
 query {
-  getRoot {
-    children {
-      owner {
-        id
+  getNodeByURI(uri: "/") {
+    ... on Folder {
+      children {
+        owner {
+          id
+        }
       }
     }
   }

@@ -2,13 +2,5 @@
 #
 # It defines the interface in which clients will query the shared file system with.
 type Query {
-  getRoot: Folder!
-
-  getNodeById(id: ID!): Node
-
   getNodeByURI(uri: String!): Node
-
-  getFileById(id: ID!): File
-
-  getFolderById(id: ID!): Folder
 }
