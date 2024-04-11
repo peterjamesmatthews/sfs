@@ -1,13 +1,13 @@
-package main
+package server
 
 import (
 	"log"
 	"net/http"
 )
 
-type LoggingHandler struct{}
+type loggingHandler struct{}
 
-func (h *LoggingHandler) WrapHandler(handler http.Handler) http.Handler {
+func (l *loggingHandler) wrapHandler(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		log.Default().Printf("%s %s", r.Method, r.URL.Path)
 		handler.ServeHTTP(w, r)

@@ -2,15 +2,12 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"net/http"
 
-	"github.com/99designs/gqlgen/graphql/playground"
 	"pjm.dev/sfs/app"
 	"pjm.dev/sfs/config"
 	"pjm.dev/sfs/db"
-	"pjm.dev/sfs/graph"
+	"pjm.dev/sfs/server"
 )
 
 func main() {
@@ -35,15 +32,10 @@ func main() {
 
 	// initialize app
 	app := app.New(db)
-	gqlHandler := graph.GetGQLHandler(app, app, app)
 
 	// initialize server
-	pattern := fmt.Sprintf("/%s", config.Server.GraphEndpoint)
-	gqlHandler = WrapHandler(gqlHandler, &LoggingHandler{}, &CORSHandler{})
-	http.Handle(pattern, gqlHandler)
-	http.Handle("/", playground.Handler("GraphQL playground", pattern))
+	server := server.New(config.Server, app)
 
 	// start server
-	log.Printf("serving GraphQL at http://%s:%s%s", config.Server.Hostname, config.Server.Port, pattern)
-	log.Fatal(http.ListenAndServe(config.Server.Hostname+":"+config.Server.Port, nil))
+	server.Serve()
 }

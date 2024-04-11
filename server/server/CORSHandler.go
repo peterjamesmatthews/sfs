@@ -1,10 +1,10 @@
-package main
+package server
 
 import "net/http"
 
-type CORSHandler struct{}
+type corsHandler struct{}
 
-func (ch *CORSHandler) WrapHandler(h http.Handler) http.Handler {
+func (c *corsHandler) wrapHandler(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		h.ServeHTTP(w, r)
