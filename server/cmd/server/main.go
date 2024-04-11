@@ -37,5 +37,5 @@ func main() {
 	server := server.New(config.Server, app)
 
 	// start server
-	server.Serve()
+	log.Fatalln(server.Serve())
 }
