@@ -1,62 +1,70 @@
 package db
 
 import (
+	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 
+	"ariga.io/atlas-go-sdk/atlasexec"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"pjm.dev/sfs/config"
+	"pjm.dev/sfs/meta"
 )
 
 func New(config config.DatabaseConfig) (*gorm.DB, error) {
 	// connect to database
 	db, err := connect(config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to initialize\n%v", err)
+		return nil, fmt.Errorf("failed to initialize: %w", err)
 	}
 
 	// migrate schema
-	if err = migrate(db); err != nil {
-		return nil, fmt.Errorf("failed to migrate\n%v", err)
-	}
-
-	// seed data
-	if err = seed(db); err != nil {
-		return nil, fmt.Errorf("failed to seed\n%v", err)
+	if err = migrate(config); err != nil {
+		return nil, fmt.Errorf("failed to migrate: %w", err)
 	}
 
 	return db, nil
 }
 
 func connect(config config.DatabaseConfig) (*gorm.DB, error) {
-	dsn := fmt.Sprintf(
-		"%s://%s:%s@%s:%s/%s",
-		"postgres",
-		config.User,
-		config.Password,
-		config.Hostname,
-		config.Port,
-		config.Name,
-	)
-
-	db, err := gorm.Open(postgres.Open(dsn))
+	db, err := gorm.Open(postgres.Open(config.GetDSN()))
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect\n%w", err)
+		return nil, fmt.Errorf(
+			"failed to open gorm connection to dsn %s: %w", config.GetDSN(), err)
 	}
 
 	return db, nil
 }
 
-func migrate(db *gorm.DB) error {
-	models := getModels()
+var migrationsPath = filepath.Join(meta.Root, "db", "migrations")
 
-	if err := db.AutoMigrate(models...); err != nil {
-		return fmt.Errorf("failed to migrate\n%w", err)
+func migrate(config config.DatabaseConfig) error {
+	dir := os.DirFS(migrationsPath)
+
+	wd, err := atlasexec.NewWorkingDir(atlasexec.WithMigrations(dir))
+	if err != nil {
+		return fmt.Errorf(
+			"failed to open atlast working directory at %s: %w", migrationsPath, err,
+		)
+	}
+	defer wd.Close()
+
+	client, err := atlasexec.NewClient(wd.Path(), "atlas")
+	if err != nil {
+		return fmt.Errorf(
+			"failed to initialize atlas client at path %s: %w", wd.Path(), err,
+		)
 	}
 
-	return nil
-}
+	_, err = client.MigrateApply(
+		context.Background(),
+		&atlasexec.MigrateApplyParams{URL: config.GetDSN()},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to apply atlas migrations: %w", err)
+	}
 
-func seed(*gorm.DB) error {
 	return nil
 }

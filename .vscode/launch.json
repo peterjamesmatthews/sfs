@@ -1,32 +1,37 @@
 {
-	"configurations": [
-		{
-			"name": "Launch Application",
-			"request": "launch",
-			"type": "chrome",
-			"url": "http://localhost",
-			"webRoot": "${workspaceFolder}/app"
-		},
-		{
-			"name": "Attach Server",
-			"type": "go",
-			"request": "attach",
-			"mode": "remote",
-			"port": 4000,
-			"host": "localhost",
-			"substitutePath": [
-				{
-					"from": "${workspaceFolder}/server",
-					"to": "/sfs/server"
-				}
-			]
-		},
-		{
-			"name": "Launch Server",
-			"type": "go",
-			"request": "launch",
-			"mode": "auto",
-			"program": "${workspaceFolder}/server/cmd/server"
-		}
-	]
+  "configurations": [
+    {
+      "name": "Launch Application",
+      "request": "launch",
+      "type": "chrome",
+      "url": "http://localhost",
+      "webRoot": "${workspaceFolder}/app"
+    },
+    {
+      "host": "localhost",
+      "mode": "remote",
+      "name": "Attach Server",
+      "port": 4000,
+      "request": "attach",
+      "substitutePath": [
+        {
+          "from": "${workspaceFolder}/server",
+          "to": "/sfs/server"
+        }
+      ],
+      "type": "go"
+    },
+    {
+      "env": {
+        "DATABASE_HOSTNAME": "localhost",
+        "SERVER_HOSTNAME": "localhost"
+      },
+      "envFile": "${workspaceFolder}/.env",
+      "mode": "auto",
+      "name": "Launch Server",
+      "program": "${workspaceFolder}/server/cmd/server",
+      "request": "launch",
+      "type": "go"
+    }
+  ]
 }

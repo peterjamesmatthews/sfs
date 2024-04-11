@@ -3,8 +3,14 @@ FROM golang:1.21-alpine
 # install dlv
 RUN go install github.com/go-delve/delve/cmd/dlv@latest
 
+# install curl
+RUN apk add curl
+
 # install watchexec
 RUN apk add watchexec
+
+# install atlas
+RUN curl -sSf https://atlasgo.sh | sh
 
 # expose server's port
 EXPOSE 8080 
