@@ -8,6 +8,7 @@ import (
 
 	"ariga.io/atlas-go-sdk/atlasexec"
 	"gorm.io/driver/postgres"
+	"gorm.io/gen"
 	"gorm.io/gorm"
 	"pjm.dev/sfs/config"
 	"pjm.dev/sfs/meta"
@@ -23,6 +24,11 @@ func New(config config.DatabaseConfig) (*gorm.DB, error) {
 	// migrate schema
 	if err = migrate(config); err != nil {
 		return nil, fmt.Errorf("failed to migrate: %w", err)
+	}
+
+	// generate database models
+	if err = generate(db); err != nil {
+		return nil, fmt.Errorf("failed to generate db models: %w", err)
 	}
 
 	return db, nil
@@ -65,6 +71,23 @@ func migrate(config config.DatabaseConfig) error {
 	if err != nil {
 		return fmt.Errorf("failed to apply atlas migrations: %w", err)
 	}
+
+	return nil
+}
+
+var dbPath = filepath.Join(meta.Root, "db", "query")
+
+func generate(db *gorm.DB) error {
+	g := gen.NewGenerator(gen.Config{
+		OutPath: dbPath,
+		Mode:    gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface,
+	})
+
+	g.UseDB(db)
+
+	g.ApplyBasic(g.GenerateAllTable()...)
+
+	g.Execute()
 
 	return nil
 }
