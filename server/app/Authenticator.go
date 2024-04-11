@@ -3,32 +3,13 @@ package app
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
 
-	"gorm.io/gorm"
-	"pjm.dev/sfs/db"
 	"pjm.dev/sfs/graph"
 )
 
 func (a *app) Authenticate(r *http.Request) (graph.User, error) {
-	name := r.Header.Get("Authorization")
-	if name == "" {
-		return graph.User{}, graph.ErrUnauthorized
-	}
-
-	var user db.User
-	err := a.db.Where(&db.User{Name: name}).First(&user).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return graph.User{}, graph.ErrUnauthorized
-	} else if err != nil {
-		return graph.User{}, fmt.Errorf("failed to authenticate request\n%w", err)
-	}
-
-	return graph.User{
-		ID:   a.Generate().String(),
-		Name: user.Name,
-	}, nil
+	return graph.User{}, errors.New("not implemented")
 }
 
 type appContextKeyType string
