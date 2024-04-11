@@ -5,10 +5,10 @@ import (
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"pjm.dev/sfs/env"
+	"pjm.dev/sfs/config"
 )
 
-func Initialize(config env.DatabaseConfig) (*gorm.DB, error) {
+func New(config config.DatabaseConfig) (*gorm.DB, error) {
 	// connect to database
 	db, err := connect(config)
 	if err != nil {
@@ -28,7 +28,7 @@ func Initialize(config env.DatabaseConfig) (*gorm.DB, error) {
 	return db, nil
 }
 
-func connect(config env.DatabaseConfig) (*gorm.DB, error) {
+func connect(config config.DatabaseConfig) (*gorm.DB, error) {
 	dsn := fmt.Sprintf(
 		"%s://%s:%s@%s:%s/%s",
 		"postgres",
@@ -57,6 +57,6 @@ func migrate(db *gorm.DB) error {
 	return nil
 }
 
-func seed(db *gorm.DB) error {
+func seed(*gorm.DB) error {
 	return nil
 }

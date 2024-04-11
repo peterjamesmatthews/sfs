@@ -1,4 +1,20 @@
-package env
+package config
+
+import (
+	"context"
+
+	"github.com/sethvargo/go-envconfig"
+)
+
+func New(ctx context.Context) (Config, error) {
+	var config Config
+	err := envconfig.Process(ctx, &config)
+	if err != nil {
+		return Config{}, err
+	}
+
+	return config, nil
+}
 
 type Config struct {
 	Server   ServerConfig   `env:", prefix=SERVER_"`

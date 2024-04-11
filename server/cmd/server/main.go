@@ -8,10 +8,9 @@ import (
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/sethvargo/go-envconfig"
 	"pjm.dev/sfs/app"
+	"pjm.dev/sfs/config"
 	"pjm.dev/sfs/db"
-	"pjm.dev/sfs/env"
 	"pjm.dev/sfs/graph"
 )
 
@@ -23,10 +22,9 @@ func main() {
 	log.Default().SetFlags(0)
 
 	// init config
-	var config env.Config
-	err := envconfig.Process(ctx, &config)
+	config, err := config.New(ctx)
 	if err != nil {
-		log.Fatalf("failed to process config from environment: %v", err)
+		log.Fatalf("failed to initialize config: %v", err)
 	}
 
 	// pretty print config
@@ -37,9 +35,9 @@ func main() {
 	log.Printf("initializing with config: %v", string(configBytes))
 
 	// init db from config
-	db, err := db.Initialize(config.Database)
+	db, err := db.New(config.Database)
 	if err != nil {
-		log.Fatalf("failed to connect to database: %v", err)
+		log.Fatalf("failed to initialize database: %v", err)
 	}
 
 	// init app
