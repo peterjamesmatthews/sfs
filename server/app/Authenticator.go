@@ -5,11 +5,25 @@ import (
 	"errors"
 	"net/http"
 
+	"pjm.dev/sfs/db/model"
 	"pjm.dev/sfs/graph"
 )
 
+// Authenticate finds the user with the same name as the Authorization header.
+//
+// If no user is found, Authenticate returns graph.ErrUnauthorized.
 func (a *app) Authenticate(r *http.Request) (graph.User, error) {
-	return graph.User{}, errors.New("not implemented")
+	name := r.Header.Get("Authorization")
+	if name == "" {
+		return graph.User{}, graph.ErrUnauthorized
+	}
+
+	var user model.User
+	if err := a.db.Where("name = ?", name).First(&user).Error; err != nil {
+		return graph.User{}, graph.ErrUnauthorized
+	}
+
+	return a.toGraphUser(user), nil
 }
 
 type appContextKeyType string
