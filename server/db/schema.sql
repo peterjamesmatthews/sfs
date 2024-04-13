@@ -1,7 +1,7 @@
 CREATE TABLE "user" (
   "id" UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
   PRIMARY KEY ("id"),
-  "name" VARCHAR NOT NULL
+  "name" VARCHAR NOT NULL UNIQUE
 );
 
 CREATE TABLE "node" (
