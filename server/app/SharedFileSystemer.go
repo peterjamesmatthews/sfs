@@ -3,6 +3,7 @@ package app
 import (
 	"errors"
 	"fmt"
+	"log"
 
 	"gorm.io/gorm"
 	"pjm.dev/sfs/db/model"
@@ -10,17 +11,21 @@ import (
 )
 
 func (a *app) CreateUser(name string) (graph.User, error) {
+	// validate name
 	if name == "" {
 		return graph.User{}, errors.New("name cannot be empty")
 	}
 
+	// insert user
 	user := model.User{Name: name}
 	if err := a.db.Create(&user).Error; errors.Is(err, gorm.ErrDuplicatedKey) {
 		return graph.User{}, graph.ErrConflict
 	} else if err != nil {
-		return graph.User{}, fmt.Errorf("failed to create user: %w", err)
+		log.Printf("failed to create user: %v", err)
+		return graph.User{}, fmt.Errorf("failed to create user")
 	}
 
+	// return graph.User
 	return a.toGraphUser(user), nil
 }
 

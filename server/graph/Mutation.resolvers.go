@@ -23,139 +23,32 @@ func (r *mutationResolver) CreateUser(ctx context.Context, name string) (*User, 
 
 // RenameNode is the resolver for the renameNode field.
 func (r *mutationResolver) RenameNode(ctx context.Context, id string, name string) (Node, error) {
-	user, err := handleGettingUserFromContext(ctx, r.AuthN)
-	if err != nil {
-		return nil, err
-	}
-
-	node, err := r.SFS.RenameNode(user, id, name)
-	if err != nil {
-		return nil, fmt.Errorf("failed to rename node %s: %w", id, err)
-	}
-
-	return node, nil
+	return nil, errors.New("not implemented: RenameNode - renameNode")
 }
 
 // MoveNode is the resolver for the moveNode field.
 func (r *mutationResolver) MoveNode(ctx context.Context, id string, parentID *string) (Node, error) {
-	user, err := handleGettingUserFromContext(ctx, r.AuthN)
-	if err != nil {
-		return nil, err
-	}
-
-	if parentID == nil {
-		root, err := r.SFS.GetRoot(user)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get root: %w", err)
-		}
-		parentID = &root.ID
-	}
-
-	node, err := r.SFS.MoveNode(user, id, *parentID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to move node %s to parent %s", id, *parentID)
-	}
-
-	return node, nil
+	return nil, errors.New("not implemented: MoveNode - moveNode")
 }
 
 // ShareNode is the resolver for the shareNode field.
 func (r *mutationResolver) ShareNode(ctx context.Context, userID string, accessType AccessType, targetID string) (*Access, error) {
-	panic(fmt.Errorf("not implemented: ShareNode - shareNode"))
+	return nil, errors.New("not implemented: ShareNode - shareNode")
 }
 
 // CreateFolder is the resolver for the createFolder field.
 func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, name string) (*Folder, error) {
-	user, err := handleGettingUserFromContext(ctx, r.AuthN)
-	if err != nil {
-		return nil, err
-	}
-
-	if name == "" {
-		return nil, errors.New("missing folder name")
-	}
-
-	var parent Folder
-	if parentID != nil {
-		parent, err = r.SFS.GetFolderByID(user, *parentID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get parent %s: %w", *parentID, err)
-		}
-	} else {
-		parent, err = r.SFS.GetRoot(user)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get root: %w", err)
-		}
-	}
-
-	folder := Folder{
-		ID:     r.UUIDGen.Generate().String(),
-		Name:   name,
-		Owner:  &user,
-		Parent: &parent,
-	}
-
-	folder, err = r.SFS.InsertFolder(user, folder)
-	if err != nil {
-		return nil, fmt.Errorf("failed to insert folder: %w", err)
-	}
-
-	return &folder, nil
+	return nil, errors.New("not implemented: CreateFolder - createFolder")
 }
 
 // CreateFile is the resolver for the createFile field.
 func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, name string, content *string) (*File, error) {
-	user, err := handleGettingUserFromContext(ctx, r.AuthN)
-	if err != nil {
-		return nil, err
-	}
-
-	var parent Folder
-	if parentID != nil {
-		parent, err = r.SFS.GetFolderByID(user, *parentID)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get parent %s: %w", *parentID, err)
-		}
-	} else {
-		parent, err = r.SFS.GetRoot(user)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get root: %w", err)
-		}
-	}
-
-	if content == nil {
-		content = new(string)
-	}
-
-	file := File{
-		ID:      r.UUIDGen.Generate().String(),
-		Name:    name,
-		Owner:   &user,
-		Parent:  &parent,
-		Content: *content,
-	}
-
-	file, err = r.SFS.InsertFile(user, file)
-	if err != nil {
-		return nil, fmt.Errorf("failed to insert file: %w", err)
-	}
-
-	return &file, nil
+	return nil, errors.New("not implemented: CreateFile - createFile")
 }
 
 // WriteFile is the resolver for the writeFile field.
 func (r *mutationResolver) WriteFile(ctx context.Context, id string, content string) (*File, error) {
-	user, err := handleGettingUserFromContext(ctx, r.AuthN)
-	if err != nil {
-		return nil, err
-	}
-
-	file, err := r.SFS.WriteFile(user, id, content)
-	if err != nil {
-		return nil, fmt.Errorf("failed to write file %s: %w", id, err)
-	}
-
-	return &file, nil
+	return nil, errors.New("not implemented: WriteFile - writeFile")
 }
 
 // Mutation returns MutationResolver implementation.

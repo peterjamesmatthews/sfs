@@ -43,7 +43,7 @@ type SharedFileSystemer interface {
 	// # Errors
 	//  - `ErrNotFound` if the node is not found.
 	//  - `ErrUnauthorized` if the user does not own the node or if the user does not have write access to the destination parent.
-	MoveNode(user User, id string, dstID string) (Node, error)
+	MoveNode(user User, id string, dstID *string) (Node, error)
 
 	// GetRoot fetches the root folder of the shared file system.
 	//
