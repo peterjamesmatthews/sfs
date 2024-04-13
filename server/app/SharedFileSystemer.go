@@ -2,9 +2,27 @@ package app
 
 import (
 	"errors"
+	"fmt"
 
+	"gorm.io/gorm"
+	"pjm.dev/sfs/db/model"
 	"pjm.dev/sfs/graph"
 )
+
+func (a *app) CreateUser(name string) (graph.User, error) {
+	if name == "" {
+		return graph.User{}, errors.New("name cannot be empty")
+	}
+
+	user := model.User{Name: name}
+	if err := a.db.Create(&user).Error; errors.Is(err, gorm.ErrDuplicatedKey) {
+		return graph.User{}, graph.ErrConflict
+	} else if err != nil {
+		return graph.User{}, fmt.Errorf("failed to create user: %w", err)
+	}
+
+	return a.toGraphUser(user), nil
+}
 
 func (a *app) GetNodeByURI(user graph.User, uri string) (graph.Node, error) {
 	return nil, errors.New("not implemented")

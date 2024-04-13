@@ -1,6 +1,15 @@
 package graph
 
 type SharedFileSystemer interface {
+	// CreateUser creates a new user.
+	//
+	// # Arguments
+	//  - name: The name of the user to create.
+	//
+	// # Errors
+	//	- `ErrConflict` if a user with the same name already exists.
+	CreateUser(name string) (User, error)
+
 	// GetNodeByURI fetches a node by its uri.
 	//
 	// # Arguments
