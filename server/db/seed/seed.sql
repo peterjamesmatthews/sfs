@@ -126,6 +126,7 @@ COPY atlas_schema_revisions.atlas_schema_revisions (version, description, type, 
 20240413000857		2	1	1	2024-04-13 00:54:37.247834+00	308209			2hfvR3ABvTLZfmC+0610AG7bzS7T+w0/l236wUPYvAc=	["h1:HW7pHIMJ+wXOsnQtqZX3xhnrqPpBcrpC1g2uKQHg7LU="]	Atlas CLI v0.21.2-e25c033-canary
 20240413002501		2	2	2	2024-04-13 00:54:37.254697+00	244583			nwC/2Z8ibqx6ZoW1pRtaz2glXYKFFMxIq/6S2MNC59w=	["h1:hfd1OR3nfbc3NvU5qodRRUsTW2abMCh5Vv4ffnCxLKw=", "h1:e1AwpT/quUQPI8jf7nXO+/hxQbi8i52bh/o8B2/zYYc="]	Atlas CLI v0.21.2-e25c033-canary
 20240413004158		2	2	2	2024-04-13 00:54:37.258228+00	164083			HR0LrbSMGjrmNB3sQQJ07BlhzhUzm0IStuHEzuQIdUU=	["h1:N7sxtFcgk6B9LQnKQgfw158pek6coSw2NpgUEyzX1i0=", "h1:57JLXVi+rdcvMbAUVHmMR7ydSfWMKM60OqSFrKnPfNQ="]	Atlas CLI v0.21.2-e25c033-canary
+20240413013118		2	1	1	2024-04-13 05:27:54.639182+00	263125			kHdG94wI9T/0FflSC4a5aU5qCYPAXuabKvnciLcbOlU=	["h1:GflwZxG6dTxDxx4GcHd9nwWvsq1MEBknbnpzDJVvF/U="]	Atlas CLI v0.21.2-e25c033-canary
 \.
 
 
@@ -134,6 +135,8 @@ COPY atlas_schema_revisions.atlas_schema_revisions (version, description, type, 
 --
 
 COPY public.access (id, "user", type, node) FROM stdin;
+3071e2a5-abfd-474e-8ab3-24c4c415a3c0	3c403b9b-4303-4d51-b8f6-7218ef382745	read	01360ece-c6ed-4f69-83fc-8e3c5422d6e7
+253a4fb7-5417-4c57-b377-0fb217817fc5	3c403b9b-4303-4d51-b8f6-7218ef382745	write	01360ece-c6ed-4f69-83fc-8e3c5422d6e7
 \.
 
 
@@ -150,6 +153,7 @@ COPY public.file (id, node, content) FROM stdin;
 --
 
 COPY public.node (id, name, owner, parent) FROM stdin;
+01360ece-c6ed-4f69-83fc-8e3c5422d6e7	Foo	3c403b9b-4303-4d51-b8f6-7218ef382745	\N
 \.
 
 
@@ -158,6 +162,7 @@ COPY public.node (id, name, owner, parent) FROM stdin;
 --
 
 COPY public."user" (id, name) FROM stdin;
+3c403b9b-4303-4d51-b8f6-7218ef382745	Peter
 \.
 
 
@@ -213,6 +218,13 @@ CREATE UNIQUE INDEX access_user_type_node ON public.access USING btree ("user", 
 --
 
 CREATE UNIQUE INDEX node_name_owner_parent ON public.node USING btree (name, owner, parent);
+
+
+--
+-- Name: user_name_key; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE UNIQUE INDEX user_name_key ON public."user" USING btree (name);
 
 
 --

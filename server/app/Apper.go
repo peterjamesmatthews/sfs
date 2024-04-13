@@ -18,7 +18,5 @@ type app struct {
 }
 
 func New(db *gorm.DB) Apper {
-	return &app{
-		db: db,
-	}
+	return &app{db: db}
 }
