@@ -2,6 +2,9 @@
 #
 # It defines the interface in which clients will mutate the shared file system with.
 type Mutation {
+  # createUser creates a new user.
+  createUser(name: String!): User
+
   # renameNode changes the name of a node.
   renameNode(id: ID!, name: String!): Node
 

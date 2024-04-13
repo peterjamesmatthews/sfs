@@ -10,6 +10,11 @@ import (
 	"fmt"
 )
 
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, name string) (*User, error) {
+	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+}
+
 // RenameNode is the resolver for the renameNode field.
 func (r *mutationResolver) RenameNode(ctx context.Context, id string, name string) (Node, error) {
 	user, err := handleGettingUserFromContext(ctx, r.AuthN)

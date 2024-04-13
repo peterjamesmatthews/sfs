@@ -3,15 +3,17 @@ module pjm.dev/sfs
 go 1.21
 
 require (
+	ariga.io/atlas-go-sdk v0.2.0
 	github.com/99designs/gqlgen v0.17.44
 	github.com/google/uuid v1.6.0
 	github.com/sethvargo/go-envconfig v1.0.0
 	github.com/vektah/gqlparser/v2 v2.5.11
+	gorm.io/gen v0.3.26
+	gorm.io/plugin/dbresolver v1.5.0
 )
 
 require (
 	ariga.io/atlas v0.14.3-0.20231010104048-0c071bfc9161 // indirect
-	ariga.io/atlas-go-sdk v0.2.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/go-openapi/inflect v0.19.0 // indirect
@@ -23,7 +25,6 @@ require (
 	github.com/jackc/pgx/v5 v5.4.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/zclconf/go-cty v1.14.1 // indirect
@@ -31,9 +32,7 @@ require (
 	golang.org/x/sync v0.7.0 // indirect
 	gorm.io/datatypes v1.1.1-0.20230130040222-c43177d3cf8c // indirect
 	gorm.io/driver/mysql v1.4.4 // indirect
-	gorm.io/gen v0.3.26 // indirect
 	gorm.io/hints v1.1.0 // indirect
-	gorm.io/plugin/dbresolver v1.5.0 // indirect
 )
 
 require (
