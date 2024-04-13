@@ -79,8 +79,9 @@ var dbPath = filepath.Join(meta.Root, "db", "query")
 
 func generate(db *gorm.DB) error {
 	g := gen.NewGenerator(gen.Config{
-		OutPath: dbPath,
-		Mode:    gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface,
+		OutPath:       dbPath,
+		Mode:          gen.WithoutContext | gen.WithDefaultQuery | gen.WithQueryInterface,
+		FieldNullable: true,
 	})
 
 	g.UseDB(db)
