@@ -13,3 +13,12 @@ CREATE TABLE "node" (
   "parent" UUID,
   CONSTRAINT "node_parent" FOREIGN KEY ("parent") REFERENCES "node" ("id") ON DELETE CASCADE
 );
+
+CREATE TABLE "file" (
+  "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+  PRIMARY KEY ("id"),
+  "node" UUID NOT NULL,
+  CONSTRAINT "file_node" FOREIGN KEY ("node") REFERENCES "node" ("id") ON DELETE CASCADE,
+  "content" TEXT NOT NULL
+);
+
