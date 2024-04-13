@@ -85,7 +85,29 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
+  Node:
+    fields:
+      owner:
+        resolver: true
+      parent:
+        resolver: true
   File:
     fields:
       owner:
+        resolver: true
+      parent:
+        resolver: true
+  Folder:
+    fields:
+      owner:
+        resolver: true
+      parent:
+        resolver: true
+      children:
+        resolver: true
+  Access:
+    fields:
+      user:
+        resolver: true
+      target:
         resolver: true

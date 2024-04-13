@@ -19,6 +19,11 @@ func (r *fileResolver) Owner(ctx context.Context, obj *File) (*User, error) {
 	return &user, nil
 }
 
+// Parent is the resolver for the parent field.
+func (r *fileResolver) Parent(ctx context.Context, obj *File) (*Folder, error) {
+	panic(fmt.Errorf("not implemented: Parent - parent"))
+}
+
 // File returns FileResolver implementation.
 func (r *Resolver) File() FileResolver { return &fileResolver{r} }
 

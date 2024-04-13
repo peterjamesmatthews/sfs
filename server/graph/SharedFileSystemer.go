@@ -10,6 +10,19 @@ type SharedFileSystemer interface {
 	//	- `ErrConflict` if a user with the same name already exists.
 	CreateUser(name string) (User, error)
 
+	// CreateFolder creates a new folder.
+	//
+	// # Arguments:
+	//  - user: The user who is creating the folder.
+	//  - parentID: The id of the parent folder.
+	//  - name: The name of the folder to create.
+	//
+	// # Errors
+	//	- `ErrNotFound` if the parent folder is not found.
+	//	- `ErrUnauthorized` if the user does not have write access to the parent folder.
+	//	- `ErrConflict` if a folder owned by `user` named `name` already exists in the parent folder.
+	CreateFolder(user User, parentID *string, name string) (Folder, error)
+
 	// GetNodeByURI fetches a node by its uri.
 	//
 	// # Arguments
@@ -61,17 +74,6 @@ type SharedFileSystemer interface {
 	//  - `ErrNotFound` if `folder`'s parent is not found.
 	//  - `ErrUnauthorized` if the user does not write access to `folder`'s parent.
 	InsertFolder(user User, folder Folder) (Folder, error)
-
-	// GetFolderbyID fetches a folder by its id.
-	//
-	// # Arguments
-	//   - user: The user who is fetching the folder.
-	//   - id: The id of the folder to fetch.
-	//
-	// # Errors
-	//  - `ErrNotFound` if `folder`'s parent is not found.
-	//  - `ErrUnauthorized` if the user does not have read access to the folder.
-	GetFolderByID(user User, id string) (Folder, error)
 
 	// InsertFile inserts a file into the shared file system.
 	//
