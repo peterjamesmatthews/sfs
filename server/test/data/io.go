@@ -1,7 +1,6 @@
-package e2e
+package data
 
 import (
-	"encoding/json"
 	"io"
 	"os"
 	"path/filepath"
@@ -10,36 +9,25 @@ import (
 	"pjm.dev/sfs/meta"
 )
 
-type Query struct {
-	Query string `json:"query"`
-}
-
-func GQLFileToString(t *testing.T, path string) string {
+func Read(t *testing.T, path string) []byte {
 	t.Helper()
 
+	// if path is relative, make it absolute to the test data directory
 	if !filepath.IsAbs(path) {
 		path = filepath.Join(meta.Root, "test", "data", path)
 	}
 
+	// open file
 	file, err := os.Open(path)
 	if err != nil {
 		t.Fatalf("failed to open file: %v", err)
 	}
 
-	// read file contents to string
+	// read file contents
 	bytes, err := io.ReadAll(file)
 	if err != nil {
 		t.Fatalf("failed to read file: %v", err)
 	}
 
-	query := Query{Query: string(bytes)}
-
-	json, err := json.Marshal(query)
-	if err != nil {
-		t.Fatalf("failed to marshal json: %v", err)
-	}
-
-	s := string(json)
-
-	return s
+	return bytes
 }

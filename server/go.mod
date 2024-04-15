@@ -1,6 +1,6 @@
 module pjm.dev/sfs
 
-go 1.21
+go 1.21.1
 
 require (
 	ariga.io/atlas-go-sdk v0.2.0
@@ -33,6 +33,7 @@ require (
 	gorm.io/datatypes v1.1.1-0.20230130040222-c43177d3cf8c // indirect
 	gorm.io/driver/mysql v1.4.4 // indirect
 	gorm.io/hints v1.1.0 // indirect
+	pjm.dev/crow v0.0.0-unpublished // indirect
 )
 
 require (
@@ -52,3 +53,5 @@ require (
 	gorm.io/driver/postgres v1.5.7
 	gorm.io/gorm v1.25.9
 )
+
+replace pjm.dev/crow v0.0.0-unpublished => ../../crow
