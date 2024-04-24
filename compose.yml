@@ -26,20 +26,6 @@ services:
       - ./server:/sfs/server
       - server_debug_bins:/sfs/server/__debug_bins/
 
-  database:
-    image: postgres:bullseye
-    container_name: ${DATABASE_HOSTNAME}
-    environment:
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - POSTGRES_DB=${DATABASE_NAME}
-    ports:
-      - 5432:${DATABASE_PORT}
-    volumes:
-      - ./server/db/seed:/docker-entrypoint-initdb.d
-      - database_data:/var/lib/postgresql/data
-
 volumes:
   app_node_modules: null
   server_debug_bins: null
-  database_data: null
