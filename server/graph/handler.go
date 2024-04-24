@@ -9,13 +9,12 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 )
 
-func NewHandler(authN Authenticator, sfs SharedFileSystemer, uuidGen UUIDGenerator) http.Handler {
+func NewHandler(authN Authenticator, sfs SharedFileSystemer) http.Handler {
 	var gqlHandler http.Handler
 
 	resolver := Resolver{
-		AuthN:   authN,
-		SFS:     sfs,
-		UUIDGen: uuidGen,
+		AuthN: authN,
+		SFS:   sfs,
 	}
 
 	config := Config{Resolvers: &resolver}

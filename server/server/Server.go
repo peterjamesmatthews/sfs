@@ -10,16 +10,12 @@ import (
 	"pjm.dev/sfs/graph"
 )
 
-type Server interface {
-	Serve() error
-}
-
-func New(config config.ServerConfig, app app.Apper) Server {
+func New(config config.Server, app *app.App) http.Handler {
 	mux := http.NewServeMux()
 
 	// initialize graph handler
 	graphPattern := fmt.Sprintf("/%s", config.GraphEndpoint)
-	graphHandler := graph.NewHandler(app, app, app)
+	graphHandler := graph.NewHandler(app, app)
 	graphHandler = wrapHandler(
 		graphHandler,
 		&loggingHandler{},
@@ -32,17 +28,5 @@ func New(config config.ServerConfig, app app.Apper) Server {
 	playgroundHandler := playground.Handler("SFS Playground", graphPattern)
 	mux.Handle(playgroundPattern, playgroundHandler)
 
-	return &server{
-		addr:    fmt.Sprintf("%s:%s", config.Hostname, config.Port),
-		handler: mux,
-	}
-}
-
-type server struct {
-	addr    string
-	handler http.Handler
-}
-
-func (s *server) Serve() error {
-	return http.ListenAndServe(s.addr, s.handler)
+	return mux
 }

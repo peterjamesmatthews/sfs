@@ -8,9 +8,9 @@ import (
 	"github.com/sethvargo/go-envconfig"
 )
 
-func New(ctx context.Context) (Config, error) {
+func New() (Config, error) {
 	var config Config
-	err := envconfig.Process(ctx, &config)
+	err := envconfig.Process(context.Background(), &config)
 	if err != nil {
 		return Config{}, err
 	}
@@ -19,8 +19,8 @@ func New(ctx context.Context) (Config, error) {
 }
 
 type Config struct {
-	Server   ServerConfig   `env:", prefix=SERVER_"`
-	Database DatabaseConfig `env:", prefix=DATABASE_"`
+	Server   Server   `env:", prefix=SERVER_"`
+	Database Database `env:", prefix=DATABASE_"j`
 }
 
 func (c Config) String() string {
@@ -31,28 +31,10 @@ func (c Config) String() string {
 	return string(bytes)
 }
 
-type ServerConfig struct {
+type Server struct {
 	Hostname      string `env:"HOSTNAME"`
 	Port          string `env:"PORT"`
 	GraphEndpoint string `env:"GRAPH_ENDPOINT"`
 }
 
-type DatabaseConfig struct {
-	Hostname string `env:"HOSTNAME"`
-	Port     string `env:"PORT"`
-	User     string `env:"USER"`
-	Password string `env:"PASSWORD"`
-	Name     string `env:"NAME"`
-}
-
-func (d *DatabaseConfig) GetDSN() string {
-	return fmt.Sprintf(
-		"%s://%s:%s@%s:%s/%s?sslmode=disable",
-		"postgres",
-		d.User,
-		d.Password,
-		d.Hostname,
-		d.Port,
-		d.Name,
-	)
-}
+type Database struct{}
