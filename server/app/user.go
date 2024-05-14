@@ -2,7 +2,7 @@ package app
 
 import "pjm.dev/sfs/db/model"
 
-func (a *app) getUserByID(id string) (model.User, error) {
+func (a *App) getUserByID(id string) (model.User, error) {
 	user := model.User{ID: id}
 	err := a.db.Where(&user).First(&user).Error
 	if err != nil {

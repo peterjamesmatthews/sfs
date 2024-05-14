@@ -5,7 +5,7 @@ import (
 	"pjm.dev/sfs/db/model"
 )
 
-func (a *app) createNode(user model.User, name string, parent *model.Node) (model.Node, error) {
+func (a *App) createNode(user model.User, name string, parent *model.Node) (model.Node, error) {
 	var parentID *string
 	if parent != nil {
 		parentID = &parent.ID
@@ -19,7 +19,7 @@ func (a *app) createNode(user model.User, name string, parent *model.Node) (mode
 	return node, nil
 }
 
-func (a *app) getNodeByID(id string) (model.Node, error) {
+func (a *App) getNodeByID(id string) (model.Node, error) {
 	var node model.Node
 	if err := a.db.Where("id = ?", id).First(&node).Error; err != nil {
 		return model.Node{}, err

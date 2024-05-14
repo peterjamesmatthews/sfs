@@ -12,7 +12,7 @@ import (
 // Authenticate finds the user with the same name as the Authorization header.
 //
 // If no user is found, Authenticate returns graph.ErrUnauthorized.
-func (a *app) Authenticate(r *http.Request) (graph.User, error) {
+func (a *App) Authenticate(r *http.Request) (graph.User, error) {
 	name := r.Header.Get("Authorization")
 	if name == "" {
 		return graph.User{}, graph.ErrUnauthorized
@@ -30,11 +30,11 @@ type appContextKeyType string
 
 const userContextKey appContextKeyType = "user"
 
-func (a *app) WithUser(ctx context.Context, user graph.User) context.Context {
+func (a *App) WithUser(ctx context.Context, user graph.User) context.Context {
 	return context.WithValue(ctx, userContextKey, user)
 }
 
-func (a *app) FromContext(ctx context.Context) (graph.User, error) {
+func (a *App) FromContext(ctx context.Context) (graph.User, error) {
 	user, ok := ctx.Value(userContextKey).(graph.User)
 	if !ok {
 		return graph.User{}, graph.ErrUnauthorized
@@ -43,7 +43,7 @@ func (a *app) FromContext(ctx context.Context) (graph.User, error) {
 	return user, nil
 }
 
-func (a *app) WrapInAuthentication(h http.Handler) http.Handler {
+func (a *App) WrapInAuthentication(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// authenticate user
 		user, err := a.Authenticate(r)

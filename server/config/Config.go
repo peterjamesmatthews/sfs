@@ -33,13 +33,13 @@ func (c Config) String() string {
 
 type ServerConfig struct {
 	Hostname      string `env:"HOSTNAME"`
-	Port          string `env:"PORT"`
+	Port          int    `env:"PORT"`
 	GraphEndpoint string `env:"GRAPH_ENDPOINT"`
 }
 
 type DatabaseConfig struct {
 	Hostname string `env:"HOSTNAME"`
-	Port     string `env:"PORT"`
+	Port     int    `env:"PORT"`
 	User     string `env:"USER"`
 	Password string `env:"PASSWORD"`
 	Name     string `env:"NAME"`
@@ -47,7 +47,7 @@ type DatabaseConfig struct {
 
 func (d *DatabaseConfig) GetDSN() string {
 	return fmt.Sprintf(
-		"%s://%s:%s@%s:%s/%s?sslmode=disable",
+		"%s://%s:%s@%s:%d/%s?sslmode=disable",
 		"postgres",
 		d.User,
 		d.Password,
