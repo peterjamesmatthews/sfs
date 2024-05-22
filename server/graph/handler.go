@@ -7,8 +7,7 @@ import (
 	"pjm.dev/sfs/config"
 )
 
-func NewHandler(config config.ServerConfig, resolver Resolver) http.Handler {
+func New(config config.ServerConfig, resolver Resolver) http.Handler {
 	executableSchema := NewExecutableSchema(Config{Resolvers: &resolver})
-	handler := handler.NewDefaultServer(executableSchema)
-	return resolver.AuthN.WrapInAuthentication(handler)
+	return handler.NewDefaultServer(executableSchema)
 }

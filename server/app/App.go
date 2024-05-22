@@ -1,15 +1,18 @@
 package app
 
 import (
-	"github.com/google/uuid"
-	"gorm.io/gorm"
+	"github.com/jackc/pgx/v5"
+	"pjm.dev/sfs/db/models"
 )
 
 type App struct {
-	db    *gorm.DB
-	uuids []uuid.UUID
+	db *pgx.Conn
+	q  *models.Queries
 }
 
-func New(db *gorm.DB) App {
-	return App{db: db}
+func New(conn *pgx.Conn) App {
+	return App{
+		db: conn,
+		q:  models.New(conn),
+	}
 }

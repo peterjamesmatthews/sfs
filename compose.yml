@@ -1,12 +1,17 @@
 name: sfs
 
+volumes:
+  app_node_modules: null
+  server_debug_bins: null
+  database_data: null
+
 services:
   app:
     build: app
     container_name: app
+    hostname: ${APP_HOSTNAME}
     env_file:
       - .env
-    hostname: ${APP_HOSTNAME}
     ports:
       - 80:${APP_PORT}
     volumes:
@@ -16,9 +21,9 @@ services:
   server:
     build: server
     container_name: server
+    hostname: ${SERVER_HOSTNAME}
     env_file:
       - .env
-    hostname: ${SERVER_HOSTNAME}
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
       - ${SERVER_DEBUG_PORT}:${SERVER_DEBUG_PORT}
@@ -27,19 +32,15 @@ services:
       - server_debug_bins:/sfs/server/__debug_bins/
 
   database:
-    image: postgres:bullseye
-    container_name: ${DATABASE_HOSTNAME}
+    image: postgres:16-bullseye
+    container_name: database
+    hostname: ${DATABASE_HOSTNAME}
     environment:
       - POSTGRES_USER=${DATABASE_USER}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
       - POSTGRES_DB=${DATABASE_NAME}
     ports:
-      - 5432:${DATABASE_PORT}
+      - ${DATABASE_PORT}:${DATABASE_PORT}
     volumes:
-      - ./server/db/seed:/docker-entrypoint-initdb.d
       - database_data:/var/lib/postgresql/data
-
-volumes:
-  app_node_modules: null
-  server_debug_bins: null
-  database_data: null
+      - ./server/db/migrations:/docker-entrypoint-initdb.d

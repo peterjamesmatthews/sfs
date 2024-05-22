@@ -1,6 +1,20 @@
 package graph
 
+import "net/http"
+
 type SharedFileSystemer interface {
+	// Authenticate determines the requesting user.
+	//
+	// # Arguments
+	//  - r: The http request to authenticate.
+	//
+	// # Returns
+	//  - The user who is making the request.
+	//
+	// # Errors
+	//  - `ErrUnauthorized` if an authenticated user cannot be determined.
+	Authenticate(*http.Request) (User, error)
+
 	// CreateUser creates a new user.
 	//
 	// # Arguments
@@ -97,6 +111,4 @@ type SharedFileSystemer interface {
 	// - `ErrNotFound` if `file`'s parent is not found.
 	// - `ErrUnauthorized` if `user` does not have write access to the file
 	WriteFile(user User, fileID string, content string) (File, error)
-
-	GetUserByID(id string) (User, error)
 }

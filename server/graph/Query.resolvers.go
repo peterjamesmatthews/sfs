@@ -11,17 +11,7 @@ import (
 
 // GetNodeByURI is the resolver for the getNodeByURI field.
 func (r *queryResolver) GetNodeByURI(ctx context.Context, uri string) (Node, error) {
-	user, err := handleGettingUserFromContext(ctx, r.AuthN)
-	if err != nil {
-		return nil, err
-	}
-
-	node, err := r.SFS.GetNodeByURI(user, uri)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get node at uri: %w", err)
-	}
-
-	return node, nil
+	return nil, fmt.Errorf("not implemented: GetNodeByURI - getNodeByURI")
 }
 
 // Query returns QueryResolver implementation.

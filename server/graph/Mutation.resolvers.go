@@ -7,18 +7,11 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 )
 
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, name string) (*User, error) {
-	user, err := r.SFS.CreateUser(name)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create user %s: %w", name, err)
-
-	}
-
-	return &user, nil
+	return nil, errors.New("not implemented: CreateUser - createUser")
 }
 
 // RenameNode is the resolver for the renameNode field.
@@ -38,17 +31,7 @@ func (r *mutationResolver) ShareNode(ctx context.Context, userID string, accessT
 
 // CreateFolder is the resolver for the createFolder field.
 func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, name string) (*Folder, error) {
-	user, err := handleGettingUserFromContext(ctx, r.AuthN)
-	if err != nil {
-		return nil, err
-	}
-
-	folder, err := r.SFS.CreateFolder(user, parentID, name)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create folder %s: %w", name, err)
-	}
-
-	return &folder, nil
+	return nil, errors.New("not implemented: CreateFolder - createFolder")
 }
 
 // CreateFile is the resolver for the createFile field.

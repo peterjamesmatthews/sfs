@@ -6,22 +6,17 @@ package graph
 
 import (
 	"context"
-	"fmt"
+	"errors"
 )
 
 // Owner is the resolver for the owner field.
 func (r *fileResolver) Owner(ctx context.Context, obj *File) (*User, error) {
-	user, err := r.SFS.GetUserByID(obj.Owner.ID)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get user by id: %w", err)
-	}
-
-	return &user, nil
+	return nil, errors.New("not implemented: Owner - owner")
 }
 
 // Parent is the resolver for the parent field.
 func (r *fileResolver) Parent(ctx context.Context, obj *File) (*Folder, error) {
-	panic(fmt.Errorf("not implemented: Parent - parent"))
+	return nil, errors.New("not implemented: Parent - parent")
 }
 
 // File returns FileResolver implementation.

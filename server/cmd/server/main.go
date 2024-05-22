@@ -28,25 +28,21 @@ func main() {
 	// initialize db
 	db, err := db.New(config.Database)
 	if err != nil {
-		log.Fatalf("failed to initialize database: %v", err)
+		log.Fatalf("failed to initialize db: %v", err)
 	}
 
 	// initialize app
 	app := app.New(db)
 
 	// initialize graph
-	graphHandler := graph.NewHandler(config.Server, graph.Resolver{
-		SFS:     &app,
-		AuthN:   &app,
-		UUIDGen: &app,
-	})
+	handler := graph.New(config.Server, graph.Resolver{SFS: &app})
 
 	// initialize server
 	mux := http.NewServeMux()
 
-	// register graph handler
+	// register graph's handler
 	graphPattern := fmt.Sprintf("/%s", config.Server.GraphEndpoint)
-	mux.Handle(graphPattern, graphHandler)
+	mux.Handle(graphPattern, handler)
 
 	// register graph's playground handler
 	mux.Handle("/", playground.Handler("SFS Playground", graphPattern))
