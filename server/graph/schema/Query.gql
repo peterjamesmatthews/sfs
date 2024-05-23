@@ -1,6 +1,0 @@
-# Query is the root query type.
-#
-# It defines the interface in which clients will query the shared file system with.
-type Query {
-  getNodeByURI(uri: String!): Node
-}

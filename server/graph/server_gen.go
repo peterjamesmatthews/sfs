@@ -46,6 +46,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	Authenticated func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -82,7 +83,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetNodeByURI func(childComplexity int, uri string) int
+		Me func(childComplexity int) int
 	}
 
 	User struct {
@@ -115,7 +116,7 @@ type MutationResolver interface {
 	WriteFile(ctx context.Context, id string, content string) (*File, error)
 }
 type QueryResolver interface {
-	GetNodeByURI(ctx context.Context, uri string) (Node, error)
+	Me(ctx context.Context) (*User, error)
 }
 
 type executableSchema struct {
@@ -312,17 +313,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.WriteFile(childComplexity, args["id"].(string), args["content"].(string)), true
 
-	case "Query.getNodeByURI":
-		if e.complexity.Query.GetNodeByURI == nil {
+	case "Query.me":
+		if e.complexity.Query.Me == nil {
 			break
 		}
 
-		args, err := ec.field_Query_getNodeByURI_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.GetNodeByURI(childComplexity, args["uri"].(string)), true
+		return e.complexity.Query.Me(childComplexity), true
 
 	case "User.id":
 		if e.complexity.User.ID == nil {
@@ -441,7 +437,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-//go:embed "schema/Access.gql" "schema/File.gql" "schema/Folder.gql" "schema/Mutation.gql" "schema/Node.gql" "schema/Query.gql" "schema/User.gql"
+//go:embed "schema.gql"
 var sourcesFS embed.FS
 
 func sourceData(filename string) string {
@@ -453,13 +449,7 @@ func sourceData(filename string) string {
 }
 
 var sources = []*ast.Source{
-	{Name: "schema/Access.gql", Input: sourceData("schema/Access.gql"), BuiltIn: false},
-	{Name: "schema/File.gql", Input: sourceData("schema/File.gql"), BuiltIn: false},
-	{Name: "schema/Folder.gql", Input: sourceData("schema/Folder.gql"), BuiltIn: false},
-	{Name: "schema/Mutation.gql", Input: sourceData("schema/Mutation.gql"), BuiltIn: false},
-	{Name: "schema/Node.gql", Input: sourceData("schema/Node.gql"), BuiltIn: false},
-	{Name: "schema/Query.gql", Input: sourceData("schema/Query.gql"), BuiltIn: false},
-	{Name: "schema/User.gql", Input: sourceData("schema/User.gql"), BuiltIn: false},
+	{Name: "schema.gql", Input: sourceData("schema.gql"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -656,21 +646,6 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_getNodeByURI_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 string
-	if tmp, ok := rawArgs["uri"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("uri"))
-		arg0, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["uri"] = arg0
 	return args, nil
 }
 
@@ -1391,8 +1366,28 @@ func (ec *executionContext) _Mutation_renameNode(ctx context.Context, field grap
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().RenameNode(rctx, fc.Args["id"].(string), fc.Args["name"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().RenameNode(rctx, fc.Args["id"].(string), fc.Args["name"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticated == nil {
+				return nil, errors.New("directive Authenticated is not implemented")
+			}
+			return ec.directives.Authenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(Node); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be pjm.dev/sfs/graph.Node`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1443,8 +1438,28 @@ func (ec *executionContext) _Mutation_moveNode(ctx context.Context, field graphq
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().MoveNode(rctx, fc.Args["id"].(string), fc.Args["parentID"].(*string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().MoveNode(rctx, fc.Args["id"].(string), fc.Args["parentID"].(*string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticated == nil {
+				return nil, errors.New("directive Authenticated is not implemented")
+			}
+			return ec.directives.Authenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(Node); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be pjm.dev/sfs/graph.Node`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1495,8 +1510,28 @@ func (ec *executionContext) _Mutation_shareNode(ctx context.Context, field graph
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().ShareNode(rctx, fc.Args["userID"].(string), fc.Args["accessType"].(AccessType), fc.Args["targetID"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().ShareNode(rctx, fc.Args["userID"].(string), fc.Args["accessType"].(AccessType), fc.Args["targetID"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticated == nil {
+				return nil, errors.New("directive Authenticated is not implemented")
+			}
+			return ec.directives.Authenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*Access); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *pjm.dev/sfs/graph.Access`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1555,8 +1590,28 @@ func (ec *executionContext) _Mutation_createFolder(ctx context.Context, field gr
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateFolder(rctx, fc.Args["parentID"].(*string), fc.Args["name"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().CreateFolder(rctx, fc.Args["parentID"].(*string), fc.Args["name"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticated == nil {
+				return nil, errors.New("directive Authenticated is not implemented")
+			}
+			return ec.directives.Authenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*Folder); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *pjm.dev/sfs/graph.Folder`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1619,8 +1674,28 @@ func (ec *executionContext) _Mutation_createFile(ctx context.Context, field grap
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateFile(rctx, fc.Args["parentID"].(*string), fc.Args["name"].(string), fc.Args["content"].(*string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().CreateFile(rctx, fc.Args["parentID"].(*string), fc.Args["name"].(string), fc.Args["content"].(*string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticated == nil {
+				return nil, errors.New("directive Authenticated is not implemented")
+			}
+			return ec.directives.Authenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*File); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *pjm.dev/sfs/graph.File`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1683,8 +1758,28 @@ func (ec *executionContext) _Mutation_writeFile(ctx context.Context, field graph
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().WriteFile(rctx, fc.Args["id"].(string), fc.Args["content"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Mutation().WriteFile(rctx, fc.Args["id"].(string), fc.Args["content"].(string))
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticated == nil {
+				return nil, errors.New("directive Authenticated is not implemented")
+			}
+			return ec.directives.Authenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*File); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *pjm.dev/sfs/graph.File`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1734,8 +1829,8 @@ func (ec *executionContext) fieldContext_Mutation_writeFile(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_getNodeByURI(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_getNodeByURI(ctx, field)
+func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_me(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1747,8 +1842,28 @@ func (ec *executionContext) _Query_getNodeByURI(ctx context.Context, field graph
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().GetNodeByURI(rctx, fc.Args["uri"].(string))
+		directive0 := func(rctx context.Context) (interface{}, error) {
+			ctx = rctx // use context from middleware stack in children
+			return ec.resolvers.Query().Me(rctx)
+		}
+		directive1 := func(ctx context.Context) (interface{}, error) {
+			if ec.directives.Authenticated == nil {
+				return nil, errors.New("directive Authenticated is not implemented")
+			}
+			return ec.directives.Authenticated(ctx, nil, directive0)
+		}
+
+		tmp, err := directive1(rctx)
+		if err != nil {
+			return nil, graphql.ErrorOnPath(ctx, err)
+		}
+		if tmp == nil {
+			return nil, nil
+		}
+		if data, ok := tmp.(*User); ok {
+			return data, nil
+		}
+		return nil, fmt.Errorf(`unexpected type %T from directive, should be *pjm.dev/sfs/graph.User`, tmp)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1757,31 +1872,26 @@ func (ec *executionContext) _Query_getNodeByURI(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(Node)
+	res := resTmp.(*User)
 	fc.Result = res
-	return ec.marshalONode2pjmᚗdevᚋsfsᚋgraphᚐNode(ctx, field.Selections, res)
+	return ec.marshalOUser2ᚖpjmᚗdevᚋsfsᚋgraphᚐUser(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_getNodeByURI(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_me(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("FieldContext.Child cannot be called on type INTERFACE")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "name":
+				return ec.fieldContext_User_name(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_getNodeByURI_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
 	}
 	return fc, nil
 }
@@ -3784,13 +3894,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 	switch obj := (obj).(type) {
 	case nil:
 		return graphql.Null
-	case File:
-		return ec._File(ctx, sel, &obj)
-	case *File:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._File(ctx, sel, obj)
 	case Folder:
 		return ec._Folder(ctx, sel, &obj)
 	case *Folder:
@@ -3798,6 +3901,13 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Folder(ctx, sel, obj)
+	case File:
+		return ec._File(ctx, sel, &obj)
+	case *File:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._File(ctx, sel, obj)
 	default:
 		panic(fmt.Errorf("unexpected type %T", obj))
 	}
@@ -4274,7 +4384,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "getNodeByURI":
+		case "me":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -4283,7 +4393,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_getNodeByURI(ctx, field)
+				res = ec._Query_me(ctx, field)
 				return res
 			}
 

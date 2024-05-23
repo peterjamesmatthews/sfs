@@ -1,19 +1,17 @@
 package graph
 
-import "net/http"
-
 type SharedFileSystemer interface {
 	// Authenticate determines the requesting user.
 	//
 	// # Arguments
-	//  - r: The http request to authenticate.
+	//	- string: The Authorization header from the request.
 	//
 	// # Returns
 	//  - The user who is making the request.
 	//
 	// # Errors
 	//  - `ErrUnauthorized` if an authenticated user cannot be determined.
-	Authenticate(*http.Request) (User, error)
+	Authenticate(string) (User, error)
 
 	// CreateUser creates a new user.
 	//
