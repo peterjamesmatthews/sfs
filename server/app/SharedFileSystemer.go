@@ -1,20 +1,17 @@
 package app
 
 import (
+	"context"
 	"errors"
-	"net/http"
+	"fmt"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
+	"pjm.dev/sfs/db/models"
 	"pjm.dev/sfs/graph"
 )
 
-func (a *App) Authenticate(r *http.Request) (graph.User, error) {
-	// get Authorization header
-	auth := r.Header.Get("Authorization")
-	if auth == "" {
-		return graph.User{}, graph.ErrUnauthorized
-	}
-
+func (a *App) Authenticate(auth string) (graph.User, error) {
 	// parse auth to user id
 	id := pgtype.UUID{}
 	err := id.Scan(auth)
@@ -23,7 +20,7 @@ func (a *App) Authenticate(r *http.Request) (graph.User, error) {
 	}
 
 	// get user by id
-	user, err := a.q.GetUserByID(r.Context(), id)
+	user, err := a.q.GetUserByID(context.TODO(), id)
 	if err != nil {
 		return graph.User{}, graph.ErrUnauthorized
 	}
@@ -33,7 +30,16 @@ func (a *App) Authenticate(r *http.Request) (graph.User, error) {
 }
 
 func (a *App) CreateUser(name string) (graph.User, error) {
-	return graph.User{}, errors.New("not implemented")
+	// create user
+	user, err := a.q.CreateUser(context.TODO(), name)
+	if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == models.UniqueViolation {
+		return graph.User{}, graph.ErrConflict
+	} else if err != nil {
+		return graph.User{}, fmt.Errorf("failed to create user: %w", err)
+	}
+
+	// convert model user to graph user
+	return a.toGraphUser(user), nil
 }
 
 func (a *App) CreateFolder(creator graph.User, parentID *string, name string) (graph.Folder, error) {
