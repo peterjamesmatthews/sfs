@@ -109,12 +109,7 @@ export type Node = {
 
 export type Query = {
   __typename?: 'Query';
-  getNodeByURI?: Maybe<Node>;
-};
-
-
-export type QueryGetNodeByUriArgs = {
-  uri: Scalars['String']['input'];
+  me: User;
 };
 
 export type User = {
@@ -123,12 +118,10 @@ export type User = {
   name: Scalars['String']['output'];
 };
 
-export type GetNodeByUriQueryVariables = Exact<{
-  uri: Scalars['String']['input'];
-}>;
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetNodeByUriQuery = { __typename?: 'Query', getNodeByURI?: { __typename?: 'File', id: string, name: string, owner: { __typename?: 'User', id: string }, parent?: { __typename?: 'Folder', id: string } | null } | { __typename?: 'Folder', id: string, name: string, owner: { __typename?: 'User', id: string }, parent?: { __typename?: 'Folder', id: string } | null } | null };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, name: string } };
 
 
-export const GetNodeByUriDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetNodeByURI"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"uri"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getNodeByURI"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"uri"},"value":{"kind":"Variable","name":{"kind":"Name","value":"uri"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<GetNodeByUriQuery, GetNodeByUriQueryVariables>;
+export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;

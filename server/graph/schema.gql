@@ -86,5 +86,5 @@ type Mutation {
 #
 # It defines the interface in which clients will query the shared file system with.
 type Query {
-  me: User @Authenticated
+  me: User! @Authenticated
 }
