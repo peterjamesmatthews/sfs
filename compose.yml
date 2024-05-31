@@ -5,6 +5,10 @@ volumes:
   server_debug_bins: null
   database_data: null
 
+networks:
+  default:
+    name: sfs
+
 services:
   app:
     build: app
