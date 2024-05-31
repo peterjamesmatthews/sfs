@@ -1,24 +1,24 @@
-import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client";
 import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./components/App.tsx";
-import defaultTheme from "./themes/index.ts";
+import { Provider as ReduxProvider } from "react-redux";
+import client from "./apollo";
+import SignUp from "./components/SignUp.tsx";
+import store from "./store";
+import theme from "./theme";
 
 const root = document.getElementById("root");
 if (root == null) throw new Error("no root");
 
-const client = new ApolloClient({
-  uri: "/graph",
-  cache: new InMemoryCache(),
-});
-
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
-    <ApolloProvider client={client}>
-      <ThemeProvider theme={defaultTheme}>
-        <App />
-      </ThemeProvider>
-    </ApolloProvider>
+    <ReduxProvider store={store}>
+      <ApolloProvider client={client}>
+        <ThemeProvider theme={theme}>
+          <SignUp />
+        </ThemeProvider>
+      </ApolloProvider>
+    </ReduxProvider>
   </React.StrictMode>
 );
