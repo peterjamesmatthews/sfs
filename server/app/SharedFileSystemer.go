@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx/v5/pgconn"
 	"pjm.dev/sfs/db/models"
 	"pjm.dev/sfs/graph"
 )
@@ -36,7 +37,10 @@ func (a *App) CreateUser(name string, password string) (graph.User, error) {
 		context.Background(),
 		models.CreateUserParams{Name: name, Salt: salt, Hash: hash},
 	)
-	if err != nil {
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == models.UniqueViolation {
+		return graph.User{}, graph.ErrConflict
+	} else if err != nil {
 		return graph.User{}, fmt.Errorf("failed to create user: %w", err)
 	}
 
