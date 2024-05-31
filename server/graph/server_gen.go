@@ -75,7 +75,7 @@ type ComplexityRoot struct {
 	Mutation struct {
 		CreateFile   func(childComplexity int, parentID *string, name string, content *string) int
 		CreateFolder func(childComplexity int, parentID *string, name string) int
-		CreateUser   func(childComplexity int, name string) int
+		CreateUser   func(childComplexity int, name string, password string) int
 		MoveNode     func(childComplexity int, id string, parentID *string) int
 		RenameNode   func(childComplexity int, id string, name string) int
 		ShareNode    func(childComplexity int, userID string, accessType AccessType, targetID string) int
@@ -107,7 +107,7 @@ type FolderResolver interface {
 	Children(ctx context.Context, obj *Folder) ([]Node, error)
 }
 type MutationResolver interface {
-	CreateUser(ctx context.Context, name string) (*User, error)
+	CreateUser(ctx context.Context, name string, password string) (*User, error)
 	RenameNode(ctx context.Context, id string, name string) (Node, error)
 	MoveNode(ctx context.Context, id string, parentID *string) (Node, error)
 	ShareNode(ctx context.Context, userID string, accessType AccessType, targetID string) (*Access, error)
@@ -263,7 +263,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateUser(childComplexity, args["name"].(string)), true
+		return e.complexity.Mutation.CreateUser(childComplexity, args["name"].(string), args["password"].(string)), true
 
 	case "Mutation.moveNode":
 		if e.complexity.Mutation.MoveNode == nil {
@@ -526,6 +526,15 @@ func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, 
 		}
 	}
 	args["name"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["password"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["password"] = arg1
 	return args, nil
 }
 
@@ -1309,7 +1318,7 @@ func (ec *executionContext) _Mutation_createUser(ctx context.Context, field grap
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Mutation().CreateUser(rctx, fc.Args["name"].(string))
+		return ec.resolvers.Mutation().CreateUser(rctx, fc.Args["name"].(string), fc.Args["password"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

@@ -46,8 +46,8 @@ func (r *folderResolver) Children(ctx context.Context, obj *Folder) ([]Node, err
 }
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, name string) (*User, error) {
-	user, err := r.SharedFileSystem.CreateUser(name)
+func (r *mutationResolver) CreateUser(ctx context.Context, name string, password string) (*User, error) {
+	user, err := r.SharedFileSystem.CreateUser(name, password)
 	if errors.Is(err, ErrConflict) {
 		return nil, fmt.Errorf("user with name %q already exists", name)
 	} else if err != nil {

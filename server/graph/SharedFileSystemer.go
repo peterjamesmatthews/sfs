@@ -20,7 +20,7 @@ type SharedFileSystemer interface {
 	//
 	// # Errors
 	//	- `ErrConflict` if a user with the same name already exists.
-	CreateUser(name string) (User, error)
+	CreateUser(name string, password string) (User, error)
 
 	// CreateFolder creates a new folder.
 	//
