@@ -1,7 +1,7 @@
 -- Create enum type "access_type"
 CREATE TYPE "public"."access_type" AS ENUM ('read', 'write');
 -- Create "user" table
-CREATE TABLE "public"."user" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "name" character varying NOT NULL, PRIMARY KEY ("id"));
+CREATE TABLE "public"."user" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "name" character varying NOT NULL, "salt" bytea NOT NULL, "hash" bytea NOT NULL, PRIMARY KEY ("id"), CONSTRAINT "user_name_key" UNIQUE ("name"));
 -- Create "node" table
 CREATE TABLE "public"."node" ("id" uuid NOT NULL DEFAULT gen_random_uuid(), "owner" uuid NOT NULL, "name" character varying NOT NULL, "parent" uuid NULL, PRIMARY KEY ("id"), CONSTRAINT "node_owner_fkey" FOREIGN KEY ("owner") REFERENCES "public"."user" ("id") ON UPDATE NO ACTION ON DELETE CASCADE, CONSTRAINT "node_parent_fkey" FOREIGN KEY ("parent") REFERENCES "public"."node" ("id") ON UPDATE NO ACTION ON DELETE CASCADE);
 -- Create "access" table

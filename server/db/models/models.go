@@ -75,4 +75,6 @@ type Node struct {
 type User struct {
 	ID   pgtype.UUID
 	Name string
+	Salt []byte
+	Hash []byte
 }
