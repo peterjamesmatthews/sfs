@@ -1,2 +1,5 @@
 -- name: GetUserByID :one
-SELECT * FROM "user" WHERE "id" = $1 LIMIT 1;
+SELECT *
+FROM public.user
+WHERE "id" = $1
+LIMIT 1;

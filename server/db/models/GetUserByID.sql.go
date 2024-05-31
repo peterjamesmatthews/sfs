@@ -12,12 +12,20 @@ import (
 )
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, name FROM "user" WHERE "id" = $1 LIMIT 1
+SELECT id, name, salt, hash
+FROM public.user
+WHERE "id" = $1
+LIMIT 1
 `
 
 func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error) {
 	row := q.db.QueryRow(ctx, getUserByID, id)
 	var i User
-	err := row.Scan(&i.ID, &i.Name)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Salt,
+		&i.Hash,
+	)
 	return i, err
 }
