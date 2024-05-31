@@ -73,17 +73,23 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateFile   func(childComplexity int, parentID *string, name string, content *string) int
-		CreateFolder func(childComplexity int, parentID *string, name string) int
-		CreateUser   func(childComplexity int, name string, password string) int
-		MoveNode     func(childComplexity int, id string, parentID *string) int
-		RenameNode   func(childComplexity int, id string, name string) int
-		ShareNode    func(childComplexity int, userID string, accessType AccessType, targetID string) int
-		WriteFile    func(childComplexity int, id string, content string) int
+		CreateFile    func(childComplexity int, parentID *string, name string, content *string) int
+		CreateFolder  func(childComplexity int, parentID *string, name string) int
+		CreateUser    func(childComplexity int, name string, password string) int
+		MoveNode      func(childComplexity int, id string, parentID *string) int
+		RefreshTokens func(childComplexity int, refresh string) int
+		RenameNode    func(childComplexity int, id string, name string) int
+		ShareNode     func(childComplexity int, userID string, accessType AccessType, targetID string) int
+		WriteFile     func(childComplexity int, id string, content string) int
 	}
 
 	Query struct {
-		Me func(childComplexity int) int
+		GetTokens func(childComplexity int, name string, password string) int
+	}
+
+	Tokens struct {
+		Access  func(childComplexity int) int
+		Refresh func(childComplexity int) int
 	}
 
 	User struct {
@@ -108,6 +114,7 @@ type FolderResolver interface {
 }
 type MutationResolver interface {
 	CreateUser(ctx context.Context, name string, password string) (*User, error)
+	RefreshTokens(ctx context.Context, refresh string) (*Tokens, error)
 	RenameNode(ctx context.Context, id string, name string) (Node, error)
 	MoveNode(ctx context.Context, id string, parentID *string) (Node, error)
 	ShareNode(ctx context.Context, userID string, accessType AccessType, targetID string) (*Access, error)
@@ -116,7 +123,7 @@ type MutationResolver interface {
 	WriteFile(ctx context.Context, id string, content string) (*File, error)
 }
 type QueryResolver interface {
-	Me(ctx context.Context) (*User, error)
+	GetTokens(ctx context.Context, name string, password string) (*Tokens, error)
 }
 
 type executableSchema struct {
@@ -277,6 +284,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.MoveNode(childComplexity, args["id"].(string), args["parentID"].(*string)), true
 
+	case "Mutation.refreshTokens":
+		if e.complexity.Mutation.RefreshTokens == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_refreshTokens_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RefreshTokens(childComplexity, args["refresh"].(string)), true
+
 	case "Mutation.renameNode":
 		if e.complexity.Mutation.RenameNode == nil {
 			break
@@ -313,12 +332,31 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Mutation.WriteFile(childComplexity, args["id"].(string), args["content"].(string)), true
 
-	case "Query.me":
-		if e.complexity.Query.Me == nil {
+	case "Query.getTokens":
+		if e.complexity.Query.GetTokens == nil {
 			break
 		}
 
-		return e.complexity.Query.Me(childComplexity), true
+		args, err := ec.field_Query_getTokens_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetTokens(childComplexity, args["name"].(string), args["password"].(string)), true
+
+	case "Tokens.access":
+		if e.complexity.Tokens.Access == nil {
+			break
+		}
+
+		return e.complexity.Tokens.Access(childComplexity), true
+
+	case "Tokens.refresh":
+		if e.complexity.Tokens.Refresh == nil {
+			break
+		}
+
+		return e.complexity.Tokens.Refresh(childComplexity), true
 
 	case "User.id":
 		if e.complexity.User.ID == nil {
@@ -562,6 +600,21 @@ func (ec *executionContext) field_Mutation_moveNode_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_refreshTokens_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["refresh"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("refresh"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["refresh"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_renameNode_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -655,6 +708,30 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_getTokens_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 string
+	if tmp, ok := rawArgs["name"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["name"] = arg0
+	var arg1 string
+	if tmp, ok := rawArgs["password"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+		arg1, err = ec.unmarshalNString2string(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["password"] = arg1
 	return args, nil
 }
 
@@ -1362,6 +1439,64 @@ func (ec *executionContext) fieldContext_Mutation_createUser(ctx context.Context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_refreshTokens(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Mutation_refreshTokens(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().RefreshTokens(rctx, fc.Args["refresh"].(string))
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*Tokens)
+	fc.Result = res
+	return ec.marshalOTokens2ᚖpjmᚗdevᚋsfsᚋgraphᚐTokens(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Mutation_refreshTokens(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "access":
+				return ec.fieldContext_Tokens_access(ctx, field)
+			case "refresh":
+				return ec.fieldContext_Tokens_refresh(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Tokens", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_refreshTokens_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_renameNode(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Mutation_renameNode(ctx, field)
 	if err != nil {
@@ -1838,8 +1973,8 @@ func (ec *executionContext) fieldContext_Mutation_writeFile(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Query_me(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Query_me(ctx, field)
+func (ec *executionContext) _Query_getTokens(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Query_getTokens(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -1851,28 +1986,8 @@ func (ec *executionContext) _Query_me(ctx context.Context, field graphql.Collect
 		}
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		directive0 := func(rctx context.Context) (interface{}, error) {
-			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Query().Me(rctx)
-		}
-		directive1 := func(ctx context.Context) (interface{}, error) {
-			if ec.directives.Authenticated == nil {
-				return nil, errors.New("directive Authenticated is not implemented")
-			}
-			return ec.directives.Authenticated(ctx, nil, directive0)
-		}
-
-		tmp, err := directive1(rctx)
-		if err != nil {
-			return nil, graphql.ErrorOnPath(ctx, err)
-		}
-		if tmp == nil {
-			return nil, nil
-		}
-		if data, ok := tmp.(*User); ok {
-			return data, nil
-		}
-		return nil, fmt.Errorf(`unexpected type %T from directive, should be *pjm.dev/sfs/graph.User`, tmp)
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Query().GetTokens(rctx, fc.Args["name"].(string), fc.Args["password"].(string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -1884,12 +1999,12 @@ func (ec *executionContext) _Query_me(ctx context.Context, field graphql.Collect
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*User)
+	res := resTmp.(*Tokens)
 	fc.Result = res
-	return ec.marshalNUser2ᚖpjmᚗdevᚋsfsᚋgraphᚐUser(ctx, field.Selections, res)
+	return ec.marshalNTokens2ᚖpjmᚗdevᚋsfsᚋgraphᚐTokens(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Query_me(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_getTokens(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1897,13 +2012,24 @@ func (ec *executionContext) fieldContext_Query_me(ctx context.Context, field gra
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_User_id(ctx, field)
-			case "name":
-				return ec.fieldContext_User_name(ctx, field)
+			case "access":
+				return ec.fieldContext_Tokens_access(ctx, field)
+			case "refresh":
+				return ec.fieldContext_Tokens_refresh(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Tokens", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_getTokens_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -2032,6 +2158,94 @@ func (ec *executionContext) fieldContext_Query___schema(ctx context.Context, fie
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Tokens_access(ctx context.Context, field graphql.CollectedField, obj *Tokens) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tokens_access(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Access, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tokens_access(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tokens",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Tokens_refresh(ctx context.Context, field graphql.CollectedField, obj *Tokens) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Tokens_refresh(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Refresh, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Tokens_refresh(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tokens",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -4330,6 +4544,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createUser(ctx, field)
 			})
+		case "refreshTokens":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_refreshTokens(ctx, field)
+			})
 		case "renameNode":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_renameNode(ctx, field)
@@ -4396,7 +4614,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "me":
+		case "getTokens":
 			field := field
 
 			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
@@ -4405,7 +4623,7 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_me(ctx, field)
+				res = ec._Query_getTokens(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -4426,6 +4644,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var tokensImplementors = []string{"Tokens"}
+
+func (ec *executionContext) _Tokens(ctx context.Context, sel ast.SelectionSet, obj *Tokens) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tokensImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Tokens")
+		case "access":
+			out.Values[i] = ec._Tokens_access(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "refresh":
+			out.Values[i] = ec._Tokens_refresh(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4928,6 +5190,20 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
+func (ec *executionContext) marshalNTokens2pjmᚗdevᚋsfsᚋgraphᚐTokens(ctx context.Context, sel ast.SelectionSet, v Tokens) graphql.Marshaler {
+	return ec._Tokens(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTokens2ᚖpjmᚗdevᚋsfsᚋgraphᚐTokens(ctx context.Context, sel ast.SelectionSet, v *Tokens) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Tokens(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNUser2pjmᚗdevᚋsfsᚋgraphᚐUser(ctx context.Context, sel ast.SelectionSet, v User) graphql.Marshaler {
 	return ec._User(ctx, sel, &v)
 }
@@ -5279,6 +5555,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	}
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOTokens2ᚖpjmᚗdevᚋsfsᚋgraphᚐTokens(ctx context.Context, sel ast.SelectionSet, v *Tokens) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Tokens(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUser2ᚖpjmᚗdevᚋsfsᚋgraphᚐUser(ctx context.Context, sel ast.SelectionSet, v *User) graphql.Marshaler {

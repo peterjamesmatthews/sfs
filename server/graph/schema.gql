@@ -6,6 +6,12 @@ type User {
   name: String!
 }
 
+# Tokens represents a user's access and refresh tokens.
+type Tokens {
+  access: String!
+  refresh: String!
+}
+
 # Node is the interface for something in the file system.
 interface Node {
   id: ID!
@@ -58,6 +64,9 @@ type Mutation {
   # createUser creates a new user.
   createUser(name: String!, password: String!): User
 
+  # refreshTokens returns new access and refresh tokens.
+  refreshTokens(refresh: String!): Tokens
+
   # renameNode changes the name of a node.
   renameNode(id: ID!, name: String!): Node @Authenticated
 
@@ -86,5 +95,6 @@ type Mutation {
 #
 # It defines the interface in which clients will query the shared file system with.
 type Query {
-  me: User! @Authenticated
+  # getTokens returns access and refresh tokens for a user.
+  getTokens(name: String!, password: String!): Tokens!
 }

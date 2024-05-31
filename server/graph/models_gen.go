@@ -56,6 +56,11 @@ type Mutation struct {
 type Query struct {
 }
 
+type Tokens struct {
+	Access  string `json:"access"`
+	Refresh string `json:"refresh"`
+}
+
 type User struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`

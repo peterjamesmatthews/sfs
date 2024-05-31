@@ -56,6 +56,11 @@ func (r *mutationResolver) CreateUser(ctx context.Context, name string, password
 	return &user, nil
 }
 
+// RefreshTokens is the resolver for the refreshTokens field.
+func (r *mutationResolver) RefreshTokens(ctx context.Context, refresh string) (*Tokens, error) {
+	panic(fmt.Errorf("not implemented: RefreshTokens - refreshTokens"))
+}
+
 // RenameNode is the resolver for the renameNode field.
 func (r *mutationResolver) RenameNode(ctx context.Context, id string, name string) (Node, error) {
 	panic(fmt.Errorf("not implemented: RenameNode - renameNode"))
@@ -86,14 +91,9 @@ func (r *mutationResolver) WriteFile(ctx context.Context, id string, content str
 	panic(fmt.Errorf("not implemented: WriteFile - writeFile"))
 }
 
-// Me is the resolver for the me field.
-func (r *queryResolver) Me(ctx context.Context) (*User, error) {
-	user, err := getUserFromContext(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get user from context: %w", err)
-	}
-
-	return &user, nil
+// GetTokens is the resolver for the getTokens field.
+func (r *queryResolver) GetTokens(ctx context.Context, name string, password string) (*Tokens, error) {
+	panic(fmt.Errorf("not implemented: GetTokens - getTokens"))
 }
 
 // Access returns AccessResolver implementation.
@@ -116,3 +116,21 @@ type fileResolver struct{ *Resolver }
 type folderResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//     it when you're done.
+//   - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) SignIn(ctx context.Context, name string, password string) (*Tokens, error) {
+	panic(fmt.Errorf("not implemented: SignIn - signIn"))
+}
+func (r *queryResolver) Me(ctx context.Context) (*User, error) {
+	user, err := getUserFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user from context: %w", err)
+	}
+
+	return &user, nil
+}
