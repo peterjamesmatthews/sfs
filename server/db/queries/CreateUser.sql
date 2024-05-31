@@ -1,2 +1,4 @@
 -- name: CreateUser :one
-INSERT INTO "user" (name) VALUES ($1) RETURNING *;
+INSERT INTO public.user (name, salt, hash)
+VALUES ($1, $2, $3)
+RETURNING *;

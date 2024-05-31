@@ -10,12 +10,25 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO "user" (name) VALUES ($1) RETURNING id, name
+INSERT INTO public.user (name, salt, hash)
+VALUES ($1, $2, $3)
+RETURNING id, name, salt, hash
 `
 
-func (q *Queries) CreateUser(ctx context.Context, name string) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, name)
+type CreateUserParams struct {
+	Name string
+	Salt []byte
+	Hash []byte
+}
+
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, createUser, arg.Name, arg.Salt, arg.Hash)
 	var i User
-	err := row.Scan(&i.ID, &i.Name)
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Salt,
+		&i.Hash,
+	)
 	return i, err
 }
