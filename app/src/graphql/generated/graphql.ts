@@ -52,6 +52,7 @@ export type Mutation = {
   createFolder?: Maybe<Folder>;
   createUser?: Maybe<User>;
   moveNode?: Maybe<Node>;
+  refreshTokens?: Maybe<Tokens>;
   renameNode?: Maybe<Node>;
   shareNode?: Maybe<Access>;
   writeFile?: Maybe<File>;
@@ -73,12 +74,18 @@ export type MutationCreateFolderArgs = {
 
 export type MutationCreateUserArgs = {
   name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 };
 
 
 export type MutationMoveNodeArgs = {
   id: Scalars['ID']['input'];
   parentID?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type MutationRefreshTokensArgs = {
+  refresh: Scalars['String']['input'];
 };
 
 
@@ -109,7 +116,19 @@ export type Node = {
 
 export type Query = {
   __typename?: 'Query';
-  me: User;
+  getTokens: Tokens;
+};
+
+
+export type QueryGetTokensArgs = {
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
+export type Tokens = {
+  __typename?: 'Tokens';
+  access: Scalars['String']['output'];
+  refresh: Scalars['String']['output'];
 };
 
 export type User = {
@@ -118,10 +137,30 @@ export type User = {
   name: Scalars['String']['output'];
 };
 
-export type MeQueryVariables = Exact<{ [key: string]: never; }>;
+export type CreateUserMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+}>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, name: string } };
+export type CreateUserMutation = { __typename?: 'Mutation', createUser?: { __typename?: 'User', id: string, name: string } | null };
+
+export type GetTokensQueryVariables = Exact<{
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+}>;
 
 
-export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
+export type GetTokensQuery = { __typename?: 'Query', getTokens: { __typename?: 'Tokens', access: string, refresh: string } };
+
+export type RefreshTokensMutationVariables = Exact<{
+  refresh: Scalars['String']['input'];
+}>;
+
+
+export type RefreshTokensMutation = { __typename?: 'Mutation', refreshTokens?: { __typename?: 'Tokens', access: string, refresh: string } | null };
+
+
+export const CreateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateUserMutation, CreateUserMutationVariables>;
+export const GetTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getTokens"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"access"}},{"kind":"Field","name":{"kind":"Name","value":"refresh"}}]}}]}}]} as unknown as DocumentNode<GetTokensQuery, GetTokensQueryVariables>;
+export const RefreshTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RefreshTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"refresh"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"refreshTokens"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"refresh"},"value":{"kind":"Variable","name":{"kind":"Name","value":"refresh"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"access"}},{"kind":"Field","name":{"kind":"Name","value":"refresh"}}]}}]}}]} as unknown as DocumentNode<RefreshTokensMutation, RefreshTokensMutationVariables>;
