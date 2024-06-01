@@ -1,30 +1,59 @@
-import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import {
+  PayloadAction,
+  createAsyncThunk,
+  createSelector,
+  createSlice,
+} from "@reduxjs/toolkit";
 import { AppDispatch, StoreState } from "..";
 import apollo from "../../apollo";
-import { User } from "../../graphql/generated/graphql";
+import {
+  CreateUserMutation,
+  GetTokensQuery,
+  Tokens,
+  User,
+} from "../../graphql/generated/graphql";
 import CreateUser from "../../graphql/query/CreateUser";
+import GetTokens from "../../graphql/query/GetTokens";
 
 type AuthState = {
   user?: User;
+  tokens?: Tokens;
 };
 
 const initialState: AuthState = {};
 
-export default createSlice({
+const auth = createSlice({
   name: "auth",
   initialState,
   reducers: {
     setUser: (state, payload: PayloadAction<User>) => {
       state.user = payload.payload;
     },
+    gotTokens: (state, payload: PayloadAction<GetTokensQuery["getTokens"]>) => {
+      state.tokens = payload.payload;
+    },
   },
 });
 
-/**
- * Creates a new user.
- */
+export default auth;
+
+export function selectTokens(state: StoreState) {
+  return state.auth.tokens;
+}
+
+export const selectAccessToken = createSelector(
+  selectTokens,
+  (tokens) => tokens?.access
+);
+
+export const selectRefreshToken = createSelector(
+  selectTokens,
+  (tokens) => tokens?.refresh
+);
+
+/** Creates a new user. */
 export const createUser = createAsyncThunk<
-  void,
+  CreateUserMutation["createUser"],
   {
     /** The name of the user to create. */
     name: string;
@@ -33,21 +62,50 @@ export const createUser = createAsyncThunk<
   },
   { dispatch: AppDispatch; state: StoreState }
 >("auth/createUser", async ({ name, password }) => {
-  // send mutation to create user
   const { data, errors } = await apollo.mutate({
     mutation: CreateUser,
     variables: { name, password },
   });
 
-  // throw any errors
-  if (errors)
-    throw new Error(
-      "failed to create user: " + errors.map((e) => e.message).join(", ")
+  if (errors) {
+    const error = new Error(
+      `failed to create user: ${errors.map((e) => e.message).join(", ")}`
     );
-  else if (!data?.createUser) throw new Error("failed to create user"); // unexpected
+    console.error(error);
+    throw error;
+  } else if (!data?.createUser) throw new Error("failed to create user"); // unexpected
 
-  /** The name and id of the created user. */
   const createdUser = data.createUser;
 
-  console.log(`created user ${createdUser.name} with id ${createdUser.id}`);
+  console.debug(`created user ${createdUser.name} with id ${createdUser.id}`);
+
+  return createdUser;
+});
+
+/** Gets a user's tokens from their name and password. */
+export const getTokens = createAsyncThunk<
+  GetTokensQuery["getTokens"],
+  { name: string; password: string },
+  { dispatch: AppDispatch; state: StoreState }
+>("auth/getTokens", async ({ name, password }, { dispatch }) => {
+  const { data, errors } = await apollo.query({
+    query: GetTokens,
+    variables: { name, password },
+  });
+
+  if (errors) {
+    const error = new Error(
+      "failed to get tokens: " + errors.map((e) => e.message).join(", ")
+    );
+    console.error(error);
+    throw error;
+  } else if (!data?.getTokens) throw new Error("failed to get tokens");
+
+  const { access, refresh } = data.getTokens;
+
+  console.debug(`got tokens: access=${access}, refresh=${refresh}`);
+
+  dispatch(auth.actions.gotTokens(data.getTokens));
+
+  return data.getTokens;
 });

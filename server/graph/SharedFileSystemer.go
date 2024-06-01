@@ -22,6 +22,16 @@ type SharedFileSystemer interface {
 	//	- `ErrConflict` if a user with the same name already exists.
 	CreateUser(name string, password string) (User, error)
 
+	// GetTokens fetches a user's access and refresh tokens, creating them if necessary.
+	//
+	// # Arguments
+	//  - name: The name of the user to fetch tokens for.
+	//  - password: The password of the user.
+	//
+	// # Errors
+	//	- `ErrUnauthorized` if the user is not found or the password is incorrect.
+	GetTokens(name string, password string) (*Tokens, error)
+
 	// CreateFolder creates a new folder.
 	//
 	// # Arguments:

@@ -2,10 +2,13 @@ package app
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
 	"pjm.dev/sfs/db/models"
 	"pjm.dev/sfs/graph"
 )
@@ -45,7 +48,79 @@ func (a *App) CreateUser(name string, password string) (graph.User, error) {
 	}
 
 	// convert and return user
-	return a.toGraphUser(user), nil
+	return a.getGraphUser(user), nil
+}
+
+func (a *App) GetTokens(name string, password string) (*graph.Tokens, error) {
+	// get user by name
+	user, err := a.q.GetUserByName(context.Background(), name)
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == models.UniqueViolation {
+		return nil, graph.ErrUnauthorized
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	// compare password and user's salt with hash
+	ok, err := a.comparePasswordWithSalt(password, user.Salt, user.Hash)
+	if err != nil {
+		return nil, fmt.Errorf("failed to compare password: %w", err)
+	} else if !ok {
+		return nil, graph.ErrUnauthorized
+	}
+
+	// generate access and refresh tokens
+	accessToken, refreshToken, err := a.generateTokensForUser(user)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate tokens: %w", err)
+	}
+
+	// hash access token with sha256
+	accessHashArr := sha256.Sum256([]byte(accessToken))
+	accessHash := accessHashArr[:]
+
+	// hash refresh token
+	refreshHashArr := sha256.Sum256([]byte(refreshToken))
+	refreshHash := refreshHashArr[:]
+
+	// begin transaction for inserting tokens
+	tx, err := a.db.Begin(context.Background())
+	if err != nil {
+		return nil, fmt.Errorf("failed to begin transaction: %w", err)
+	}
+	defer tx.Rollback(context.Background())
+
+	// insert access token
+	_, err = a.q.WithTx(tx).InsertAccessToken(
+		context.Background(),
+		models.InsertAccessTokenParams{
+			Owner: user.ID,
+			Hash:  accessHash,
+			// set expiration to 5 minutes from now
+			Expiration: pgtype.Timestamp{Time: time.Now().Add(time.Minute * 5), Valid: true},
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to insert access token: %w", err)
+	}
+
+	// insert refresh token
+	_, err = a.q.WithTx(tx).InsertRefreshToken(
+		context.Background(),
+		models.InsertRefreshTokenParams{
+			Owner: user.ID,
+			Hash:  refreshHash,
+			// set expiration to 1 week from now
+			Expiration: pgtype.Timestamp{Time: time.Now().Add(time.Hour * 24 * 7), Valid: true},
+		},
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to insert refresh token: %w", err)
+	}
+
+	// convert and return tokens
+	tokens := a.getGraphTokens(string(accessHash), string(refreshHash))
+	return &tokens, tx.Commit(context.Background())
 }
 
 func (a *App) CreateFolder(creator graph.User, parentID *string, name string) (graph.Folder, error) {

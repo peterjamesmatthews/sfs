@@ -5,8 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"pjm.dev/sfs/db/models"
 )
 
 // userNameRegex is a regular expression that matches valid user names.
@@ -46,4 +49,47 @@ func (a *App) hashPasswordWithSalt(password string, salt []byte) ([]byte, error)
 
 	// return hash
 	return hash, nil
+}
+
+// comparePasswordWithSalt compares a password with a salt and hash using bcrypt.
+func (a *App) comparePasswordWithSalt(password string, salt []byte, hash []byte) (bool, error) {
+	err := bcrypt.CompareHashAndPassword(hash, append([]byte(password), salt...))
+	if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+		return false, nil
+	} else if err != nil {
+		return false, fmt.Errorf("failed to compare hash and password: %w", err)
+	}
+	return true, nil
+}
+
+var JWT_SECRET []byte = []byte("secret") // TODO change this to an env var
+
+// generateTokensForUser generates access and refresh tokens for a user.
+func (a *App) generateTokensForUser(user models.User) (string, string, error) {
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"iss":  "sfs",
+		"sub":  user.ID,
+		"type": "access",
+		"iat":  time.Now().Unix(),
+	})
+
+	access, err := accessToken.SignedString(JWT_SECRET)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to sign access token: %w", err)
+	}
+
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"iss":  "sfs",
+		"sub":  user.ID,
+		"type": "refresh",
+		"iat":  time.Now().Unix(),
+	})
+
+	refresh, err := refreshToken.SignedString(JWT_SECRET)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to sign refresh token: %w", err)
+	}
+
+	// return access and refresh tokens
+	return access, refresh, nil
 }

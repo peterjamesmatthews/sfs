@@ -93,7 +93,12 @@ func (r *mutationResolver) WriteFile(ctx context.Context, id string, content str
 
 // GetTokens is the resolver for the getTokens field.
 func (r *queryResolver) GetTokens(ctx context.Context, name string, password string) (*Tokens, error) {
-	panic(fmt.Errorf("not implemented: GetTokens - getTokens"))
+	tokens, err := r.SharedFileSystem.GetTokens(name, password)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get tokens: %w", err)
+
+	}
+	return tokens, nil
 }
 
 // Access returns AccessResolver implementation.
@@ -116,21 +121,3 @@ type fileResolver struct{ *Resolver }
 type folderResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) SignIn(ctx context.Context, name string, password string) (*Tokens, error) {
-	panic(fmt.Errorf("not implemented: SignIn - signIn"))
-}
-func (r *queryResolver) Me(ctx context.Context) (*User, error) {
-	user, err := getUserFromContext(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get user from context: %w", err)
-	}
-
-	return &user, nil
-}
