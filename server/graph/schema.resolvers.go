@@ -101,6 +101,15 @@ func (r *queryResolver) GetTokens(ctx context.Context, name string, password str
 	return tokens, nil
 }
 
+// Me is the resolver for the Me field.
+func (r *queryResolver) Me(ctx context.Context) (*User, error) {
+	user, err := getUserFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user from context: %w", err)
+	}
+	return &user, nil
+}
+
 // Access returns AccessResolver implementation.
 func (r *Resolver) Access() AccessResolver { return &accessResolver{r} }
 

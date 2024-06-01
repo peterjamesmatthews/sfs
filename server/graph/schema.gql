@@ -97,4 +97,7 @@ type Mutation {
 type Query {
   # getTokens returns access and refresh tokens for a user.
   getTokens(name: String!, password: String!): Tokens!
+
+  # Me returns the current user.
+  Me: User! @Authenticated
 }
