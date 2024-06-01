@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/99designs/gqlgen v0.17.44
+	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/sethvargo/go-envconfig v1.0.0
 	github.com/vektah/gqlparser/v2 v2.5.11
@@ -21,7 +22,6 @@ require (
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
-	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.7 // indirect
 	github.com/kr/text v0.2.0 // indirect
