@@ -1,3 +1,10 @@
+.PHONY: all
+all: graph migrate sqlc
+
+.PHONY: graph
+graph:
+	go generate ./graph
+
 .PHONY: migrate
 migrate:
 	atlas migrate diff \
