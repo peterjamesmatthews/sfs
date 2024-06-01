@@ -4,8 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider as ReduxProvider } from "react-redux";
 import client from "./apollo";
-import SignIn from "./components/SignIn.tsx";
-import SignUp from "./components/SignUp.tsx";
+import App from "./components/App.tsx";
 import store from "./store";
 import theme from "./theme";
 
@@ -17,8 +16,7 @@ ReactDOM.createRoot(root).render(
     <ReduxProvider store={store}>
       <ApolloProvider client={client}>
         <ThemeProvider theme={theme}>
-          <SignUp />
-          <SignIn />
+          <App />
         </ThemeProvider>
       </ApolloProvider>
     </ReduxProvider>

@@ -1,11 +1,16 @@
-import { useQuery } from "@apollo/client";
-import { Typography } from "@mui/material";
-import Me from "../graphql/query/Me";
+import { useSelector } from "react-redux";
+import { selectAccessToken } from "../store/slices/auth";
+import Me from "./Me";
+import SignIn from "./SignIn";
+import SignUp from "./SignUp";
 
 export default function App() {
-  const { loading, error, data } = useQuery(Me);
-  if (loading) return <Typography>Loading...</Typography>;
-  if (error) return <Typography>Error {error.message}</Typography>;
-  if (!data) return <Typography>No data</Typography>;
-  return <Typography>Hello, {data.me.name}!</Typography>;
+  const accessToken = useSelector(selectAccessToken);
+
+  return (
+    <>
+      <SignUp />
+      {accessToken ? <Me /> : <SignIn />}
+    </>
+  );
 }
