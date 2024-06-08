@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"crypto/sha256"
 	"errors"
 	"fmt"
 	"time"
@@ -14,7 +13,20 @@ import (
 )
 
 func (a *App) Authenticate(auth string) (graph.User, error) {
-	return graph.User{}, errors.ErrUnsupported
+	// get token from auth
+	token := a.getTokenFromAuthorization(auth)
+
+	// get hash of token
+	hash := a.hashToken(token)
+
+	// get user by hash
+	userIDandName, err := a.q.GetUserIDAndNameByAccessHash(context.Background(), hash)
+	if err != nil {
+		return graph.User{}, fmt.Errorf("failed to get user by access hash: %w", err) // TODO handle pg.ErrNoRows
+	}
+
+	// return user
+	return a.getGraphUser(models.User{ID: userIDandName.ID, Name: userIDandName.Name}), nil
 }
 
 func (a *App) CreateUser(name string, password string) (graph.User, error) {
@@ -76,12 +88,10 @@ func (a *App) GetTokens(name string, password string) (*graph.Tokens, error) {
 	}
 
 	// hash access token with sha256
-	accessHashArr := sha256.Sum256([]byte(accessToken))
-	accessHash := accessHashArr[:]
+	accessHash := a.hashToken(accessToken)
 
 	// hash refresh token
-	refreshHashArr := sha256.Sum256([]byte(refreshToken))
-	refreshHash := refreshHashArr[:]
+	refreshHash := a.hashToken(refreshToken)
 
 	// begin transaction for inserting tokens
 	tx, err := a.db.Begin(context.Background())
@@ -119,7 +129,7 @@ func (a *App) GetTokens(name string, password string) (*graph.Tokens, error) {
 	}
 
 	// convert and return tokens
-	tokens := a.getGraphTokens(string(accessHash), string(refreshHash))
+	tokens := a.getGraphTokens(accessToken, refreshToken)
 	return &tokens, tx.Commit(context.Background())
 }
 
