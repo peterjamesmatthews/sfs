@@ -58,7 +58,13 @@ func (r *mutationResolver) CreateUser(ctx context.Context, name string, password
 
 // RefreshTokens is the resolver for the refreshTokens field.
 func (r *mutationResolver) RefreshTokens(ctx context.Context, refresh string) (*Tokens, error) {
-	panic(fmt.Errorf("not implemented: RefreshTokens - refreshTokens"))
+	tokens, err := r.SharedFileSystem.RefreshTokens(refresh)
+	if errors.Is(err, ErrForbidden) {
+		return nil, fmt.Errorf("refresh token is expired")
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to refresh tokens: %w", err)
+	}
+	return &tokens, nil
 }
 
 // RenameNode is the resolver for the renameNode field.

@@ -86,6 +86,16 @@ func (a *App) GetTokens(name string, password string) (graph.Tokens, error) {
 	return a.getGraphTokens(access, refresh), nil
 }
 
+func (a *App) RefreshTokens(refresh string) (graph.Tokens, error) {
+	access, refresh, err := a.refreshTokens(refresh)
+	if errors.Is(err, errExpired) {
+		return graph.Tokens{}, graph.ErrForbidden
+	} else if err != nil {
+		return graph.Tokens{}, fmt.Errorf("failed to refresh tokens: %w", err)
+	}
+	return a.getGraphTokens(access, refresh), nil
+}
+
 func (a *App) CreateFolder(creator graph.User, parentID *string, name string) (graph.Folder, error) {
 	return graph.Folder{}, errors.ErrUnsupported
 }

@@ -32,6 +32,15 @@ type SharedFileSystemer interface {
 	//	- `ErrUnauthorized` if the user is not found or the password is incorrect.
 	GetTokens(name string, password string) (Tokens, error)
 
+	// RefreshTokens refreshes a user's access and refresh tokens.
+	//
+	// # Arguments
+	//  - refresh: The user's refresh token.
+	//
+	// # Errors
+	//	- `ErrForbidden` if the refresh token is expired.
+	RefreshTokens(refresh string) (Tokens, error)
+
 	// CreateFolder creates a new folder.
 	//
 	// # Arguments:
