@@ -1,15 +1,20 @@
-import { ApolloClient, ApolloLink, InMemoryCache } from "@apollo/client";
+import {
+  ApolloClient,
+  ApolloLink,
+  HttpLink,
+  InMemoryCache,
+} from "@apollo/client";
 import store from "../store";
 import { selectAccessToken } from "../store/slices/auth";
 
-export default new ApolloClient({
-  uri: "/graph",
-  cache: new InMemoryCache(),
-  // TODO fix me
-  link: new ApolloLink((operation, forward) => {
+const link = ApolloLink.from([
+  new ApolloLink((operation, forward) => {
     const token = selectAccessToken(store.getState());
-    if (!token) return forward(operation);
-    operation.setContext({ headers: { Authorization: `Bearer ${token}` } });
+    if (token)
+      operation.setContext({ headers: { Authorization: `Bearer ${token}` } });
     return forward(operation);
   }),
-});
+  new HttpLink({ uri: "/graph" }),
+]);
+
+export default new ApolloClient({ cache: new InMemoryCache(), link });
