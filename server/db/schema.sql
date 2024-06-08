@@ -22,17 +22,3 @@ CREATE TABLE access (
   type access_type NOT NULL,
   PRIMARY KEY (accessor, target)
 );
-CREATE TABLE access_token (
-  id UUID NOT NULL UNIQUE PRIMARY KEY DEFAULT gen_random_uuid(),
-  owner UUID NOT NULL REFERENCES public.user (id) ON DELETE CASCADE,
-  hash BYTEA NOT NULL,
-  creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  expiration TIMESTAMP NOT NULL
-);
-CREATE TABLE refresh_token (
-  id UUID NOT NULL UNIQUE PRIMARY KEY DEFAULT gen_random_uuid(),
-  owner UUID NOT NULL REFERENCES public.user (id) ON DELETE CASCADE,
-  hash BYTEA NOT NULL,
-  creation TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  expiration TIMESTAMP NOT NULL
-);

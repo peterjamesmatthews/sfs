@@ -98,7 +98,7 @@ func (r *queryResolver) GetTokens(ctx context.Context, name string, password str
 		return nil, fmt.Errorf("failed to get tokens: %w", err)
 
 	}
-	return tokens, nil
+	return &tokens, nil
 }
 
 // Me is the resolver for the Me field.

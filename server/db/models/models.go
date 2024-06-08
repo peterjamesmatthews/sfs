@@ -59,14 +59,6 @@ type Access struct {
 	Type     AccessType
 }
 
-type AccessToken struct {
-	ID         pgtype.UUID
-	Owner      pgtype.UUID
-	Hash       []byte
-	Creation   pgtype.Timestamp
-	Expiration pgtype.Timestamp
-}
-
 type File struct {
 	ID      pgtype.UUID
 	Node    pgtype.UUID
@@ -78,14 +70,6 @@ type Node struct {
 	Owner  pgtype.UUID
 	Name   string
 	Parent pgtype.UUID
-}
-
-type RefreshToken struct {
-	ID         pgtype.UUID
-	Owner      pgtype.UUID
-	Hash       []byte
-	Creation   pgtype.Timestamp
-	Expiration pgtype.Timestamp
 }
 
 type User struct {

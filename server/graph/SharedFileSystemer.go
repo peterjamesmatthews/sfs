@@ -30,7 +30,7 @@ type SharedFileSystemer interface {
 	//
 	// # Errors
 	//	- `ErrUnauthorized` if the user is not found or the password is incorrect.
-	GetTokens(name string, password string) (*Tokens, error)
+	GetTokens(name string, password string) (Tokens, error)
 
 	// CreateFolder creates a new folder.
 	//
