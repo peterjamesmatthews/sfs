@@ -1,4 +1,4 @@
-FROM golang:1.21-alpine
+FROM golang:1.22.3-alpine
 
 # install dlv
 RUN go install github.com/go-delve/delve/cmd/dlv@latest
