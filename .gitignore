@@ -25,3 +25,6 @@ dist-ssr
 
 # Output of dlv builds
 __debug_bins
+
+# secrets
+secrets.env

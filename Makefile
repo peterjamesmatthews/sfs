@@ -1,6 +1,6 @@
 .PHONY: develop
 develop:
-	docker compose --env-file .env up -d --build --force-recreate 
+	docker compose up -d --build --force-recreate 
 
 .PHONY: clean
 clean:

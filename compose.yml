@@ -16,6 +16,7 @@ services:
     hostname: ${APP_HOSTNAME}
     env_file:
       - .env
+      - secrets.env
     ports:
       - 80:${APP_PORT}
     volumes:
