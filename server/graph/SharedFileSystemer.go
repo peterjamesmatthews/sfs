@@ -41,6 +41,14 @@ type SharedFileSystemer interface {
 	//	- `ErrForbidden` if the refresh token is expired.
 	RefreshTokens(refresh string) (Tokens, error)
 
+	// GetTokensFromAuth0Token get's a user's access and refresh tokens from an Auth0 token.
+	//
+	// If a user with the name in the token does not exist, one is created.
+	//
+	// # Errors
+	//	- `ErrUnauthorized` if the token is invalid.
+	GetTokensFromAuth0Token(token string) (Tokens, error)
+
 	// CreateFolder creates a new folder.
 	//
 	// # Arguments:

@@ -86,7 +86,7 @@ func (a *App) getUserFromToken(tokenString string) (models.User, error) {
 		return models.User{}, fmt.Errorf("failed to scan user ID from access token: %w", err)
 	}
 
-	user, err := a.q.GetUserByID(context.Background(), *id)
+	user, err := a.queries.GetUserByID(context.Background(), *id)
 	if err != nil {
 		return models.User{}, fmt.Errorf("failed to get user by ID: %w", err)
 	}
@@ -135,7 +135,7 @@ func (a *App) refreshTokens(refresh string) (string, string, error) {
 	}
 
 	// get user by id
-	user, err := a.q.GetUserByID(context.Background(), *id)
+	user, err := a.queries.GetUserByID(context.Background(), *id)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to get user by ID: %w", err)
 	}

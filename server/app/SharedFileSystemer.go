@@ -5,7 +5,9 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgtype"
 	"pjm.dev/sfs/db/models"
 	"pjm.dev/sfs/graph"
 )
@@ -43,7 +45,7 @@ func (a *App) CreateUser(name string, password string) (graph.User, error) {
 	}
 
 	// create user
-	user, err := a.q.CreateUser(
+	user, err := a.queries.CreateUser(
 		context.Background(),
 		models.CreateUserParams{Name: name, Salt: salt, Hash: hash},
 	)
@@ -60,7 +62,7 @@ func (a *App) CreateUser(name string, password string) (graph.User, error) {
 
 func (a *App) GetTokens(name string, password string) (graph.Tokens, error) {
 	// get user by name
-	user, err := a.q.GetUserByName(context.Background(), name)
+	user, err := a.queries.GetUserByName(context.Background(), name)
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == models.UniqueViolation {
 		return graph.Tokens{}, graph.ErrUnauthorized
@@ -74,6 +76,36 @@ func (a *App) GetTokens(name string, password string) (graph.Tokens, error) {
 		return graph.Tokens{}, fmt.Errorf("failed to compare password: %w", err)
 	} else if !ok {
 		return graph.Tokens{}, graph.ErrUnauthorized
+	}
+
+	// generate access and refresh tokens for user
+	access, refresh, err := a.generateTokensForUser(user)
+	if err != nil {
+		return graph.Tokens{}, fmt.Errorf("failed to generate tokens: %w", err)
+	}
+
+	// convert and return tokens
+	return a.getGraphTokens(access, refresh), nil
+}
+
+func (a *App) GetTokensFromAuth0Token(token string) (graph.Tokens, error) {
+	// get user's name from Auth0 token
+	id, name, err := a.auth0.GetIDAndNameFromToken(token)
+	if err != nil {
+		return graph.Tokens{}, fmt.Errorf("failed to get user name from token: %w", err)
+	}
+
+	// get user by name
+	var user models.User
+	user, err = a.queries.GetUserByName(context.Background(), name)
+
+	// create user if not found
+	if errors.Is(err, pgx.ErrNoRows) {
+		user, err = a.queries.CreateUser(context.Background(), models.CreateUserParams{Name: name, Auth0ID: pgtype.Text{String: id, Valid: true}})
+	}
+
+	if err != nil {
+		return graph.Tokens{}, fmt.Errorf("failed to get user: %w", err)
 	}
 
 	// generate access and refresh tokens for user

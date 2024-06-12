@@ -10,7 +10,7 @@ import (
 )
 
 const getUserByName = `-- name: GetUserByName :one
-SELECT id, name, salt, hash
+SELECT id, name, salt, hash, auth0_id
 FROM public.user
 WHERE "name" = $1
 LIMIT 1
@@ -24,6 +24,7 @@ func (q *Queries) GetUserByName(ctx context.Context, name string) (User, error) 
 		&i.Name,
 		&i.Salt,
 		&i.Hash,
+		&i.Auth0ID,
 	)
 	return i, err
 }

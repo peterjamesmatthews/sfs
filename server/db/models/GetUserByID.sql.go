@@ -12,7 +12,7 @@ import (
 )
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, name, salt, hash
+SELECT id, name, salt, hash, auth0_id
 FROM public.user
 WHERE "id" = $1
 LIMIT 1
@@ -26,6 +26,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id pgtype.UUID) (User, error)
 		&i.Name,
 		&i.Salt,
 		&i.Hash,
+		&i.Auth0ID,
 	)
 	return i, err
 }

@@ -107,6 +107,15 @@ func (r *queryResolver) GetTokens(ctx context.Context, name string, password str
 	return &tokens, nil
 }
 
+// GetTokensFromAuth0 is the resolver for the getTokensFromAuth0 field.
+func (r *queryResolver) GetTokensFromAuth0(ctx context.Context, token string) (*Tokens, error) {
+	tokens, err := r.SharedFileSystem.GetTokensFromAuth0Token(token)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get tokens: %w", err)
+	}
+	return &tokens, nil
+}
+
 // Me is the resolver for the Me field.
 func (r *queryResolver) Me(ctx context.Context) (*User, error) {
 	user, err := getUserFromContext(ctx)

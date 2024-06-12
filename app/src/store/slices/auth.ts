@@ -9,6 +9,7 @@ import store, { AppDispatch, StoreState } from "..";
 import apollo from "../../apollo";
 import {
   CreateUserMutation,
+  GetTokensFromAuth0Query,
   GetTokensQuery,
   RefreshTokensMutation,
   Tokens,
@@ -16,6 +17,7 @@ import {
 } from "../../graphql/generated/graphql";
 import CreateUser from "../../graphql/query/CreateUser";
 import GetTokens from "../../graphql/query/GetTokens";
+import GetTokensFromAuth0 from "../../graphql/query/GetTokensFromAuth0";
 import RefreshTokens from "../../graphql/query/RefreshTokens";
 
 type AuthState = {
@@ -82,7 +84,7 @@ export const createUser = createAsyncThunk<
 });
 
 /** Gets a user's tokens from their name and password. */
-export const getTokens = createAsyncThunk<
+export const getTokensFromNameAndPassword = createAsyncThunk<
   GetTokensQuery["getTokens"],
   { name: string; password: string },
   { dispatch: AppDispatch }
@@ -158,4 +160,31 @@ export const refreshTokens = createAsyncThunk<
   else console.warn("access token has no expiration date");
 
   return data.refreshTokens;
+});
+
+export const getTokensFromAuth0 = createAsyncThunk<
+  GetTokensFromAuth0Query["getTokensFromAuth0"],
+  { token: string },
+  { dispatch: AppDispatch }
+>("auth/getTokensFromAuth0", async ({ token }, { dispatch }) => {
+  // query for tokens
+  const { data, errors } = await apollo.query({
+    query: GetTokensFromAuth0,
+    variables: { token },
+  });
+  if (errors) {
+    const error = new Error(
+      "failed to get tokens from Auth0: " +
+        errors.map((e) => e.message).join(", ")
+    );
+    console.error(error);
+    throw error;
+  } else if (!data?.getTokensFromAuth0)
+    throw new Error("failed to get tokens from Auth0");
+
+  // store the tokens in the store
+  dispatch(auth.actions.gotTokens(data.getTokensFromAuth0));
+
+  // return tokens
+  return data.getTokensFromAuth0;
 });

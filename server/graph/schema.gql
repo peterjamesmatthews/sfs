@@ -98,6 +98,9 @@ type Query {
   # getTokens returns access and refresh tokens for a user.
   getTokens(name: String!, password: String!): Tokens!
 
+  # getTokens returns access and refresh tokens for a user authenticated with Auth0.
+  getTokensFromAuth0(token: String!): Tokens!
+
   # Me returns the current user.
   Me: User! @Authenticated
 }
