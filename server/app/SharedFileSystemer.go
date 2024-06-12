@@ -101,7 +101,13 @@ func (a *App) GetTokensFromAuth0Token(token string) (graph.Tokens, error) {
 
 	// create user if not found
 	if errors.Is(err, pgx.ErrNoRows) {
-		user, err = a.queries.CreateUser(context.Background(), models.CreateUserParams{Name: name, Auth0ID: pgtype.Text{String: id, Valid: true}})
+		user, err = a.queries.CreateUser(
+			context.Background(),
+			models.CreateUserParams{
+				Name:    name,
+				Auth0ID: pgtype.Text{String: id, Valid: true},
+			},
+		)
 	}
 
 	if err != nil {

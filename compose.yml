@@ -29,6 +29,7 @@ services:
     hostname: ${SERVER_HOSTNAME}
     env_file:
       - .env
+      - secrets.env
     ports:
       - ${SERVER_PORT}:${SERVER_PORT}
       - ${SERVER_DEBUG_PORT}:${SERVER_DEBUG_PORT}

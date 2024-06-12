@@ -10,7 +10,8 @@ export default function App() {
   return (
     <>
       <SignUp />
-      {accessToken ? <Me /> : <SignIn />}
+      <SignIn />
+      {accessToken ? <Me /> : null}
     </>
   );
 }

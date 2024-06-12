@@ -6,7 +6,14 @@ import (
 	"fmt"
 
 	"github.com/sethvargo/go-envconfig"
+	"pjm.dev/sfs/app"
 )
+
+type Config struct {
+	Server   ServerConfig   `env:", prefix=SERVER_"`
+	App      app.Config     `env:", prefix="`
+	Database DatabaseConfig `env:", prefix=DATABASE_"`
+}
 
 func New(ctx context.Context) (Config, error) {
 	var config Config
@@ -16,11 +23,6 @@ func New(ctx context.Context) (Config, error) {
 	}
 
 	return config, nil
-}
-
-type Config struct {
-	Server   ServerConfig   `env:", prefix=SERVER_"`
-	Database DatabaseConfig `env:", prefix=DATABASE_"`
 }
 
 func (c Config) String() string {

@@ -32,10 +32,10 @@ func main() {
 	}
 
 	// initialize app
-	app := app.New(db)
+	app := app.New(config.App, db)
 
 	// initialize graph
-	handler := graph.New(config.Server, graph.Resolver{SharedFileSystem: &app})
+	handler := graph.New(graph.Resolver{SharedFileSystem: &app})
 
 	// initialize server
 	mux := http.NewServeMux()

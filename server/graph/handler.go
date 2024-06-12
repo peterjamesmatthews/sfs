@@ -4,10 +4,9 @@ import (
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
-	"pjm.dev/sfs/config"
 )
 
-func New(config config.ServerConfig, resolver Resolver) http.Handler {
+func New(resolver Resolver) http.Handler {
 	executableSchema := NewExecutableSchema(Config{
 		Resolvers:  &resolver,
 		Directives: DirectiveRoot{Authenticated: authenticated},
