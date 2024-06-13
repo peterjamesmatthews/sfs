@@ -63,8 +63,7 @@ func (a *App) CreateUser(name string, password string) (graph.User, error) {
 func (a *App) GetTokens(name string, password string) (graph.Tokens, error) {
 	// get user by name
 	user, err := a.queries.GetUserByName(context.Background(), name)
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) && pgErr.Code == models.UniqueViolation {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return graph.Tokens{}, graph.ErrUnauthorized
 	} else if err != nil {
 		return graph.Tokens{}, fmt.Errorf("failed to get user: %w", err)
