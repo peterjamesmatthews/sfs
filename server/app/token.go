@@ -17,32 +17,28 @@ func (a *App) getTokenFromAuthorization(auth string) string {
 	return strings.TrimPrefix(auth, "Bearer ")
 }
 
-const JWT_ISSUER = "sfs" // TODO move to config
-
-var JWT_SECRET = []byte("secret") // TODO move to config
-
 // generateTokensForUser generates access and refresh tokens for a user.
 func (a *App) generateTokensForUser(user models.User) (string, string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
-		Issuer:    JWT_ISSUER,
+		Issuer:    a.config.JWT_ISSUER,
 		Subject:   uuid.UUID(user.ID.Bytes).String(),
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	})
 
-	access, err := accessToken.SignedString(JWT_SECRET)
+	access, err := accessToken.SignedString(a.config.JWT_SECRET)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to sign access token: %w", err)
 	}
 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
-		Issuer:    JWT_ISSUER,
+		Issuer:    a.config.JWT_ISSUER,
 		Subject:   uuid.UUID(user.ID.Bytes).String(),
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	})
 
-	refresh, err := refreshToken.SignedString(JWT_SECRET)
+	refresh, err := refreshToken.SignedString(a.config.JWT_SECRET)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to sign refresh token: %w", err)
 	}
@@ -57,7 +53,7 @@ func (a *App) getUserFromToken(tokenString string) (models.User, error) {
 		tokenString,
 		&jwt.RegisteredClaims{},
 		func(t *jwt.Token) (interface{}, error) {
-			return JWT_SECRET, nil
+			return a.config.JWT_SECRET, nil
 		},
 	)
 	if err != nil {
@@ -70,7 +66,7 @@ func (a *App) getUserFromToken(tokenString string) (models.User, error) {
 	iss, err := token.Claims.GetIssuer()
 	if err != nil {
 		return models.User{}, fmt.Errorf("failed to get issuer from access token: %w", err)
-	} else if iss != JWT_ISSUER {
+	} else if iss != a.config.JWT_ISSUER {
 		return models.User{}, errors.New("invalid token issuer")
 	}
 
@@ -99,7 +95,7 @@ var errExpired = errors.New("expired")
 func (a *App) refreshTokens(refresh string) (string, string, error) {
 	// parse refresh token
 	token, err := jwt.ParseWithClaims(refresh, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {
-		return JWT_SECRET, nil
+		return a.config.JWT_SECRET, nil
 	})
 	if err != nil {
 		return "", "", fmt.Errorf("failed to parse refresh token: %w", err)
@@ -109,7 +105,7 @@ func (a *App) refreshTokens(refresh string) (string, string, error) {
 	iss, err := token.Claims.GetIssuer()
 	if err != nil {
 		return "", "", fmt.Errorf("failed to get issuer from refresh token: %w", err)
-	} else if iss != JWT_ISSUER {
+	} else if iss != a.config.JWT_ISSUER {
 		return "", "", errors.New("invalid token issuer")
 	}
 
