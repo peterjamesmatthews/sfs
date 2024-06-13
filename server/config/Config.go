@@ -7,12 +7,14 @@ import (
 
 	"github.com/sethvargo/go-envconfig"
 	"pjm.dev/sfs/app"
+	"pjm.dev/sfs/db"
+	"pjm.dev/sfs/server"
 )
 
 type Config struct {
-	Server   ServerConfig   `env:", prefix=SERVER_"`
-	App      app.Config     `env:", prefix="`
-	Database DatabaseConfig `env:", prefix=DATABASE_"`
+	Server   server.Config `env:", prefix=SERVER_"`
+	App      app.Config    `env:", prefix="`
+	Database db.Config     `env:", prefix=DATABASE_"`
 }
 
 func New(ctx context.Context) (Config, error) {
@@ -31,30 +33,4 @@ func (c Config) String() string {
 		return fmt.Sprintf("failed to marshal config: %s", err.Error())
 	}
 	return string(bytes)
-}
-
-type ServerConfig struct {
-	Hostname      string `env:"HOSTNAME"`
-	Port          int    `env:"PORT"`
-	GraphEndpoint string `env:"GRAPH_ENDPOINT"`
-}
-
-type DatabaseConfig struct {
-	Hostname string `env:"HOSTNAME"`
-	Port     int    `env:"PORT"`
-	User     string `env:"USER"`
-	Password string `env:"PASSWORD"`
-	Name     string `env:"NAME"`
-}
-
-func (d *DatabaseConfig) GetDSN() string {
-	return fmt.Sprintf(
-		"%s://%s:%s@%s:%d/%s?sslmode=disable",
-		"postgres",
-		d.User,
-		d.Password,
-		d.Hostname,
-		d.Port,
-		d.Name,
-	)
 }

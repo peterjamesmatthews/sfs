@@ -6,11 +6,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/99designs/gqlgen/graphql/playground"
 	"pjm.dev/sfs/app"
 	"pjm.dev/sfs/config"
 	"pjm.dev/sfs/db"
 	"pjm.dev/sfs/graph"
+	"pjm.dev/sfs/server"
 )
 
 func main() {
@@ -35,18 +35,16 @@ func main() {
 	app := app.New(config.App, db)
 
 	// initialize graph
-	handler := graph.New(graph.Resolver{SharedFileSystem: &app})
+	graphHandler := graph.New(graph.Resolver{SharedFileSystem: &app})
 
 	// initialize server
-	mux := http.NewServeMux()
-
-	// register graph's handler
-	graphPattern := fmt.Sprintf("/%s", config.Server.GraphEndpoint)
-	mux.Handle(graphPattern, handler)
-
-	// register graph's playground handler
-	mux.Handle("/", playground.Handler("SFS Playground", graphPattern))
+	handler := server.New(config.Server, graphHandler)
 
 	// start server
-	log.Fatalln(http.ListenAndServe(fmt.Sprintf("%s:%d", config.Server.Hostname, config.Server.Port), mux))
+	log.Fatalln(
+		http.ListenAndServe(
+			fmt.Sprintf("%s:%d", config.Server.Hostname, config.Server.Port),
+			handler,
+		),
+	)
 }
