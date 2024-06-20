@@ -89,7 +89,7 @@ func (a *App) GetTokens(name string, password string) (graph.Tokens, error) {
 
 func (a *App) GetTokensFromAuth0Token(token string) (graph.Tokens, error) {
 	// get user's name from Auth0 token
-	id, name, err := a.auth0.GetIDAndNameFromToken(token)
+	id, name, err := a.getIDAndNameFromToken(token)
 	if err != nil {
 		return graph.Tokens{}, fmt.Errorf("failed to get user name from token: %w", err)
 	}

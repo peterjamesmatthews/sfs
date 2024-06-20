@@ -7,12 +7,7 @@ import (
 	"net/http"
 )
 
-type Auth0 interface {
-	// GetIDAndNameFromToken gets the ID and name of a user from their opaque token.
-	GetIDAndNameFromToken(token string) (id string, name string, err error)
-}
-
-func (a *App) GetIDAndNameFromToken(token string) (id string, name string, err error) {
+func (a *App) getIDAndNameFromToken(token string) (id string, name string, err error) {
 	// construct GET https://{Auth0 domain}/userinfo request
 	request, err := http.NewRequest(http.MethodGet, "https://"+a.config.AUTH0_DOMAIN+"/userinfo", nil)
 	if err != nil {
