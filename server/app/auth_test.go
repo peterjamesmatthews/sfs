@@ -6,51 +6,69 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGetIDAndNameFromToken(t *testing.T) {
+	tests := []struct {
+		name     string
+		token    string
+		response auth0UserInfoResponse
+	}{
+		{
+			name:     "valid token",
+			token:    "valid_token",
+			response: auth0UserInfoResponse{Sub: "foo", Name: "bar"},
+		},
+	}
+
 	// Create a new instance of the App
 	app := &App{}
 
-	// Create a test server with an insecure TLS configuration
-	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Set the response headers
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Create a test server with an insecure TLS configuration
+			server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				// assert this is a GET request
+				assert.Equal(t, r.Method, http.MethodGet, "unexpected method")
 
-		// Write the response body
-		response := map[string]interface{}{
-			"sub":  "123",
-			"name": "John Doe",
-		}
-		json.NewEncoder(w).Encode(response)
-	}))
-	client := server.Client()
-	http.DefaultClient = client
-	defer server.Close()
+				// assert this request's path is /userinfo
+				assert.Equal(t, r.URL.Path, "/userinfo", "unexpected path")
 
-	// Set the test server URL in the App
-	serverURL, err := url.Parse(server.URL)
-	if err != nil {
-		t.Fatalf("Failed to parse server URL: %v", err)
-	}
+				// assert the Authorization header is of the form "Bearer <test.token>"
+				assert.Equal(t, r.Header.Get("Authorization"), "Bearer "+test.token, "unexpected Authorization header")
 
-	// Set the AUTH0_DOMAIN in the App
-	app.config.AUTH0_DOMAIN = serverURL.Host
+				// Set the response headers
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
 
-	// Call the getIDAndNameFromToken function with a valid token
-	id, name, err := app.getIDAndNameFromToken("valid_token")
-	if err != nil {
-		t.Errorf("Unexpected error: %v", err)
-	}
+				// Write the response body
+				response := auth0UserInfoResponse{Sub: test.response.Sub, Name: test.response.Name}
+				json.NewEncoder(w).Encode(response)
+			}))
+			defer server.Close()
 
-	// Verify the returned ID and name
-	expectedID := "123"
-	expectedName := "John Doe"
-	if id != expectedID {
-		t.Errorf("Expected ID to be %s, but got %s", expectedID, id)
-	}
-	if name != expectedName {
-		t.Errorf("Expected name to be %s, but got %s", expectedName, name)
+			// Set the test server's client as the default client
+			client := server.Client()
+			http.DefaultClient = client
+
+			// Set the test server's URL as the AUTH0_DOMAIN
+			serverURL, err := url.Parse(server.URL)
+			if err != nil {
+				t.Fatalf("Failed to parse server URL: %v", err)
+			}
+			app.config.AUTH0_DOMAIN = serverURL.Host
+
+			// Call the getIDAndNameFromToken function with a valid token
+			id, name, err := app.getIDAndNameFromToken(test.token)
+			if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+			}
+
+			// Verify the returned ID and name
+			assert.Equal(t, test.response.Sub, id, "unexpected ID")
+			assert.Equal(t, test.response.Name, name, "unexpected name")
+		})
 	}
 }
