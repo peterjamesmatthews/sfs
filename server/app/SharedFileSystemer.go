@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgtype"
 	"pjm.dev/sfs/db/models"
 	"pjm.dev/sfs/graph"
@@ -49,8 +47,7 @@ func (a *App) CreateUser(name string, password string) (graph.User, error) {
 		context.Background(),
 		models.CreateUserParams{Name: name, Salt: salt, Hash: hash},
 	)
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) && pgErr.Code == models.UniqueViolation {
+	if a.isConflictError(err) {
 		return graph.User{}, graph.ErrConflict
 	} else if err != nil {
 		return graph.User{}, fmt.Errorf("failed to create user: %w", err)
@@ -63,7 +60,7 @@ func (a *App) CreateUser(name string, password string) (graph.User, error) {
 func (a *App) GetTokens(name string, password string) (graph.Tokens, error) {
 	// get user by name
 	user, err := a.queries.GetUserByName(context.Background(), name)
-	if errors.Is(err, pgx.ErrNoRows) {
+	if a.isNotFoundError(err) {
 		return graph.Tokens{}, graph.ErrUnauthorized
 	} else if err != nil {
 		return graph.Tokens{}, fmt.Errorf("failed to get user: %w", err)
@@ -99,7 +96,7 @@ func (a *App) GetTokensFromAuth0Token(token string) (graph.Tokens, error) {
 	user, err = a.queries.GetUserByName(context.Background(), name)
 
 	// create user if not found
-	if errors.Is(err, pgx.ErrNoRows) {
+	if a.isNotFoundError(err) {
 		user, err = a.queries.CreateUser(
 			context.Background(),
 			models.CreateUserParams{
