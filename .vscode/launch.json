@@ -20,18 +20,6 @@
         }
       ],
       "type": "go"
-    },
-    {
-      "env": {
-        "DATABASE_HOSTNAME": "localhost",
-        "SERVER_HOSTNAME": "localhost"
-      },
-      "envFile": "${workspaceFolder}/.env",
-      "mode": "auto",
-      "name": "Launch Server",
-      "program": "${workspaceFolder}/server/cmd/server",
-      "request": "launch",
-      "type": "go"
     }
   ]
 }
