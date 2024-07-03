@@ -13,12 +13,12 @@ services:
   app:
     build: app
     container_name: app
-    hostname: ${APP_HOSTNAME}
+    hostname: $APP_HOSTNAME
     env_file:
-      - .env
       - secrets.env
+      - .env
     ports:
-      - 80:${APP_PORT}
+      - 80:$APP_PORT
     volumes:
       - ./app:/sfs/app
       - app_node_modules:/sfs/app/node_modules/
@@ -26,13 +26,13 @@ services:
   server:
     build: server
     container_name: server
-    hostname: ${SERVER_HOSTNAME}
+    hostname: $SERVER_HOSTNAME
     env_file:
-      - .env
       - secrets.env
+      - .env
     ports:
-      - ${SERVER_PORT}:${SERVER_PORT}
-      - ${SERVER_DEBUG_PORT}:${SERVER_DEBUG_PORT}
+      - $SERVER_PORT:$SERVER_PORT
+      - $SERVER_DEBUG_PORT:$SERVER_DEBUG_PORT
     volumes:
       - ./server:/sfs/server
       - server_debug_bins:/sfs/server/__debug_bins/
@@ -40,13 +40,13 @@ services:
   database:
     image: postgres:16-bullseye
     container_name: database
-    hostname: ${DATABASE_HOSTNAME}
+    hostname: $DATABASE_HOSTNAME
     environment:
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_USER=$DATABASE_USER
+      - POSTGRES_PASSWORD=$DATABASE_PASSWORD
+      - POSTGRES_DB=$DATABASE_NAME
     ports:
-      - ${DATABASE_PORT}:${DATABASE_PORT}
+      - $DATABASE_PORT:$DATABASE_PORT
     volumes:
       - database_data:/var/lib/postgresql/data
       - ./server/db/migrations:/docker-entrypoint-initdb.d
