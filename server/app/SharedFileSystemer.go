@@ -24,83 +24,23 @@ func (a *App) Authenticate(auth string) (graph.User, error) {
 	return a.getGraphUser(user), nil
 }
 
-func (a *App) CreateUser(name string, password string) (graph.User, error) {
-	// validate name
-	if !a.isValidUserName(name) {
-		return graph.User{}, fmt.Errorf("invalid user name: %s", name)
-	}
-
-	// generate salt
-	salt, err := a.generateSalt()
-	if err != nil {
-		return graph.User{}, fmt.Errorf("failed to generate salt: %w", err)
-	}
-
-	// hash password with salt
-	hash, err := a.hashPasswordWithSalt(password, salt)
-	if err != nil {
-		return graph.User{}, fmt.Errorf("failed to hash password: %w", err)
-	}
-
-	// create user
-	user, err := a.queries.CreateUser(
-		context.Background(),
-		models.CreateUserParams{Name: name, Salt: salt, Hash: hash},
-	)
-	if a.isConflictError(err) {
-		return graph.User{}, graph.ErrConflict
-	} else if err != nil {
-		return graph.User{}, fmt.Errorf("failed to create user: %w", err)
-	}
-
-	// convert and return user
-	return a.getGraphUser(user), nil
-}
-
-func (a *App) GetTokens(name string, password string) (graph.Tokens, error) {
-	// get user by name
-	user, err := a.queries.GetUserByName(context.Background(), name)
-	if a.isNotFoundError(err) {
-		return graph.Tokens{}, graph.ErrUnauthorized
-	} else if err != nil {
-		return graph.Tokens{}, fmt.Errorf("failed to get user: %w", err)
-	}
-
-	// compare password and user's salt with hash
-	ok, err := a.comparePasswordWithSalt(password, user.Salt, user.Hash)
-	if err != nil {
-		return graph.Tokens{}, fmt.Errorf("failed to compare password: %w", err)
-	} else if !ok {
-		return graph.Tokens{}, graph.ErrUnauthorized
-	}
-
-	// generate access and refresh tokens for user
-	access, refresh, err := a.generateTokensForUser(user)
-	if err != nil {
-		return graph.Tokens{}, fmt.Errorf("failed to generate tokens: %w", err)
-	}
-
-	// convert and return tokens
-	return a.getGraphTokens(access, refresh), nil
-}
-
 func (a *App) GetTokensFromAuth0Token(token string) (graph.Tokens, error) {
-	// get user's name from Auth0 token
-	id, name, err := a.getIDAndNameFromToken(token)
+	// get user's email from Auth0 token
+	id, email, err := a.getIDAndEmailFromToken(token)
 	if err != nil {
 		return graph.Tokens{}, fmt.Errorf("failed to get user name from token: %w", err)
 	}
 
-	// get user by name
+	// get user by email
 	var user models.User
-	user, err = a.queries.GetUserByName(context.Background(), name)
+	user, err = a.queries.GetUserByEmail(context.Background(), email)
 
 	// create user if not found
 	if a.isNotFoundError(err) {
 		user, err = a.queries.CreateUser(
 			context.Background(),
 			models.CreateUserParams{
-				Name:    name,
+				Email:   email,
 				Auth0ID: pgtype.Text{String: id, Valid: true},
 			},
 		)

@@ -45,17 +45,6 @@ func (r *folderResolver) Children(ctx context.Context, obj *Folder) ([]Node, err
 	panic(fmt.Errorf("not implemented: Children - children"))
 }
 
-// CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, name string, password string) (*User, error) {
-	user, err := r.SharedFileSystem.CreateUser(name, password)
-	if errors.Is(err, ErrConflict) {
-		return nil, fmt.Errorf("user with name %q already exists", name)
-	} else if err != nil {
-		return nil, fmt.Errorf("failed to create user: %w", err)
-	}
-	return &user, nil
-}
-
 // RefreshTokens is the resolver for the refreshTokens field.
 func (r *mutationResolver) RefreshTokens(ctx context.Context, refresh string) (*Tokens, error) {
 	tokens, err := r.SharedFileSystem.RefreshTokens(refresh)
@@ -95,16 +84,6 @@ func (r *mutationResolver) CreateFile(ctx context.Context, parentID *string, nam
 // WriteFile is the resolver for the writeFile field.
 func (r *mutationResolver) WriteFile(ctx context.Context, id string, content string) (*File, error) {
 	panic(fmt.Errorf("not implemented: WriteFile - writeFile"))
-}
-
-// GetTokens is the resolver for the getTokens field.
-func (r *queryResolver) GetTokens(ctx context.Context, name string, password string) (*Tokens, error) {
-	tokens, err := r.SharedFileSystem.GetTokens(name, password)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get tokens: %w", err)
-
-	}
-	return &tokens, nil
 }
 
 // GetTokensFromAuth0 is the resolver for the getTokensFromAuth0 field.

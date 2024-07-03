@@ -18,8 +18,8 @@ func TestGetIDAndNameFromToken(t *testing.T) {
 	}{
 		{
 			name:     "valid token",
-			token:    "valid_token",
-			response: auth0UserInfoResponse{Sub: "foo", Name: "bar"},
+			token:    "mock-token",
+			response: auth0UserInfoResponse{Sub: "foo", Email: "bar@example.com"},
 		},
 	}
 
@@ -44,7 +44,10 @@ func TestGetIDAndNameFromToken(t *testing.T) {
 				w.WriteHeader(http.StatusOK)
 
 				// Write the response body
-				response := auth0UserInfoResponse{Sub: test.response.Sub, Name: test.response.Name}
+				response := auth0UserInfoResponse{
+					Sub:   test.response.Sub,
+					Email: test.response.Email,
+				}
 				json.NewEncoder(w).Encode(response)
 			}))
 			defer server.Close()
@@ -61,14 +64,14 @@ func TestGetIDAndNameFromToken(t *testing.T) {
 			app.config.AUTH0_DOMAIN = serverURL.Host
 
 			// Call the getIDAndNameFromToken function with a valid token
-			id, name, err := app.getIDAndNameFromToken(test.token)
+			id, name, err := app.getIDAndEmailFromToken(test.token)
 			if err != nil {
 				t.Errorf("Unexpected error: %v", err)
 			}
 
 			// Verify the returned ID and name
 			assert.Equal(t, test.response.Sub, id, "unexpected ID")
-			assert.Equal(t, test.response.Name, name, "unexpected name")
+			assert.Equal(t, test.response.Email, name, "unexpected name")
 		})
 	}
 }

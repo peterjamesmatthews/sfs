@@ -74,8 +74,6 @@ type Node struct {
 
 type User struct {
 	ID      pgtype.UUID
-	Name    string
-	Salt    []byte
-	Hash    []byte
+	Email   string
 	Auth0ID pgtype.Text
 }

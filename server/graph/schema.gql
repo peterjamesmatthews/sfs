@@ -61,9 +61,6 @@ type Access {
 #
 # It defines the interface in which clients will mutate the shared file system with.
 type Mutation {
-  # createUser creates a new user.
-  createUser(name: String!, password: String!): User
-
   # refreshTokens returns new access and refresh tokens.
   refreshTokens(refresh: String!): Tokens
 
@@ -95,9 +92,6 @@ type Mutation {
 #
 # It defines the interface in which clients will query the shared file system with.
 type Query {
-  # getTokens returns access and refresh tokens for a user.
-  getTokens(name: String!, password: String!): Tokens!
-
   # getTokens returns access and refresh tokens for a user authenticated with Auth0.
   getTokensFromAuth0(token: String!): Tokens!
 

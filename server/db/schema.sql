@@ -1,8 +1,6 @@
 CREATE TABLE public.user (
   id UUID NOT NULL UNIQUE PRIMARY KEY DEFAULT gen_random_uuid(),
-  name VARCHAR NOT NULL UNIQUE,
-  salt BYTEA,
-  hash BYTEA,
+  email VARCHAR NOT NULL UNIQUE,
   auth0_id VARCHAR
 );
 CREATE TABLE node (

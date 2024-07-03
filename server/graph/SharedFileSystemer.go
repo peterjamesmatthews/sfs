@@ -13,25 +13,6 @@ type SharedFileSystemer interface {
 	//  - `ErrUnauthorized` if an authenticated user cannot be determined.
 	Authenticate(string) (User, error)
 
-	// CreateUser creates a new user.
-	//
-	// # Arguments
-	//  - name: The name of the user to create.
-	//
-	// # Errors
-	//	- `ErrConflict` if a user with the same name already exists.
-	CreateUser(name string, password string) (User, error)
-
-	// GetTokens fetches a user's access and refresh tokens, creating them if necessary.
-	//
-	// # Arguments
-	//  - name: The name of the user to fetch tokens for.
-	//  - password: The password of the user.
-	//
-	// # Errors
-	//	- `ErrUnauthorized` if the user is not found or the password is incorrect.
-	GetTokens(name string, password string) (Tokens, error)
-
 	// RefreshTokens refreshes a user's access and refresh tokens.
 	//
 	// # Arguments

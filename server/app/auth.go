@@ -8,11 +8,11 @@ import (
 )
 
 type auth0UserInfoResponse struct {
-	Sub  string `json:"sub"`
-	Name string `json:"name"`
+	Sub   string `json:"sub"`
+	Email string `json:"email"`
 }
 
-func (a *App) getIDAndNameFromToken(token string) (id string, name string, err error) {
+func (a *App) getIDAndEmailFromToken(token string) (string, string, error) {
 	// construct GET https://{Auth0 domain}/userinfo request
 	request, err := http.NewRequest(http.MethodGet, "https://"+a.config.AUTH0_DOMAIN+"/userinfo", nil)
 	if err != nil {
@@ -43,5 +43,5 @@ func (a *App) getIDAndNameFromToken(token string) (id string, name string, err e
 	}
 
 	// return ID and name
-	return body.Sub, body.Name, nil
+	return body.Sub, body.Email, nil
 }
