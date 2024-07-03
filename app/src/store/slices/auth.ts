@@ -17,11 +17,14 @@ import GetTokensFromAuth0 from "../../graphql/query/GetTokensFromAuth0";
 import RefreshTokens from "../../graphql/query/RefreshTokens";
 
 type AuthState = {
-  user?: User;
-  tokens?: Tokens;
+  user: User | null;
+  tokens: Tokens | null;
 };
 
-const initialState: AuthState = {};
+const initialState: AuthState = {
+  user: null,
+  tokens: null,
+};
 
 const auth = createSlice({
   name: "auth",
@@ -32,6 +35,10 @@ const auth = createSlice({
     },
     gotTokens: (state, payload: PayloadAction<Tokens>) => {
       state.tokens = payload.payload;
+    },
+    signOut: (state) => {
+      state.user = null;
+      state.tokens = null;
     },
   },
 });
