@@ -22,7 +22,7 @@ func main() {
 	log.Printf("initializing with config: %s", cfg)
 
 	// initialize handler
-	handler, err := config.NewHandler(cfg)
+	_, _, handler, err := config.NewStack(cfg)
 	if err != nil {
 		log.Fatalf("failed to initialize server: %v", err)
 	}

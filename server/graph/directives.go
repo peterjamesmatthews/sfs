@@ -12,7 +12,7 @@ import (
 //
 // # Errors
 //   - ErrUnauthorized: if the Authorization header is missing or invalid.
-func authenticated(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error) {
+func authenticated(ctx context.Context, obj any, next graphql.Resolver) (any, error) {
 	// get authorization from context
 	auth := getAuthorizationFromContext(ctx)
 	if auth == "" {

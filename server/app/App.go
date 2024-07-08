@@ -13,3 +13,7 @@ type App struct {
 func New(config Config, conn *pgx.Conn) App {
 	return App{config: config, queries: models.New(conn)}
 }
+
+func (a *App) SetDatabase(conn *pgx.Conn) {
+	a.queries = models.New(conn)
+}
