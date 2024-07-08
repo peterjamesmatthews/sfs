@@ -1,4 +1,4 @@
-package app
+package auth0
 
 import (
 	"encoding/json"
@@ -7,14 +7,22 @@ import (
 	"net/http"
 )
 
-type auth0UserInfoResponse struct {
+type Auth0 struct {
+	config Config
+}
+
+func New(config Config) *Auth0 {
+	return &Auth0{config: config}
+}
+
+type userInfoReponse struct {
 	Sub   string `json:"sub"`
 	Email string `json:"email"`
 }
 
-func (a *App) getIDAndEmailFromToken(token string) (string, string, error) {
+func (a *Auth0) GetIDAndEmailFromToken(token string) (string, string, error) {
 	// construct GET https://{Auth0 domain}/userinfo request
-	request, err := http.NewRequest(http.MethodGet, "https://"+a.config.AUTH0_DOMAIN+"/userinfo", nil)
+	request, err := http.NewRequest(http.MethodGet, "https://"+a.config.Domain+"/userinfo", nil)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to create request: %w", err)
 	}
@@ -36,7 +44,7 @@ func (a *App) getIDAndEmailFromToken(token string) (string, string, error) {
 	}
 
 	// extract ID and email from body
-	var body auth0UserInfoResponse
+	var body userInfoReponse
 	err = json.Unmarshal(bodyBytes, &body)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to unmarshal body: %w", err)

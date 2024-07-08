@@ -1,4 +1,4 @@
-package app
+package auth0
 
 import (
 	"encoding/json"
@@ -14,17 +14,14 @@ func TestGetIDAndNameFromToken(t *testing.T) {
 	tests := []struct {
 		name     string
 		token    string
-		response auth0UserInfoResponse
+		response userInfoReponse
 	}{
 		{
 			name:     "valid token",
 			token:    "mock-token",
-			response: auth0UserInfoResponse{Sub: "foo", Email: "bar@example.com"},
+			response: userInfoReponse{Sub: "foo", Email: "bar@example.com"},
 		},
 	}
-
-	// Create a new instance of the App
-	app := &App{}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -44,7 +41,7 @@ func TestGetIDAndNameFromToken(t *testing.T) {
 				w.WriteHeader(http.StatusOK)
 
 				// Write the response body
-				response := auth0UserInfoResponse{
+				response := userInfoReponse{
 					Sub:   test.response.Sub,
 					Email: test.response.Email,
 				}
@@ -61,10 +58,11 @@ func TestGetIDAndNameFromToken(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Failed to parse server URL: %v", err)
 			}
-			app.config.AUTH0_DOMAIN = serverURL.Host
+
+			auth0 := New(Config{Domain: serverURL.Host})
 
 			// Call the getIDAndNameFromToken function with a valid token
-			id, name, err := app.getIDAndEmailFromToken(test.token)
+			id, name, err := auth0.GetIDAndEmailFromToken(test.token)
 			if err != nil {
 				t.Errorf("Unexpected error: %v", err)
 			}

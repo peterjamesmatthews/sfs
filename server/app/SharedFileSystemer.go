@@ -26,7 +26,7 @@ func (a *App) Authenticate(auth string) (graph.User, error) {
 
 func (a *App) GetTokensFromAuth0Token(token string) (graph.Tokens, error) {
 	// get user's email from Auth0 token
-	id, email, err := a.getIDAndEmailFromToken(token)
+	id, email, err := a.auth0.GetIDAndEmailFromToken(token)
 	if err != nil {
 		return graph.Tokens{}, fmt.Errorf("failed to get user name from token: %w", err)
 	}

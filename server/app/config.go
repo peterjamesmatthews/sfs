@@ -1,7 +1,6 @@
 package app
 
 type Config struct {
-	AUTH0_DOMAIN string `env:"AUTH0_DOMAIN"`
-	JWT_ISSUER   string `env:"JWT_ISSUER"`
-	JWT_SECRET   []byte `env:"JWT_SECRET"`
+	JWT_Issuer string `env:"JWT_ISSUER"`
+	JWT_Secret []byte `env:"JWT_SECRET"`
 }

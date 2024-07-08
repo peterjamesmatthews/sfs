@@ -6,6 +6,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"pjm.dev/sfs/app"
+	"pjm.dev/sfs/auth0"
 	"pjm.dev/sfs/db"
 	"pjm.dev/sfs/graph"
 	"pjm.dev/sfs/server"
@@ -24,8 +25,11 @@ func NewStack(config Config) (*pgx.Conn, app.App, http.Handler, error) {
 		return nil, app.App{}, nil, fmt.Errorf("failed to initialize db: %w", err)
 	}
 
+	// initialize auth0
+	auth0 := auth0.New(config.Auth0)
+
 	// initialize app
-	app := app.New(config.App, db)
+	app := app.New(config.App, db, auth0)
 
 	// initialize graph
 	graphHandler := graph.New(graph.Resolver{SharedFileSystem: &app})
