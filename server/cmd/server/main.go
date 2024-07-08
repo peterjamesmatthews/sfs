@@ -6,11 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"pjm.dev/sfs/app"
 	"pjm.dev/sfs/config"
-	"pjm.dev/sfs/db"
-	"pjm.dev/sfs/graph"
-	"pjm.dev/sfs/server"
 )
 
 func main() {
@@ -19,32 +15,22 @@ func main() {
 	log.Println("Hello from pjm.dev/sfs/cmd/server!")
 
 	// initialize config
-	config, err := config.New(context.Background())
+	cfg, err := config.New(context.Background())
 	if err != nil {
 		log.Fatalf("failed to initialize config: %v", err)
 	}
-	log.Printf("initializing with config: %s\n", config)
+	log.Printf("initializing with config: %s", cfg)
 
-	// initialize db
-	db, err := db.New(config.Database)
+	// initialize handler
+	handler, err := config.NewHandler(cfg)
 	if err != nil {
-		log.Fatalf("failed to initialize db: %v", err)
+		log.Fatalf("failed to initialize server: %v", err)
 	}
 
-	// initialize app
-	app := app.New(config.App, db)
-
-	// initialize graph
-	graphHandler := graph.New(graph.Resolver{SharedFileSystem: &app})
-
-	// initialize server
-	handler := server.New(config.Server, graphHandler)
+	// construct server's address
+	addr := fmt.Sprintf("%s:%d", cfg.Server.Hostname, cfg.Server.Port)
+	log.Printf("server initialized, listening on %s", addr)
 
 	// start server
-	log.Fatalln(
-		http.ListenAndServe(
-			fmt.Sprintf("%s:%d", config.Server.Hostname, config.Server.Port),
-			handler,
-		),
-	)
+	log.Fatalln(http.ListenAndServe(addr, handler))
 }

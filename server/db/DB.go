@@ -8,7 +8,7 @@ import (
 )
 
 func New(config Config) (*pgx.Conn, error) {
-	db, err := pgx.Connect(context.Background(), config.GetDSN())
+	db, err := pgx.Connect(context.Background(), config.GetConnectionString())
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}

@@ -10,7 +10,7 @@ type Config struct {
 	Name     string `env:"NAME"`
 }
 
-func (c *Config) GetDSN() string {
+func (c *Config) GetConnectionString() string {
 	return fmt.Sprintf(
 		"%s://%s:%s@%s:%d/%s?sslmode=disable",
 		"postgres",

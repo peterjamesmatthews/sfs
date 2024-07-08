@@ -20,11 +20,7 @@ type Config struct {
 func New(ctx context.Context) (Config, error) {
 	var config Config
 	err := envconfig.Process(ctx, &config)
-	if err != nil {
-		return Config{}, err
-	}
-
-	return config, nil
+	return config, err
 }
 
 func (c Config) String() string {
