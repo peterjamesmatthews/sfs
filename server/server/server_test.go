@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strconv"
 	"testing"
@@ -22,11 +23,37 @@ import (
 	"pjm.dev/sfs/server"
 )
 
+// test represents a single test for server_test tests.
+type test struct {
+	// identifier for the test
+	name string
+
+	// database state before the test
+	seed *os.File
+
+	// request to send to the server
+	request *http.Request
+
+	// response to expect from the server
+	response *http.Response
+
+	// database state after the test
+	dump *os.File
+}
+
 type mock struct {
 	m.Mock
 }
 
-func newTestServer(t *testing.T) (*httptest.Server, *mock) {
+var cfg = config.Config{
+	Database: db.Config{
+		User:     "foo",
+		Password: "bar",
+		Name:     "baz",
+	},
+}
+
+func newTestServer(t *testing.T) (*httptest.Server, *mock, *pgx.Conn) {
 	t.Helper()
 
 	// TODO cache this container across tests; test independence should be solved with transactions
@@ -47,16 +74,9 @@ func newTestServer(t *testing.T) (*httptest.Server, *mock) {
 		t.Fatalf("failed to parse connection port: %v", err)
 	}
 
-	cfg := config.Config{}
-
-	cfg.Database = db.Config{
-		Hostname: connectionURL.Hostname(),
-		Port:     port,
-		Name:     "postgres",
-		Password: "password",
-		User:     "postgres",
-	}
-
+	cfg := cfg.Clone()
+	cfg.Database.Hostname = connectionURL.Hostname()
+	cfg.Database.Port = port
 	cfg.Server = server.Config{GraphEndpoint: "graph"}
 
 	mock := new(mock)
@@ -66,11 +86,11 @@ func newTestServer(t *testing.T) (*httptest.Server, *mock) {
 		t.Fatalf("failed to initialize test server: %v", err)
 	}
 
-	// wrap each request in a transaction
+	// TODO wrap each request in a transaction
 	// server := wrapInTransaction(stack.Server, stack.Database, t, stack.App)
-	server := stack.Server // TODO nested transactions are not supported by pgx?
+	server := stack.Server
 
-	return httptest.NewServer(server), mock
+	return httptest.NewServer(server), mock, stack.Database
 }
 
 func wrapInTransaction(server http.Handler, db *pgx.Conn, t *testing.T, app app.App) http.Handler {
@@ -103,9 +123,9 @@ func newPostgresContainer(t *testing.T) *postgres.PostgresContainer {
 
 	container, err := postgres.Run(ctx,
 		"docker.io/postgres:16-bullseye",
-		postgres.WithDatabase("postgres"),
-		postgres.WithUsername("postgres"),
-		postgres.WithPassword("password"),
+		postgres.WithUsername(cfg.Database.User),
+		postgres.WithPassword(cfg.Database.Password),
+		postgres.WithDatabase(cfg.Database.Name),
 		postgres.WithInitScripts(migrations...),
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").

@@ -32,3 +32,7 @@ func (c Config) String() string {
 	}
 	return string(bytes)
 }
+
+func (c Config) Clone() Config {
+	return c
+}

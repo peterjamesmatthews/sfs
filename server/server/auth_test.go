@@ -5,37 +5,23 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os"
+	"os/exec"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-// test represents a single test for server_test tests.
-type test struct {
-	// identifier for the test
-	name string
-
-	// database state before the test
-	seed *os.File
-
-	// request to send to the server
-	request *http.Request
-
-	// response to expect from the server
-	response *http.Response
-
-	// database state after the test
-	dump *os.File
+func (m *mock) GetIDAndEmailFromToken(token string) (string, string, error) {
+	args := m.Called(token)
+	return args.String(0), args.String(1), args.Error(2)
 }
 
 // TestGetTokensFromAuth0 tests server's handling of the getTokensFromAuth0 query.
 func TestGetTokensFromAuth0(t *testing.T) { // TODO parametrize test with more cases
-	server, mock := newTestServer(t)
+	server, mock, db := newTestServer(t)
 	defer server.Close()
 
-	// test a user is created when logging in for the first time
 	token := "mock-new-user-token"
 	id := "mock-new-user-id"
 	email := "mock-new-user-email"
@@ -73,13 +59,24 @@ func TestGetTokensFromAuth0(t *testing.T) { // TODO parametrize test with more c
 	assert.NotContains(t, body, "errors", "unexpected errors in response: %s", body)
 	assert.Contains(t, body, "access", "access token missing from response: %s", body)
 	assert.Contains(t, body, "refresh", "refresh token missing from response: %s", body)
-
 	mock.AssertExpectations(t)
 
-	// TODO assert new user was created in database
-}
+	var dump string
 
-func (m *mock) GetIDAndEmailFromToken(token string) (string, string, error) {
-	args := m.Called(token)
-	return args.String(0), args.String(1), args.Error(2)
+	cmd := exec.Command(
+		"pg_dump",
+		"-d", db.Config().Database,
+		"-h", db.Config().Host,
+		"-p", fmt.Sprintf("%d", db.Config().Port),
+		"-U", db.Config().User,
+	)
+	cmd.Env = append(cmd.Environ(), "PGPASSWORD="+db.Config().Password)
+	output, err := cmd.Output()
+	if err != nil {
+		t.Fatalf("failed to dump database: %v", err)
+	}
+	dump = string(output)
+
+	assert.Contains(t, dump, id, "user ID missing from database dump: %s", dump)
+	assert.Contains(t, dump, email, "user email missing from database dump: %s", dump)
 }
