@@ -3,7 +3,6 @@ package server_test
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -11,7 +10,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"pjm.dev/sfs/graph"
 )
 
 // test represents a single test for server_test tests.
@@ -39,11 +37,12 @@ func TestGetTokensFromAuth0(t *testing.T) { // TODO parametrize test with more c
 
 	// test a user is created when logging in for the first time
 	token := "mock-new-user-token"
-	tokens := graph.Tokens{Access: "mock-new-user-access", Refresh: "mock-new-user-refresh"}
+	id := "mock-new-user-id"
+	email := "mock-new-user-email"
 
 	mock.
 		On("GetIDAndEmailFromToken", token).
-		Return(tokens.Access, tokens.Refresh, nil)
+		Return(id, email, nil)
 
 	url, err := url.Parse(server.URL + "/graph")
 	if err != nil {
@@ -53,10 +52,8 @@ func TestGetTokensFromAuth0(t *testing.T) { // TODO parametrize test with more c
 	request := &http.Request{
 		Method: http.MethodPost,
 		URL:    url,
-		Header: http.Header{
-			"Content-Type": []string{"application/json"},
-		},
-		Body: io.NopCloser(strings.NewReader(fmt.Sprintf(`{"query":"query { getTokensFromAuth0(token: \"%s\") { access refresh } }"}`, token))), // TODO ref to test fixture
+		Header: http.Header{"Content-Type": []string{"application/json"}},
+		Body:   io.NopCloser(strings.NewReader(fmt.Sprintf(`{"query":"query { getTokensFromAuth0(token: \"%s\") { access refresh } }"}`, token))), // TODO ref to test fixture
 	}
 	want := &http.Response{StatusCode: http.StatusOK}
 
@@ -65,20 +62,21 @@ func TestGetTokensFromAuth0(t *testing.T) { // TODO parametrize test with more c
 		t.Fatalf("failed to send request: %v", err)
 	}
 
-	if !assert.Equal(t, want.StatusCode, got.StatusCode) {
-		t.Fatalf("unexpected status code: want %d, got %d", want.StatusCode, got.StatusCode)
-	}
+	assert.Equal(t, want.StatusCode, got.StatusCode, "unexpected status code: want %d, got %d", want.StatusCode, got.StatusCode)
 
-	// TODO compare response body with test fixture
-	body, err := io.ReadAll(got.Body)
+	bytes, err := io.ReadAll(got.Body)
 	if err != nil {
 		t.Fatalf("failed to read response body: %v", err)
 	}
-	log.Printf("response body: %s", body)
+	body := string(bytes)
+
+	assert.NotContains(t, body, "errors", "unexpected errors in response: %s", body)
+	assert.Contains(t, body, "access", "access token missing from response: %s", body)
+	assert.Contains(t, body, "refresh", "refresh token missing from response: %s", body)
 
 	mock.AssertExpectations(t)
 
-	// TODO dump database and compare with test fixture
+	// TODO assert new user was created in database
 }
 
 func (m *mock) GetIDAndEmailFromToken(token string) (string, string, error) {
