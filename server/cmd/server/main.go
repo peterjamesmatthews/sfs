@@ -21,8 +21,8 @@ func main() {
 	}
 	log.Printf("initializing with config: %s", cfg)
 
-	// initialize handler
-	_, _, handler, err := config.NewStack(cfg)
+	// initialize stack
+	stack, err := config.NewStack(cfg, nil)
 	if err != nil {
 		log.Fatalf("failed to initialize server: %v", err)
 	}
@@ -32,5 +32,5 @@ func main() {
 	log.Printf("server initialized, listening on %s", addr)
 
 	// start server
-	log.Fatalln(http.ListenAndServe(addr, handler))
+	log.Fatalln(http.ListenAndServe(addr, stack.Server))
 }

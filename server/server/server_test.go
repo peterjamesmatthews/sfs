@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/jackc/pgx/v5"
+	m "github.com/stretchr/testify/mock"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -21,7 +22,11 @@ import (
 	"pjm.dev/sfs/server"
 )
 
-func newTestServer(t *testing.T) *httptest.Server {
+type mock struct {
+	m.Mock
+}
+
+func newTestServer(t *testing.T) (*httptest.Server, *mock) {
 	t.Helper()
 
 	// TODO cache this container across tests; test independence should be solved with transactions
@@ -54,15 +59,18 @@ func newTestServer(t *testing.T) *httptest.Server {
 
 	cfg.Server = server.Config{GraphEndpoint: "graph"}
 
-	db, app, server, err := config.NewStack(cfg)
+	mock := new(mock)
+
+	stack, err := config.NewStack(cfg, mock)
 	if err != nil {
 		t.Fatalf("failed to initialize test server: %v", err)
 	}
 
 	// wrap each request in a transaction
-	server = wrapInTransaction(server, db, t, app)
+	// server := wrapInTransaction(stack.Server, stack.Database, t, stack.App)
+	server := stack.Server // TODO nested transactions are not supported by pgx?
 
-	return httptest.NewServer(server)
+	return httptest.NewServer(server), mock
 }
 
 func wrapInTransaction(server http.Handler, db *pgx.Conn, t *testing.T, app app.App) http.Handler {
