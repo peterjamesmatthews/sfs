@@ -14,12 +14,12 @@ func TestGetIDAndNameFromToken(t *testing.T) {
 	tests := []struct {
 		name     string
 		token    string
-		response userInfoReponse
+		response userInfoResponse
 	}{
 		{
 			name:     "valid token",
 			token:    "mock-token",
-			response: userInfoReponse{Sub: "foo", Email: "bar@example.com"},
+			response: userInfoResponse{Sub: "foo", Email: "bar@example.com"},
 		},
 	}
 
@@ -41,7 +41,7 @@ func TestGetIDAndNameFromToken(t *testing.T) {
 				w.WriteHeader(http.StatusOK)
 
 				// Write the response body
-				response := userInfoReponse{
+				response := userInfoResponse{
 					Sub:   test.response.Sub,
 					Email: test.response.Email,
 				}

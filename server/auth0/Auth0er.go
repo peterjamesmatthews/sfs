@@ -15,7 +15,7 @@ func New(config Config) *Auth0 {
 	return &Auth0{config: config}
 }
 
-type userInfoReponse struct {
+type userInfoResponse struct {
 	Sub   string `json:"sub"`
 	Email string `json:"email"`
 }
@@ -44,7 +44,7 @@ func (a *Auth0) GetIDAndEmailFromToken(token string) (string, string, error) {
 	}
 
 	// extract ID and email from body
-	var body userInfoReponse
+	var body userInfoResponse
 	err = json.Unmarshal(bodyBytes, &body)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to unmarshal body: %w", err)
