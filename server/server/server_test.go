@@ -16,7 +16,6 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 	"github.com/testcontainers/testcontainers-go/wait"
-	"pjm.dev/sfs/app"
 	"pjm.dev/sfs/config"
 	"pjm.dev/sfs/db"
 	"pjm.dev/sfs/meta"
@@ -56,7 +55,6 @@ var cfg = config.Config{
 func newTestServer(t *testing.T) (*httptest.Server, *mock, *pgx.Conn) {
 	t.Helper()
 
-	// TODO cache this container across tests; test independence should be solved with transactions
 	dbContainer := newPostgresContainer(t)
 
 	connectionString, err := dbContainer.ConnectionString(context.Background())
@@ -86,29 +84,7 @@ func newTestServer(t *testing.T) (*httptest.Server, *mock, *pgx.Conn) {
 		t.Fatalf("failed to initialize test server: %v", err)
 	}
 
-	// TODO wrap each request in a transaction
-	// server := wrapInTransaction(stack.Server, stack.Database, t, stack.App)
-	server := stack.Server
-
-	return httptest.NewServer(server), mock, stack.Database
-}
-
-func wrapInTransaction(server http.Handler, db *pgx.Conn, t *testing.T, app app.App) http.Handler {
-	server = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tx, err := db.Begin(r.Context())
-		if err != nil {
-			t.Fatalf("failed to begin transaction: %v", err)
-		}
-
-		app.SetDatabase(tx.Conn())
-
-		server.ServeHTTP(w, r)
-
-		if err := tx.Rollback(r.Context()); err != nil {
-			t.Fatalf("failed to rollback transaction: %v", err)
-		}
-	})
-	return server
+	return httptest.NewServer(stack.Server), mock, stack.Database
 }
 
 func newPostgresContainer(t *testing.T) *postgres.PostgresContainer {
