@@ -43,7 +43,7 @@ func TestGetTokensFromAuth0(t *testing.T) {
 				Method: http.MethodPost,
 				URL:    url,
 				Header: http.Header{"Content-Type": []string{"application/json"}},
-				Body:   io.NopCloser(strings.NewReader(fmt.Sprintf(`{"query":"query { getTokensFromAuth0(token: \"%s\") { access refresh } }"}`, token))), // TODO ref to test fixture
+				Body:   io.NopCloser(strings.NewReader(fmt.Sprintf(`{"query":"query { getTokensFromAuth0(token: \"%s\") { access refresh } }"}`, token))),
 			},
 			response: &http.Response{StatusCode: http.StatusOK},
 		},
@@ -53,7 +53,7 @@ func TestGetTokensFromAuth0(t *testing.T) {
 				Method: http.MethodPost,
 				URL:    url,
 				Header: http.Header{"Content-Type": []string{"application/json"}},
-				Body:   io.NopCloser(strings.NewReader(fmt.Sprintf(`{"query":"query { getTokensFromAuth0(token: \"%s\") { access refresh } }"}`, token))), // TODO ref to test fixture
+				Body:   io.NopCloser(strings.NewReader(fmt.Sprintf(`{"query":"query { getTokensFromAuth0(token: \"%s\") { access refresh } }"}`, token))),
 			},
 			response: &http.Response{StatusCode: http.StatusOK},
 		},
