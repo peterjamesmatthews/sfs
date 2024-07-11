@@ -47,6 +47,28 @@ type mock struct {
 	m.Mock
 }
 
+func newTestServer(t *testing.T) (*httptest.Server, *mock, *pgx.Conn) {
+	t.Helper()
+
+	// initialize postgres container for database
+	dbContainer := newPostgresContainer(t)
+
+	// configure stack's config to use the database container
+	cfg := getConfigFromDatabaseContainer(dbContainer, t)
+
+	// initialize mock for stack
+	mock := new(mock)
+
+	// initialize stack
+	stack, err := config.NewStack(cfg, config.WithAuth0er(mock))
+	if err != nil {
+		t.Fatalf("failed to initialize test server: %v", err)
+	}
+
+	// return test server, mock, and database connection
+	return httptest.NewServer(stack.Server), mock, stack.Database
+}
+
 var cfg = config.Config{
 	Database: db.Config{
 		User:     "foo",
@@ -55,11 +77,8 @@ var cfg = config.Config{
 	},
 }
 
-func newTestServer(t *testing.T) (*httptest.Server, *mock, *pgx.Conn) {
-	t.Helper()
-
-	dbContainer := newPostgresContainer(t)
-
+// getConfigFromDatabaseContainer returns a config.Config with the database connection details from a postgres container.
+func getConfigFromDatabaseContainer(dbContainer *postgres.PostgresContainer, t *testing.T) config.Config {
 	connectionString, err := dbContainer.ConnectionString(context.Background())
 	if err != nil {
 		t.Fatalf("failed to get connection string: %v", err)
@@ -79,27 +98,22 @@ func newTestServer(t *testing.T) (*httptest.Server, *mock, *pgx.Conn) {
 	cfg.Database.Hostname = connectionURL.Hostname()
 	cfg.Database.Port = port
 	cfg.Server = server.Config{GraphEndpoint: "graph"}
-
-	mock := new(mock)
-
-	stack, err := config.NewStack(cfg, config.WithAuth0er(mock))
-	if err != nil {
-		t.Fatalf("failed to initialize test server: %v", err)
-	}
-
-	return httptest.NewServer(stack.Server), mock, stack.Database
+	return cfg
 }
 
+// newPostgresContainer starts a new postgres container with the project's database schema.
 func newPostgresContainer(t *testing.T) *postgres.PostgresContainer {
 	t.Helper()
 
 	ctx := context.Background()
 
+	// find database schema migration files; they should be alphabetically sorted
 	migrations, err := filepath.Glob(filepath.Join(meta.Root, "db", "migrations", "*.sql"))
 	if err != nil {
 		t.Fatalf("failed to find migration files: %s", err)
 	}
 
+	// start postgres container with database schema migrations
 	container, err := postgres.Run(ctx,
 		"docker.io/postgres:16-bullseye",
 		postgres.WithUsername(cfg.Database.User),
@@ -114,6 +128,11 @@ func newPostgresContainer(t *testing.T) *postgres.PostgresContainer {
 	if err != nil {
 		t.Fatalf("failed to start container: %s", err)
 	}
+
+	// register container termination on test cleanup
+	t.Cleanup(func() {
+		container.Terminate(ctx)
+	})
 
 	return container
 }
@@ -137,9 +156,7 @@ func dumpDatabase(db *pgx.Conn, t *testing.T) string {
 	return string(output)
 }
 
+// TestNewPostgresContainer simply tests the newPostgresContainer function executes without error.
 func TestNewPostgresContainer(t *testing.T) {
-	container := newPostgresContainer(t)
-	t.Cleanup(func() {
-		container.Terminate(context.Background())
-	})
+	newPostgresContainer(t)
 }
