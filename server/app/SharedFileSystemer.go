@@ -17,7 +17,7 @@ func (a *App) Authenticate(auth string) (graph.User, error) {
 	// get user from token
 	user, err := a.getUserFromToken(token)
 	if err != nil {
-		return graph.User{}, fmt.Errorf("failed to get user from token: %w", err)
+		return graph.User{}, graph.ErrUnauthorized
 	}
 
 	// return user
