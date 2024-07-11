@@ -51,7 +51,7 @@ func (a *App) getUserFromToken(tokenString string) (models.User, error) {
 	// parse token
 	token, err := jwt.ParseWithClaims(
 		tokenString,
-		&jwt.RegisteredClaims{},
+		new(jwt.RegisteredClaims),
 		func(t *jwt.Token) (interface{}, error) {
 			return a.config.JWT_Secret, nil
 		},
@@ -59,7 +59,7 @@ func (a *App) getUserFromToken(tokenString string) (models.User, error) {
 	if err != nil {
 		return models.User{}, fmt.Errorf("failed to parse access token: %w", err)
 	} else if !token.Valid {
-		return models.User{}, errors.New("token is invalid")
+		return models.User{}, errors.New("invalid token")
 	}
 
 	// verify token issuer
@@ -76,17 +76,20 @@ func (a *App) getUserFromToken(tokenString string) (models.User, error) {
 		return models.User{}, fmt.Errorf("failed to get subject from access token: %w", err)
 	}
 
-	id := &pgtype.UUID{}
+	// get user's id from subject subject
+	id := new(pgtype.UUID)
 	err = id.Scan(sub)
 	if err != nil {
 		return models.User{}, fmt.Errorf("failed to scan user ID from access token: %w", err)
 	}
 
+	// get user by id
 	user, err := a.queries.GetUserByID(context.Background(), *id)
 	if err != nil {
 		return models.User{}, fmt.Errorf("failed to get user by ID: %w", err)
 	}
 
+	// return user
 	return user, nil
 }
 
@@ -94,7 +97,7 @@ var errExpired = errors.New("expired")
 
 func (a *App) refreshTokens(refresh string) (string, string, error) {
 	// parse refresh token
-	token, err := jwt.ParseWithClaims(refresh, &jwt.RegisteredClaims{}, func(t *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(refresh, new(jwt.RegisteredClaims), func(t *jwt.Token) (interface{}, error) {
 		return a.config.JWT_Secret, nil
 	})
 	if err != nil {
@@ -124,7 +127,7 @@ func (a *App) refreshTokens(refresh string) (string, string, error) {
 	}
 
 	// get id from user
-	id := &pgtype.UUID{}
+	id := new(pgtype.UUID)
 	err = id.Scan(sub)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to scan user ID from refresh token: %w", err)
