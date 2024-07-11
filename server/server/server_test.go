@@ -42,6 +42,7 @@ type test struct {
 	dump *os.File
 }
 
+// mock provides a mockable interface for many of the project's interfaces.
 type mock struct {
 	m.Mock
 }
@@ -81,7 +82,7 @@ func newTestServer(t *testing.T) (*httptest.Server, *mock, *pgx.Conn) {
 
 	mock := new(mock)
 
-	stack, err := config.NewStack(cfg, mock)
+	stack, err := config.NewStack(cfg, config.WithAuth0er(mock))
 	if err != nil {
 		t.Fatalf("failed to initialize test server: %v", err)
 	}

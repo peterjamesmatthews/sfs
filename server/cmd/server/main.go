@@ -22,7 +22,7 @@ func main() {
 	log.Printf("initializing with config: %s", cfg)
 
 	// initialize stack
-	stack, err := config.NewStack(cfg, nil)
+	stack, err := config.NewStack(cfg)
 	if err != nil {
 		log.Fatalf("failed to initialize server: %v", err)
 	}
