@@ -5,11 +5,9 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"os/exec"
 	"strings"
 	"testing"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -89,20 +87,4 @@ func TestGetTokensFromAuth0(t *testing.T) {
 		assert.Contains(t, dump, id, "user ID missing from database dump: %s", dump)
 		assert.Contains(t, dump, email, "user email missing from database dump: %s", dump)
 	}
-}
-
-func dumpDatabase(db *pgx.Conn, t *testing.T) string {
-	cmd := exec.Command(
-		"pg_dump",
-		"-d", db.Config().Database,
-		"-h", db.Config().Host,
-		"-p", fmt.Sprintf("%d", db.Config().Port),
-		"-U", db.Config().User,
-	)
-	cmd.Env = append(cmd.Environ(), "PGPASSWORD="+db.Config().Password)
-	output, err := cmd.Output()
-	if err != nil {
-		t.Fatalf("failed to dump database: %v", err)
-	}
-	return string(output)
 }
