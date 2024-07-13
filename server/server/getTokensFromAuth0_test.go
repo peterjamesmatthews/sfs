@@ -58,6 +58,7 @@ func TestGetTokensFromAuth0(t *testing.T) {
 			t.Fatalf("failed to send request: %v", err)
 		}
 
+		// perform assertions on response status code
 		assert.Equal(
 			t, test.response.StatusCode, got.StatusCode,
 			"unexpected status code: want %d, got %d", test.response.StatusCode, got.StatusCode,
@@ -69,16 +70,19 @@ func TestGetTokensFromAuth0(t *testing.T) {
 		}
 		body := string(bytes)
 
+		// perform assertions on response body
 		assert.NotContains(t, body, "errors", "unexpected errors in response: %s", body)
 		assert.Contains(t, body, "access", "access token missing from response: %s", body)
 		assert.Contains(t, body, "refresh", "refresh token missing from response: %s", body)
+
+		// perform assertions on mock
 		mock.AssertExpectations(t)
 
+		// perform assertions on database
 		dump := dumpDatabase(t, db)
 		if err != nil {
 			t.Fatalf("failed to dump database: %v", err)
 		}
-
 		assert.Contains(t, dump, id, "user ID missing from database dump: %s", dump)
 		assert.Contains(t, dump, email, "user email missing from database dump: %s", dump)
 	}
