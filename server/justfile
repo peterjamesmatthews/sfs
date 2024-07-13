@@ -1,17 +1,21 @@
-.PHONY: all
+# list all available commands
+list:
+  @just --list
+
+# generate all code
 all: graph migrate sqlc
 
-.PHONY: graph
+# generate graphql code
 graph:
 	go generate ./graph
 
-.PHONY: migrate
+# generate sql schema migration
 migrate:
 	atlas migrate diff \
 		--dir "file://db/migrations" \
 		--to "file://db/schema.sql" \
 		--dev-url "docker://postgres/16/dev"
 
-.PHONY: sqlc
+# generate sqlc code
 sqlc:
 	sqlc generate -f db/sqlc.yml
