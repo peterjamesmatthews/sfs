@@ -6,17 +6,12 @@ import SignOut from "./SignOut";
 
 export default function App() {
   const accessToken = useSelector(selectAccessToken);
+  if (!accessToken) return <SignIn />;
 
   return (
     <>
-      {accessToken ? (
-        <>
-          <Me />
-          <SignOut />
-        </>
-      ) : (
-        <SignIn />
-      )}
+      <Me />
+      <SignOut />
     </>
   );
 }
