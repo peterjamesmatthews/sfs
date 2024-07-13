@@ -140,7 +140,7 @@ func newPostgresContainer(t *testing.T) *postgres.PostgresContainer {
 // dumpDatabase returns a string result of the pg_dump command on a given database.
 //
 // If an error occurs, this function calls t.Fatalf with the error message.
-func dumpDatabase(db *pgx.Conn, t *testing.T) string {
+func dumpDatabase(t *testing.T, db *pgx.Conn) string {
 	cmd := exec.Command(
 		"pg_dump",
 		"-d", db.Config().Database,

@@ -74,7 +74,7 @@ func TestGetTokensFromAuth0(t *testing.T) {
 		assert.Contains(t, body, "refresh", "refresh token missing from response: %s", body)
 		mock.AssertExpectations(t)
 
-		dump := dumpDatabase(db, t)
+		dump := dumpDatabase(t, db)
 		if err != nil {
 			t.Fatalf("failed to dump database: %v", err)
 		}
