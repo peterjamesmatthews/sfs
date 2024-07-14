@@ -40,6 +40,7 @@ const auth = createSlice({
 		},
 		signOut: (state) => {
 			state.user = null;
+			state.auth0Token = null;
 			state.tokens = null;
 		},
 	},
