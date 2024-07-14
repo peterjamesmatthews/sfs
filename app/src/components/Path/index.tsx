@@ -14,8 +14,8 @@ export default function Path() {
   );
 
   /** Links to each path segment. */
-  let links = paths.map((path, i) => (
-    <Link className="Link" to={path}>
+  const links = paths.map((path, i) => (
+    <Link key={segments[i]} className="Link" to={path}>
       /{segments[i]}
     </Link>
   ));
