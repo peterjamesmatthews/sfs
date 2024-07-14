@@ -10,6 +10,6 @@
 		}
 	},
 	"files": {
-		"ignore": ["node_modules", "gql"]
+		"ignore": ["node_modules", "generated"]
 	}
 }

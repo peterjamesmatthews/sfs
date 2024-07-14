@@ -13,6 +13,8 @@ export default function SignOut() {
   };
 
   return accessToken === undefined ? null : (
-    <button onClick={handleSignOut}>Sign out with Auth0</button>
+    <button type="button" onClick={handleSignOut}>
+      Sign out with Auth0
+    </button>
   );
 }

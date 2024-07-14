@@ -93,11 +93,12 @@ export const refreshTokens = createAsyncThunk<
 	});
 	if (errors) {
 		const error = new Error(
-			"failed to refresh tokens: " + errors.map((e) => e.message).join(", "),
+			`failed to refresh tokens: ${errors.map((e) => e.message).join(", ")}`,
 		);
 		console.error(error);
 		throw error;
-	} else if (!data?.refreshTokens) throw new Error("failed to refresh tokens");
+	}
+	if (!data?.refreshTokens) throw new Error("missing refresh tokens");
 
 	// store the new tokens in the store
 	dispatch(auth.actions.gotTokens(data.refreshTokens));

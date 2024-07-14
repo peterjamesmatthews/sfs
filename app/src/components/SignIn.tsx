@@ -20,6 +20,8 @@ export default function SignIn() {
   }, [isAuthenticated, accessToken, getAccessTokenSilently]);
 
   return (
-    <button onClick={() => loginWithRedirect()}>Sign in with Auth0</button>
+    <button type="button" onClick={() => loginWithRedirect()}>
+      Sign in with Auth0
+    </button>
   );
 }
