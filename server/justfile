@@ -1,4 +1,4 @@
-# list all available commands
+# list available recipes
 list:
   @just --list
 
