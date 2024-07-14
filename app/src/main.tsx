@@ -10,7 +10,7 @@ import store from "./store";
 import theme from "./theme";
 
 const root = document.getElementById("root");
-if (root == null) throw new Error("no root");
+if (root == null) throw new Error("missing root");
 
 ReactDOM.createRoot(root).render(
   <React.StrictMode>
