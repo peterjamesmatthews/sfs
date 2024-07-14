@@ -1,0 +1,4 @@
+/* Select subsequent <a class="Link"> children of a <p class="Link"> */
+p.Path a.Link:not(:first-child) {
+  margin: 0 0 0 .2rem;
+}

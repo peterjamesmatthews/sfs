@@ -5,7 +5,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider as ReduxProvider } from "react-redux";
 import client from "./apollo";
-import App from "./components/App.tsx";
+import App from "./components/App";
 import store from "./store";
 import theme from "./theme";
 
