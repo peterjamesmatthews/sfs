@@ -27,5 +27,5 @@ ReactDOM.createRoot(root).render(
         </ApolloProvider>
       </ReduxProvider>
     </Auth0Provider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

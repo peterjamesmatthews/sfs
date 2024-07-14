@@ -1,7 +1,11 @@
 {
 	"$schema": "https://biomejs.dev/schemas/1.6.1/schema.json",
-	"organizeImports": {
-		"enabled": true
+	"files": {
+		"ignore": ["node_modules", "generated"]
+	},
+	"formatter": {
+		"formatWithErrors": true,
+		"indentStyle": "space"
 	},
 	"linter": {
 		"enabled": true,
@@ -9,7 +13,7 @@
 			"recommended": true
 		}
 	},
-	"files": {
-		"ignore": ["node_modules", "generated"]
+	"organizeImports": {
+		"enabled": true
 	}
 }

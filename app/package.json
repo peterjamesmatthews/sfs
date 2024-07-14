@@ -1,13 +1,4 @@
 {
-	"name": "app",
-	"private": true,
-	"version": "0.0.0",
-	"type": "module",
-	"scripts": {
-		"lint": "biome lint src",
-		"dev": "vite",
-		"generate": "graphql-codegen"
-	},
 	"dependencies": {
 		"@apollo/client": "^3.9.8",
 		"@auth0/auth0-react": "^2.2.4",
@@ -35,5 +26,15 @@
 		"typescript": "^5.2.2",
 		"vite": "^5.1.6",
 		"vite-plugin-graphql-codegen": "^3.3.6"
-	}
+	},
+	"name": "app",
+	"private": true,
+	"scripts": {
+		"format": "biome format --write src",
+		"generate": "graphql-codegen",
+		"lint": "biome lint src",
+		"start": "vite"
+	},
+	"type": "module",
+	"version": "0.0.0"
 }

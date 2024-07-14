@@ -10,7 +10,7 @@ export default function Path() {
 
   /** Absolute paths for each segment. */
   const paths = segments.map(
-    (_, i) => `/${segments.slice(0, i + 1).join("/")}`
+    (_, i) => `/${segments.slice(0, i + 1).join("/")}`,
   );
 
   /** Links to each path segment. */
