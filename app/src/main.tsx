@@ -4,9 +4,10 @@ import ThemeProvider from "@mui/material/styles/ThemeProvider";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Provider as ReduxProvider } from "react-redux";
+import { PersistGate } from "redux-persist/integration/react";
 import client from "./apollo";
 import App from "./components/App";
-import store from "./store";
+import store, { persistor } from "./store";
 import theme from "./theme";
 
 const root = document.getElementById("root");
@@ -20,11 +21,13 @@ ReactDOM.createRoot(root).render(
       authorizationParams={{ redirect_uri: window.location.origin }}
     >
       <ReduxProvider store={store}>
-        <ApolloProvider client={client}>
-          <ThemeProvider theme={theme}>
-            <App />
-          </ThemeProvider>
-        </ApolloProvider>
+        <PersistGate loading={null} persistor={persistor}>
+          <ApolloProvider client={client}>
+            <ThemeProvider theme={theme}>
+              <App />
+            </ThemeProvider>
+          </ApolloProvider>
+        </PersistGate>
       </ReduxProvider>
     </Auth0Provider>
   </React.StrictMode>,
