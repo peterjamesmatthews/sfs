@@ -80,9 +80,6 @@ func TestGetTokensFromAuth0(t *testing.T) {
 
 		// perform assertions on database
 		dump := dumpDatabase(t, db)
-		if err != nil {
-			t.Fatalf("failed to dump database: %v", err)
-		}
 		assert.Contains(t, dump, id, "user ID missing from database dump: %s", dump)
 		assert.Contains(t, dump, email, "user email missing from database dump: %s", dump)
 	}
