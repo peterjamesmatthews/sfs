@@ -51,7 +51,7 @@ func (a *App) GetTokensFromAuth0Token(token string) (graph.Tokens, error) {
 	}
 
 	// generate access and refresh tokens for user
-	access, refresh, err := a.generateTokensForUser(user)
+	access, refresh, err := a.getTokensForUser(user)
 	if err != nil {
 		return graph.Tokens{}, fmt.Errorf("failed to generate tokens: %w", err)
 	}

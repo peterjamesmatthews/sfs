@@ -97,4 +97,6 @@ type Query {
 
   # me returns the current user.
   me: User! @Authenticated
+
+  getNodeFromPath(path: String!): Node! @Authenticated
 }

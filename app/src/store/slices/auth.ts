@@ -76,17 +76,21 @@ export const refreshTokens = createAsyncThunk<
   { expiresAt: Date },
   { dispatch: AppDispatch }
 >("auth/refreshTokens", async ({ expiresAt }, { dispatch }) => {
-  // calculate the amount of milliseconds until 10 seconds before the tokens expire
-  const refreshAt = new Date(expiresAt.getTime() - 10 * 1000);
+  // calculate the amount of milliseconds until 1 second before the tokens expire
+  const refreshAt = new Date(expiresAt.getTime() - 1000);
 
   // wait until it's time to refresh the tokens
-  await new Promise((r) => setTimeout(r, refreshAt.getTime() - Date.now()));
+  console.log("waiting to refresh token");
+  await new Promise((resolve) =>
+    setTimeout(resolve, refreshAt.getTime() - Date.now()),
+  );
 
   // get the current refresh token
   const refreshToken = selectRefreshToken(store.getState());
   if (!refreshToken) throw new Error("no refresh token");
 
   // refresh the tokens
+  console.log("querying to refresh tokens");
   const { data, errors } = await apollo.mutate({
     mutation: RefreshTokens,
     variables: { refresh: refreshToken },

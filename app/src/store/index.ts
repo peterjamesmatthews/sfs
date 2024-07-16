@@ -9,7 +9,7 @@ import {
   persistReducer,
   persistStore,
 } from "redux-persist";
-import storage from "redux-persist/lib/storage";
+import session from "redux-persist/lib/storage/session";
 import auth from "./slices/auth";
 
 const rootReducer = combineReducers({
@@ -17,7 +17,7 @@ const rootReducer = combineReducers({
 });
 
 const persistedReducer = persistReducer(
-  { key: "root", version: 1, storage },
+  { key: "root", version: 1, storage: session },
   rootReducer,
 );
 

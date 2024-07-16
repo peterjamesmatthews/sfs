@@ -104,6 +104,11 @@ func (r *queryResolver) Me(ctx context.Context) (*User, error) {
 	return &user, nil
 }
 
+// GetNodeFromPath is the resolver for the getNodeFromPath field.
+func (r *queryResolver) GetNodeFromPath(ctx context.Context, path string) (Node, error) {
+	return nil, errors.ErrUnsupported
+}
+
 // Access returns AccessResolver implementation.
 func (r *Resolver) Access() AccessResolver { return &accessResolver{r} }
 

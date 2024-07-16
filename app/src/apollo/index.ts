@@ -17,4 +17,8 @@ const link = ApolloLink.from([
   new HttpLink({ uri: "/graph" }),
 ]);
 
-export default new ApolloClient({ cache: new InMemoryCache(), link });
+export default new ApolloClient({
+  cache: new InMemoryCache(),
+  link,
+  connectToDevTools: true,
+});

@@ -17,12 +17,12 @@ func (a *App) getTokenFromAuthorization(auth string) string {
 	return strings.TrimPrefix(auth, "Bearer ")
 }
 
-// generateTokensForUser generates access and refresh tokens for a user.
-func (a *App) generateTokensForUser(user models.User) (string, string, error) {
+// getTokensForUser generates access and refresh tokens for a user.
+func (a *App) getTokensForUser(user models.User) (string, string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
 		Issuer:    a.config.JWT_Issuer,
 		Subject:   uuid.UUID(user.ID.Bytes).String(),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Minute)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(5 * time.Second)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	})
 
@@ -140,7 +140,7 @@ func (a *App) refreshTokens(refresh string) (string, string, error) {
 	}
 
 	// generate new access and refresh tokens
-	access, newRefresh, err := a.generateTokensForUser(user)
+	access, newRefresh, err := a.getTokensForUser(user)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to generate tokens: %w", err)
 	}
