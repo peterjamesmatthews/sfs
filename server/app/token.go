@@ -22,7 +22,7 @@ func (a *App) getTokensForUser(user models.User) (string, string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
 		Issuer:    a.config.JWT_Issuer,
 		Subject:   uuid.UUID(user.ID.Bytes).String(),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(5 * time.Second)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	})
 
@@ -34,7 +34,7 @@ func (a *App) getTokensForUser(user models.User) (string, string, error) {
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
 		Issuer:    a.config.JWT_Issuer,
 		Subject:   uuid.UUID(user.ID.Bytes).String(),
-		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
+		ExpiresAt: jwt.NewNumericDate(time.Now().Add(14 * 24 * time.Hour)), // two weeks
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	})
 
