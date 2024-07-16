@@ -80,7 +80,6 @@ export const refreshTokens = createAsyncThunk<
   const refreshAt = new Date(expiresAt.getTime() - 1000);
 
   // wait until it's time to refresh the tokens
-  console.log("waiting to refresh token");
   await new Promise((resolve) =>
     setTimeout(resolve, refreshAt.getTime() - Date.now()),
   );
@@ -90,7 +89,6 @@ export const refreshTokens = createAsyncThunk<
   if (!refreshToken) throw new Error("no refresh token");
 
   // refresh the tokens
-  console.log("querying to refresh tokens");
   const { data, errors } = await apollo.mutate({
     mutation: RefreshTokens,
     variables: { refresh: refreshToken },
