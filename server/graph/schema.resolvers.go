@@ -106,7 +106,21 @@ func (r *queryResolver) Me(ctx context.Context) (*User, error) {
 
 // GetNodeFromPath is the resolver for the getNodeFromPath field.
 func (r *queryResolver) GetNodeFromPath(ctx context.Context, path string) (Node, error) {
-	return nil, errors.ErrUnsupported
+	user, err := getUserFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user from context: %w", err)
+	}
+
+	node, err := r.SharedFileSystem.GetNodeFromPath(user, path)
+	if errors.Is(err, ErrNotFound) {
+		return nil, fmt.Errorf("node not found")
+	} else if errors.Is(err, ErrUnauthorized) {
+		return nil, fmt.Errorf("unauthorized")
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to get node: %w", err)
+	}
+
+	return node, nil
 }
 
 // Access returns AccessResolver implementation.

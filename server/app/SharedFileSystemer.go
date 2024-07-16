@@ -74,7 +74,7 @@ func (a *App) CreateFolder(creator graph.User, parentID *string, name string) (g
 	return graph.Folder{}, errors.ErrUnsupported
 }
 
-func (a *App) GetNodeByURI(user graph.User, uri string) (graph.Node, error) {
+func (a *App) GetNodeFromPath(user graph.User, path string) (graph.Node, error) {
 	return nil, errors.ErrUnsupported
 }
 

@@ -43,16 +43,16 @@ type SharedFileSystemer interface {
 	//	- `ErrConflict` if a folder owned by `user` named `name` already exists in the parent folder.
 	CreateFolder(user User, parentID *string, name string) (Folder, error)
 
-	// GetNodeByURI fetches a node by its uri.
+	// GetNodeFromPath fetches a node by its path.
 	//
 	// # Arguments
 	//  - user: The user who is fetching the node.
-	//  - uri: a '/' separated path of node names.
+	//  - path: '/' separated node names. '/' is the root folder.
 	//
 	// # Errors
 	//  - `ErrNotFound` if the node is not found.
-	//  - `ErrUnauthorized` if `user` does not have read access to any of the nodes in the uri.
-	GetNodeByURI(user User, uri string) (Node, error)
+	//  - `ErrUnauthorized` if `user` does not have read access to any of the nodes in the path.
+	GetNodeFromPath(user User, path string) (Node, error)
 
 	// RenameNode renames a node.
 	//
