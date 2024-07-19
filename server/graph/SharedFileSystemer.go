@@ -51,7 +51,7 @@ type SharedFileSystemer interface {
 	//
 	// # Errors
 	//  - `ErrNotFound` if the node is not found.
-	//  - `ErrUnauthorized` if `user` does not have read access to any of the nodes in the path.
+	//  - `ErrForbidden` if `user` does not have read access to any of the nodes in the path.
 	GetNodeFromPath(user User, path string) (Node, error)
 
 	// RenameNode renames a node.
