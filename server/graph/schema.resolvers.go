@@ -73,7 +73,24 @@ func (r *mutationResolver) ShareNode(ctx context.Context, userID string, accessT
 
 // CreateFolder is the resolver for the createFolder field.
 func (r *mutationResolver) CreateFolder(ctx context.Context, path string) (*Folder, error) {
-	panic(fmt.Errorf("not implemented: CreateFolder - createFolder"))
+	// get user from context
+	user, err := getUserFromContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user from context: %w", err)
+	}
+
+	folder, err := r.SharedFileSystem.CreateFolder(user, path)
+	if errors.Is(err, ErrNotFound) {
+		return nil, fmt.Errorf("parent in path not found")
+	} else if errors.Is(err, ErrConflict) {
+		return nil, fmt.Errorf("folder already exists at path")
+	} else if errors.Is(err, ErrForbidden) {
+		return nil, fmt.Errorf("forbidden")
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to create folder: %w", err)
+	}
+
+	return &folder, nil
 }
 
 // CreateFile is the resolver for the createFile field.
