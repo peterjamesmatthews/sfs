@@ -72,7 +72,7 @@ func (r *mutationResolver) ShareNode(ctx context.Context, userID string, accessT
 }
 
 // CreateFolder is the resolver for the createFolder field.
-func (r *mutationResolver) CreateFolder(ctx context.Context, parentID *string, name string) (*Folder, error) {
+func (r *mutationResolver) CreateFolder(ctx context.Context, path string) (*Folder, error) {
 	panic(fmt.Errorf("not implemented: CreateFolder - createFolder"))
 }
 

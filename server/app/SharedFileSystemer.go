@@ -70,12 +70,37 @@ func (a *App) RefreshTokens(refresh string) (graph.Tokens, error) {
 	return a.getGraphTokens(access, refresh), nil
 }
 
-func (a *App) CreateFolder(creator graph.User, parentID *string, name string) (graph.Folder, error) {
+func (a *App) CreateFolder(user graph.User, path string) (graph.Folder, error) {
 	return graph.Folder{}, errors.ErrUnsupported
 }
 
 func (a *App) GetNodeFromPath(user graph.User, path string) (graph.Node, error) {
 	return nil, errors.ErrUnsupported
+	// names := getPathSegments(path)
+
+	// var parent pgtype.UUID
+	// var node models.Node
+	// var canRead bool
+	// for i, name := range names {
+	// 	node, err := a.queries.GetNodeByParentAndName(context.Background(), parent, name)
+	// 	if a.isNotFoundError(err) {
+	// 		return nil, graph.ErrNotFound
+	// 	}
+
+	// 	if !canRead {
+	// 		canRead, err = a.canReadNode(user, node)
+	// 		if err != nil {
+	// 			return nil, fmt.Errorf("failed to check read permission: %w", err)
+	// 		}
+	// 	}
+	// }
+
+	// // if we've reached the end of the path, check if the user can read the node
+	// if !canRead {
+	// 	return nil, graph.ErrForbidden
+	// }
+
+	// return a.toGraphNode(node), nil
 }
 
 func (a *App) RenameNode(user graph.User, id string, name string) (graph.Node, error) {

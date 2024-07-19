@@ -34,14 +34,13 @@ type SharedFileSystemer interface {
 	//
 	// # Arguments:
 	//  - user: The user who is creating the folder.
-	//  - parentID: The id of the parent folder.
-	//  - name: The name of the folder to create.
+	//  - path: The path of the folder to create.
 	//
 	// # Errors
-	//	- `ErrNotFound` if the parent folder is not found.
-	//	- `ErrUnauthorized` if the user does not have write access to the parent folder.
-	//	- `ErrConflict` if a folder owned by `user` named `name` already exists in the parent folder.
-	CreateFolder(user User, parentID *string, name string) (Folder, error)
+	//	- `ErrNotFound` if any node w/in the path is not found.
+	//	- `ErrConflict` if a folder owned by `user` already exists at the path.
+	//	- `ErrForbidden` if `user` does not have write access to the parent folder.
+	CreateFolder(user User, path string) (Folder, error)
 
 	// GetNodeFromPath fetches a node by its path.
 	//

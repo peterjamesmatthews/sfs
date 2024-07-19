@@ -74,7 +74,7 @@ type ComplexityRoot struct {
 
 	Mutation struct {
 		CreateFile    func(childComplexity int, parentID *string, name string, content *string) int
-		CreateFolder  func(childComplexity int, parentID *string, name string) int
+		CreateFolder  func(childComplexity int, path string) int
 		MoveNode      func(childComplexity int, id string, parentID *string) int
 		RefreshTokens func(childComplexity int, refresh string) int
 		RenameNode    func(childComplexity int, id string, name string) int
@@ -118,7 +118,7 @@ type MutationResolver interface {
 	RenameNode(ctx context.Context, id string, name string) (Node, error)
 	MoveNode(ctx context.Context, id string, parentID *string) (Node, error)
 	ShareNode(ctx context.Context, userID string, accessType AccessType, targetID string) (*Access, error)
-	CreateFolder(ctx context.Context, parentID *string, name string) (*Folder, error)
+	CreateFolder(ctx context.Context, path string) (*Folder, error)
 	CreateFile(ctx context.Context, parentID *string, name string, content *string) (*File, error)
 	WriteFile(ctx context.Context, id string, content string) (*File, error)
 }
@@ -260,7 +260,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateFolder(childComplexity, args["parentID"].(*string), args["name"].(string)), true
+		return e.complexity.Mutation.CreateFolder(childComplexity, args["path"].(string)), true
 
 	case "Mutation.moveNode":
 		if e.complexity.Mutation.MoveNode == nil {
@@ -540,24 +540,15 @@ func (ec *executionContext) field_Mutation_createFile_args(ctx context.Context, 
 func (ec *executionContext) field_Mutation_createFolder_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
-	var arg0 *string
-	if tmp, ok := rawArgs["parentID"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("parentID"))
-		arg0, err = ec.unmarshalOID2ᚖstring(ctx, tmp)
+	var arg0 string
+	if tmp, ok := rawArgs["path"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("path"))
+		arg0, err = ec.unmarshalNString2string(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
 	}
-	args["parentID"] = arg0
-	var arg1 string
-	if tmp, ok := rawArgs["name"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
-		arg1, err = ec.unmarshalNString2string(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["name"] = arg1
+	args["path"] = arg0
 	return args, nil
 }
 
@@ -1669,7 +1660,7 @@ func (ec *executionContext) _Mutation_createFolder(ctx context.Context, field gr
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		directive0 := func(rctx context.Context) (interface{}, error) {
 			ctx = rctx // use context from middleware stack in children
-			return ec.resolvers.Mutation().CreateFolder(rctx, fc.Args["parentID"].(*string), fc.Args["name"].(string))
+			return ec.resolvers.Mutation().CreateFolder(rctx, fc.Args["path"].(string))
 		}
 		directive1 := func(ctx context.Context) (interface{}, error) {
 			if ec.directives.Authenticated == nil {

@@ -74,10 +74,8 @@ type Mutation {
   shareNode(userID: ID!, accessType: AccessType!, targetID: ID!): Access
     @Authenticated
 
-  # createFolder creates a new folder under an optional parent.
-  #
-  # If no parent is provided, the folder is created under the root.
-  createFolder(parentID: ID, name: String!): Folder @Authenticated
+  # createFolder creates a new folder at the provided path
+  createFolder(path: String!): Folder @Authenticated
 
   # createFile creates a new file under an optional parent.
   #
