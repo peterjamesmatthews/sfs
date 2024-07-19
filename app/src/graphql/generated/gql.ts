@@ -15,7 +15,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "\nquery GetNodeFromPath($path: String!) {\n  getNodeFromPath(path: $path) {\n    id\n    name\n    parent {\n      id\n      name\n    }\n    ...on Folder {\n      children {\n        id\n        name\n      }\n    }\n    ... on File {\n      content\n    }\n  }  \n}\n": types.GetNodeFromPathDocument,
     "\nquery GetTokensFromAuth0($token: String!) {\n  getTokensFromAuth0(token: $token) {\n    access\n    refresh\n  }\n}\n": types.GetTokensFromAuth0Document,
-    "\nquery Me {\n  me {\n    name\n  }\n}\n": types.MeDocument,
+    "\nquery Me {\n  me {\n    email\n  }\n}\n": types.MeDocument,
     "\nmutation RefreshTokens($refresh: String!) {\n  refreshTokens(refresh: $refresh) {\n    access\n    refresh\n  }\n}\n": types.RefreshTokensDocument,
 };
 
@@ -44,7 +44,7 @@ export function gql(source: "\nquery GetTokensFromAuth0($token: String!) {\n  ge
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\nquery Me {\n  me {\n    name\n  }\n}\n"): (typeof documents)["\nquery Me {\n  me {\n    name\n  }\n}\n"];
+export function gql(source: "\nquery Me {\n  me {\n    email\n  }\n}\n"): (typeof documents)["\nquery Me {\n  me {\n    email\n  }\n}\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

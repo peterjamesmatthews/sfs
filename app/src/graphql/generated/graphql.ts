@@ -109,7 +109,7 @@ export type Node = {
 
 export type Query = {
   __typename?: 'Query';
-  getNodeFromPath?: Maybe<Node>;
+  getNodeFromPath: Node;
   getTokensFromAuth0: Tokens;
   me: User;
 };
@@ -132,8 +132,8 @@ export type Tokens = {
 
 export type User = {
   __typename?: 'User';
+  email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
 };
 
 export type GetNodeFromPathQueryVariables = Exact<{
@@ -141,7 +141,7 @@ export type GetNodeFromPathQueryVariables = Exact<{
 }>;
 
 
-export type GetNodeFromPathQuery = { __typename?: 'Query', getNodeFromPath?: { __typename?: 'File', content: string, id: string, name: string, parent?: { __typename?: 'Folder', id: string, name: string } | null } | { __typename?: 'Folder', id: string, name: string, children: Array<{ __typename?: 'File', id: string, name: string } | { __typename?: 'Folder', id: string, name: string }>, parent?: { __typename?: 'Folder', id: string, name: string } | null } | null };
+export type GetNodeFromPathQuery = { __typename?: 'Query', getNodeFromPath: { __typename?: 'File', content: string, id: string, name: string, parent?: { __typename?: 'Folder', id: string, name: string } | null } | { __typename?: 'Folder', id: string, name: string, children: Array<{ __typename?: 'File', id: string, name: string } | { __typename?: 'Folder', id: string, name: string }>, parent?: { __typename?: 'Folder', id: string, name: string } | null } };
 
 export type GetTokensFromAuth0QueryVariables = Exact<{
   token: Scalars['String']['input'];
@@ -153,7 +153,7 @@ export type GetTokensFromAuth0Query = { __typename?: 'Query', getTokensFromAuth0
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', name: string } };
+export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', email: string } };
 
 export type RefreshTokensMutationVariables = Exact<{
   refresh: Scalars['String']['input'];
@@ -165,5 +165,5 @@ export type RefreshTokensMutation = { __typename?: 'Mutation', refreshTokens?: {
 
 export const GetNodeFromPathDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetNodeFromPath"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"path"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getNodeFromPath"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"path"},"value":{"kind":"Variable","name":{"kind":"Name","value":"path"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"parent"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Folder"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"children"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"File"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"content"}}]}}]}}]}}]} as unknown as DocumentNode<GetNodeFromPathQuery, GetNodeFromPathQueryVariables>;
 export const GetTokensFromAuth0Document = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTokensFromAuth0"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"token"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"getTokensFromAuth0"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"token"},"value":{"kind":"Variable","name":{"kind":"Name","value":"token"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"access"}},{"kind":"Field","name":{"kind":"Name","value":"refresh"}}]}}]}}]} as unknown as DocumentNode<GetTokensFromAuth0Query, GetTokensFromAuth0QueryVariables>;
-export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
+export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"email"}}]}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
 export const RefreshTokensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RefreshTokens"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"refresh"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"refreshTokens"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"refresh"},"value":{"kind":"Variable","name":{"kind":"Name","value":"refresh"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"access"}},{"kind":"Field","name":{"kind":"Name","value":"refresh"}}]}}]}}]} as unknown as DocumentNode<RefreshTokensMutation, RefreshTokensMutationVariables>;

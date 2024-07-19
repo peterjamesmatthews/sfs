@@ -10,7 +10,7 @@ export default function Me() {
 
   return (
     <div>
-      <h1>Hello {data.me.name}</h1>
+      <h1>Hello {data.me.email}</h1>
     </div>
   );
 }

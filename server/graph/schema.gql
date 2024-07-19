@@ -3,7 +3,7 @@ directive @Authenticated on FIELD_DEFINITION
 # User represents a user of the shared file system
 type User {
   id: ID!
-  name: String!
+  email: String!
 }
 
 # Tokens represents a user's access and refresh tokens.

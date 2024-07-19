@@ -7,7 +7,7 @@ import (
 )
 
 func (a *App) getGraphUser(user models.User) graph.User {
-	return graph.User{ID: uuid.UUID(user.ID.Bytes).String(), Name: user.Email}
+	return graph.User{ID: uuid.UUID(user.ID.Bytes).String(), Email: user.Email}
 }
 
 func (a *App) getGraphTokens(access string, refresh string) graph.Tokens {
