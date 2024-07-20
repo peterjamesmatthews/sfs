@@ -4,7 +4,7 @@ list:
 
 # start sfs
 start:
-  docker compose up -d --build --force-recreate
+  docker compose up --detach --build --force-recreate
 
 # stop sfs
 stop:
