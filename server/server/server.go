@@ -15,7 +15,7 @@ func New(config Config, graph http.Handler) http.Handler {
 	mux.Handle(pattern, graph)
 
 	// register graph's playground
-	mux.Handle("/", playground.Handler("SFS Playground", pattern))
+	mux.Handle(pattern+"/playground", playground.Handler("SFS Playground", pattern))
 
 	return mux
 }
