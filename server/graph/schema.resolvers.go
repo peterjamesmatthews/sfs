@@ -79,6 +79,7 @@ func (r *mutationResolver) CreateFolder(ctx context.Context, path string) (*Fold
 		return nil, fmt.Errorf("failed to get user from context: %w", err)
 	}
 
+	// create folder
 	folder, err := r.SharedFileSystem.CreateFolder(user, path)
 	if errors.Is(err, ErrNotFound) {
 		return nil, fmt.Errorf("parent in path not found")
@@ -90,6 +91,7 @@ func (r *mutationResolver) CreateFolder(ctx context.Context, path string) (*Fold
 		return nil, fmt.Errorf("failed to create folder: %w", err)
 	}
 
+	// return folder
 	return &folder, nil
 }
 
