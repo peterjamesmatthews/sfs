@@ -39,6 +39,7 @@ services:
 
   database:
     image: postgres:16-bullseye
+    command: postgres -c log_statement=all
     container_name: database
     hostname: $DATABASE_HOSTNAME
     environment:
