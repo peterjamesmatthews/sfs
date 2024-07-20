@@ -66,8 +66,7 @@ export type MutationCreateFileArgs = {
 
 
 export type MutationCreateFolderArgs = {
-  name: Scalars['String']['input'];
-  parentID?: InputMaybe<Scalars['ID']['input']>;
+  path: Scalars['String']['input'];
 };
 
 

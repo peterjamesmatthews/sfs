@@ -70,8 +70,29 @@ func (a *App) RefreshTokens(refresh string) (graph.Tokens, error) {
 	return a.getGraphTokens(access, refresh), nil
 }
 
-func (a *App) CreateFolder(user graph.User, path string) (graph.Folder, error) {
-	return graph.Folder{}, errors.ErrUnsupported
+func (a *App) CreateFolder(gUser graph.User, path string) (graph.Folder, error) {
+	// get user
+	user, err := a.getUserFromGraphUser(gUser)
+	if a.isNotFoundError(err) {
+		return graph.Folder{}, graph.ErrUnauthorized
+	} else if err != nil {
+		return graph.Folder{}, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	// create node
+	node, err := a.createNode(user, path)
+	if a.isNotFoundError(err) {
+		return graph.Folder{}, graph.ErrNotFound
+	} else if a.isConflictError(err) {
+		return graph.Folder{}, graph.ErrConflict
+	} else if errors.Is(err, errForbidden) {
+		return graph.Folder{}, graph.ErrForbidden
+	} else if err != nil {
+		return graph.Folder{}, fmt.Errorf("failed to create folder: %w", err)
+	}
+
+	// return created node as folder
+	return a.getGraphFolder(node), nil
 }
 
 func (a *App) GetNodeFromPath(user graph.User, path string) (graph.Node, error) {
