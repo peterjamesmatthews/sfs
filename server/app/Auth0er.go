@@ -5,5 +5,5 @@ type Auth0er interface {
 }
 
 func (a *App) SetAuth0er(auth0er Auth0er) {
-	a.auth0 = auth0er
+	a.Auth0 = auth0er
 }

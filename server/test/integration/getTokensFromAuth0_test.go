@@ -1,4 +1,4 @@
-package server_test
+package integration
 
 import (
 	"fmt"
@@ -13,7 +13,8 @@ import (
 
 // TestGetTokensFromAuth0 tests server's handling of the getTokensFromAuth0 query.
 func TestGetTokensFromAuth0(t *testing.T) {
-	server, mock, db := newTestServer(t)
+	t.Parallel()
+	server, mock, stack := newTestServer(t)
 	defer server.Close()
 
 	token := "mock-new-user-token"
@@ -79,7 +80,7 @@ func TestGetTokensFromAuth0(t *testing.T) {
 		mock.AssertExpectations(t)
 
 		// perform assertions on database
-		dump := dumpDatabase(t, db)
+		dump := dumpDatabase(t, stack.Database)
 		assert.Contains(t, dump, id, "user ID missing from database dump: %s", dump)
 		assert.Contains(t, dump, email, "user email missing from database dump: %s", dump)
 	}

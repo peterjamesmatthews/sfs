@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"pjm.dev/sfs/db/models"
 )
 
 func (a *App) createNode(user models.User, path string) (models.Node, error) {
+	// get segments of path
 	segments := getPathSegments(path)
 	if len(segments) == 0 {
 		return models.Node{}, fmt.Errorf("path must contain at least one segment")
@@ -18,9 +20,9 @@ func (a *App) createNode(user models.User, path string) (models.Node, error) {
 
 	// get uuid of parent from path
 	var parent models.Node
-	var err error // declare outside of loop to avoid shadowing
+	var err error // declare outside of loop to avoid shadowing parent
 	for _, segment := range segments[:len(segments)-1] {
-		parent, err = a.queries.GetNodeByOwnerNameParent(
+		parent, err = a.Queries.GetNodeByOwnerNameParent(
 			context.Background(),
 			models.GetNodeByOwnerNameParentParams{
 				Owner:  user.ID,
@@ -34,13 +36,42 @@ func (a *App) createNode(user models.User, path string) (models.Node, error) {
 	}
 
 	// insert node
-	node, err := a.queries.CreateNode(context.Background(), models.CreateNodeParams{
+	node, err := a.Queries.CreateNode(context.Background(), models.CreateNodeParams{
 		Owner:  user.ID,
 		Name:   name,
 		Parent: parent.ID,
 	})
 	if err != nil {
 		return models.Node{}, fmt.Errorf("failed to create node: %w", err)
+	}
+
+	return node, nil
+}
+
+func (a *App) getNodeFromPath(user models.User, path string) (models.Node, error) {
+	// get segments of path
+	segments := getPathSegments(path)
+	if len(segments) == 0 {
+		return models.Node{}, fmt.Errorf("path must contain at least one segment")
+	}
+
+	// for each segment, get node by owner, name, and parentID
+	var parentID pgtype.UUID
+	var node models.Node
+	var err error // declare outside of loop to avoid shadowing parent
+	for _, segment := range segments {
+		node, err = a.Queries.GetNodeByOwnerNameParent(
+			context.Background(),
+			models.GetNodeByOwnerNameParentParams{
+				Owner:  user.ID,
+				Name:   segment,
+				Parent: parentID,
+			},
+		)
+		if err != nil {
+			return models.Node{}, fmt.Errorf("failed to get node: %w", err)
+		}
+		parentID = node.ID
 	}
 
 	return node, nil

@@ -1,4 +1,4 @@
-package server_test
+package integration
 
 import (
 	"context"
@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -21,7 +22,6 @@ import (
 	"pjm.dev/sfs/config"
 	"pjm.dev/sfs/db"
 	"pjm.dev/sfs/meta"
-	"pjm.dev/sfs/server"
 )
 
 // test represents a single test for server_test tests.
@@ -47,14 +47,16 @@ type mock struct {
 	m.Mock
 }
 
-func newTestServer(t *testing.T) (*httptest.Server, *mock, *pgx.Conn) {
+func newTestServer(t *testing.T) (*httptest.Server, *mock, config.Stack) {
 	t.Helper()
 
 	// initialize postgres container for database
-	dbContainer := newPostgresContainer(t)
+	postgresContainer := newPostgresContainer(t)
 
 	// configure stack's config to use the database container
-	cfg := getConfigFromDatabaseContainer(dbContainer, t)
+	cfg := config.Config{
+		Database: getDatabaseConfigFromContainer(t, postgresContainer),
+	}
 
 	// initialize mock for stack
 	mock := new(mock)
@@ -66,39 +68,43 @@ func newTestServer(t *testing.T) (*httptest.Server, *mock, *pgx.Conn) {
 	}
 
 	// return test server, mock, and database connection
-	return httptest.NewServer(stack.Server), mock, stack.Database
+	return httptest.NewServer(stack.Server), mock, stack
 }
 
-var cfg = config.Config{
-	Database: db.Config{
-		User:     "foo",
-		Password: "bar",
-		Name:     "baz",
-	},
-}
-
-// getConfigFromDatabaseContainer returns a config.Config with the database connection details from a postgres container.
-func getConfigFromDatabaseContainer(dbContainer *postgres.PostgresContainer, t *testing.T) config.Config {
+// getDatabaseConfigFromContainer returns a config.Config with the database connection details from a postgres container.
+func getDatabaseConfigFromContainer(t *testing.T, dbContainer *postgres.PostgresContainer) db.Config {
 	connectionString, err := dbContainer.ConnectionString(context.Background())
 	if err != nil {
 		t.Fatalf("failed to get connection string: %v", err)
 	}
 
-	connectionURL, err := url.Parse(connectionString)
+	url, err := url.Parse(connectionString)
 	if err != nil {
 		t.Fatalf("failed to parse connection URL: %v", err)
 	}
 
-	port, err := strconv.Atoi(connectionURL.Port())
+	_, err = strconv.Atoi(url.Port())
 	if err != nil {
 		t.Fatalf("failed to parse connection port: %v", err)
 	}
 
-	cfg := cfg.Clone()
-	cfg.Database.Hostname = connectionURL.Hostname()
-	cfg.Database.Port = port
-	cfg.Server = server.Config{GraphEndpoint: "graph"}
-	return cfg
+	port, err := strconv.Atoi(url.Port())
+	if err != nil {
+		t.Fatalf("failed to parse connection port: %v", err)
+	}
+
+	password, set := url.User.Password()
+	if !set {
+		t.Fatalf("failed to parse unset connection password: %v", err)
+	}
+
+	return db.Config{
+		User:     url.User.Username(),
+		Password: password,
+		Hostname: url.Hostname(),
+		Port:     port,
+		Name:     strings.TrimPrefix(url.Path, "/"),
+	}
 }
 
 // newPostgresContainer starts a new postgres container with the project's database schema.
@@ -116,9 +122,9 @@ func newPostgresContainer(t *testing.T) *postgres.PostgresContainer {
 	// start postgres container with database schema migrations
 	container, err := postgres.Run(ctx,
 		"docker.io/postgres:16-bullseye",
-		postgres.WithUsername(cfg.Database.User),
-		postgres.WithPassword(cfg.Database.Password),
-		postgres.WithDatabase(cfg.Database.Name),
+		postgres.WithUsername("postgres"),
+		postgres.WithPassword("password"),
+		postgres.WithDatabase("postgres"),
 		postgres.WithInitScripts(migrations...),
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("database system is ready to accept connections").
@@ -154,9 +160,4 @@ func dumpDatabase(t *testing.T, db *pgx.Conn) string {
 		t.Fatalf("failed to dump database: %v", err)
 	}
 	return string(output)
-}
-
-// TestNewPostgresContainer simply tests the newPostgresContainer function executes without error.
-func TestNewPostgresContainer(t *testing.T) {
-	newPostgresContainer(t)
 }

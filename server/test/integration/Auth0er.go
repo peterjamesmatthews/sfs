@@ -1,4 +1,4 @@
-package server_test
+package integration
 
 // this file provides mock's implementation of the app.Auth0er interface.
 

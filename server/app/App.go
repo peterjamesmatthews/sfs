@@ -6,15 +6,15 @@ import (
 )
 
 type App struct {
-	config  Config
-	queries *models.Queries
-	auth0   Auth0er
+	Config  Config
+	Queries *models.Queries
+	Auth0   Auth0er
 }
 
 func New(config Config, conn *pgx.Conn, auth0 Auth0er) App {
-	return App{config: config, queries: models.New(conn), auth0: auth0}
+	return App{Config: config, Queries: models.New(conn), Auth0: auth0}
 }
 
 func (a *App) SetDatabase(conn *pgx.Conn) {
-	a.queries = models.New(conn)
+	a.Queries = models.New(conn)
 }

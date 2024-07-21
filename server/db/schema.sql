@@ -23,7 +23,7 @@ CREATE UNIQUE INDEX unique_owner_name_parent ON node (
 );
 CREATE TABLE file (
   id UUID NOT NULL UNIQUE PRIMARY KEY DEFAULT gen_random_uuid(),
-  node UUID NOT NULL REFERENCES node (id) ON DELETE CASCADE,
+  node UUID NOT NULL UNIQUE REFERENCES node (id) ON DELETE CASCADE,
   content BYTEA NOT NULL DEFAULT ''
 );
 CREATE TYPE access_type AS ENUM ('read', 'write');

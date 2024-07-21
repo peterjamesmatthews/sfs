@@ -26,18 +26,18 @@ func (a *App) Authenticate(auth string) (graph.User, error) {
 
 func (a *App) GetTokensFromAuth0Token(token string) (graph.Tokens, error) {
 	// get user's email from Auth0 token
-	id, email, err := a.auth0.GetIDAndEmailFromToken(token)
+	id, email, err := a.Auth0.GetIDAndEmailFromToken(token)
 	if err != nil {
 		return graph.Tokens{}, fmt.Errorf("failed to get user name from token: %w", err)
 	}
 
 	// get user by email
 	var user models.User
-	user, err = a.queries.GetUserByEmail(context.Background(), email)
+	user, err = a.Queries.GetUserByEmail(context.Background(), email)
 
 	// create user if not found
 	if a.isNotFoundError(err) {
-		user, err = a.queries.CreateUser(
+		user, err = a.Queries.CreateUser(
 			context.Background(),
 			models.CreateUserParams{
 				Email:   email,
@@ -51,7 +51,7 @@ func (a *App) GetTokensFromAuth0Token(token string) (graph.Tokens, error) {
 	}
 
 	// generate access and refresh tokens for user
-	access, refresh, err := a.getTokensForUser(user)
+	access, refresh, err := a.GetTokensForUser(user)
 	if err != nil {
 		return graph.Tokens{}, fmt.Errorf("failed to generate tokens: %w", err)
 	}
@@ -95,8 +95,25 @@ func (a *App) CreateFolder(gUser graph.User, path string) (graph.Folder, error) 
 	return a.getGraphFolder(node), nil
 }
 
-func (a *App) GetNodeFromPath(user graph.User, path string) (graph.Node, error) {
-	return nil, errors.ErrUnsupported
+func (a *App) GetNodeFromPath(gUser graph.User, path string) (graph.Node, error) {
+	// get user
+	user, err := a.getUserFromGraphUser(gUser)
+	if a.isNotFoundError(err) {
+		return nil, graph.ErrUnauthorized
+	} else if err != nil {
+		return nil, fmt.Errorf("failed to get user: %w", err)
+	}
+
+	// get node from path
+	node, err := a.getNodeFromPath(user, path)
+	if a.isNotFoundError(err) {
+		return nil, graph.ErrNotFound
+	} else if errors.Is(err, errForbidden) {
+		return nil, graph.ErrForbidden
+	}
+
+	// return converted node
+	return a.getGraphNode(node)
 }
 
 func (a *App) RenameNode(user graph.User, id string, name string) (graph.Node, error) {
