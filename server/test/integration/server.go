@@ -39,12 +39,12 @@ type test struct {
 	dump *os.File
 }
 
-// mock provides a mockable interface for many of the project's interfaces.
-type mock struct {
+// stackMock provides a mock for this stack's interfaces
+type stackMock struct {
 	m.Mock
 }
 
-func newTestServer(t *testing.T) (*httptest.Server, *mock, config.Stack) {
+func newTestServer(t *testing.T) (*httptest.Server, *stackMock, config.Stack) {
 	t.Helper()
 
 	// initialize postgres container for database
@@ -55,17 +55,17 @@ func newTestServer(t *testing.T) (*httptest.Server, *mock, config.Stack) {
 		Database: getDatabaseConfigFromContainer(t, postgresContainer),
 	}
 
-	// initialize mock for stack
-	mock := new(mock)
+	// initialize mockable for stack
+	mockable := new(stackMock)
 
 	// initialize stack
-	stack, err := config.NewStack(cfg, config.WithAuth0er(mock))
+	stack, err := config.NewStack(cfg, config.WithAuth0er(mockable))
 	if err != nil {
 		t.Fatalf("failed to initialize test server: %v", err)
 	}
 
 	// return test server, mock, and database connection
-	return httptest.NewServer(stack.Server), mock, stack
+	return httptest.NewServer(stack.Server), mockable, stack
 }
 
 // getDatabaseConfigFromContainer returns a config.Config with the database connection details from a postgres container.
