@@ -8,7 +8,7 @@ package models
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 const getNodeByOwnerNameParent = `-- name: GetNodeByOwnerNameParent :one
@@ -27,13 +27,13 @@ LIMIT 1
 `
 
 type GetNodeByOwnerNameParentParams struct {
-	Owner  pgtype.UUID
+	Owner  uuid.UUID
 	Name   string
-	Parent pgtype.UUID
+	Parent uuid.NullUUID
 }
 
 func (q *Queries) GetNodeByOwnerNameParent(ctx context.Context, arg GetNodeByOwnerNameParentParams) (Node, error) {
-	row := q.db.QueryRow(ctx, getNodeByOwnerNameParent, arg.Owner, arg.Name, arg.Parent)
+	row := q.db.QueryRowContext(ctx, getNodeByOwnerNameParent, arg.Owner, arg.Name, arg.Parent)
 	var i Node
 	err := row.Scan(
 		&i.ID,

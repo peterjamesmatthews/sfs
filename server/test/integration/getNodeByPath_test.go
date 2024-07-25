@@ -9,7 +9,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/assert"
 	"pjm.dev/sfs/db/models"
 	"pjm.dev/sfs/graph"
@@ -25,7 +24,7 @@ func TestGetNodeFromPath(t *testing.T) {
 		context.Background(),
 		models.CreateUserParams{
 			Email:   "mock-user@pjm.dev",
-			Auth0ID: pgtype.Text{String: "auth0|mock-user-auth0-id", Valid: true},
+			Auth0ID: "auth0|mock-user-auth0-id",
 		},
 	)
 	if err != nil {

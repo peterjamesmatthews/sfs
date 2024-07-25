@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"pjm.dev/sfs/db/models"
 	"pjm.dev/sfs/graph"
 )
@@ -41,7 +40,7 @@ func (a *App) GetTokensFromAuth0Token(token string) (graph.Tokens, error) {
 			context.Background(),
 			models.CreateUserParams{
 				Email:   email,
-				Auth0ID: pgtype.Text{String: id, Valid: true},
+				Auth0ID: id,
 			},
 		)
 	}

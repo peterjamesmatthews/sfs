@@ -1,16 +1,16 @@
 package db
 
 import (
-	"context"
+	"database/sql"
 	"fmt"
 
-	"github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
-func New(config Config) (*pgx.Conn, error) {
-	db, err := pgx.Connect(context.Background(), config.GetConnectionString())
+func New(config Config) (*sql.DB, error) {
+	db, err := sql.Open("pgx", config.GetConnectionString())
 	if err != nil {
-		return nil, fmt.Errorf("failed to connect to database: %w", err)
+		return nil, fmt.Errorf("failed to open db: %w", err)
 	}
 
 	return db, nil

@@ -8,7 +8,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 type AccessType string
@@ -54,26 +54,26 @@ func (ns NullAccessType) Value() (driver.Value, error) {
 }
 
 type Access struct {
-	Accessor pgtype.UUID
-	Target   pgtype.UUID
+	Accessor uuid.UUID
+	Target   uuid.UUID
 	Type     AccessType
 }
 
 type File struct {
-	ID      pgtype.UUID
-	Node    pgtype.UUID
+	ID      uuid.UUID
+	Node    uuid.UUID
 	Content []byte
 }
 
 type Node struct {
-	ID     pgtype.UUID
-	Owner  pgtype.UUID
+	ID     uuid.UUID
+	Owner  uuid.UUID
 	Name   string
-	Parent pgtype.UUID
+	Parent uuid.NullUUID
 }
 
 type User struct {
-	ID      pgtype.UUID
+	ID      uuid.UUID
 	Email   string
-	Auth0ID pgtype.Text
+	Auth0ID string
 }

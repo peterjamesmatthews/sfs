@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 	"pjm.dev/sfs/db/models"
 )
 
@@ -27,7 +27,7 @@ func (a *App) createNode(user models.User, path string) (models.Node, error) {
 			models.GetNodeByOwnerNameParentParams{
 				Owner:  user.ID,
 				Name:   segment,
-				Parent: parent.ID,
+				Parent: uuid.NullUUID{UUID: parent.ID, Valid: parent.ID != uuid.Nil},
 			},
 		)
 		if err != nil {
@@ -39,7 +39,7 @@ func (a *App) createNode(user models.User, path string) (models.Node, error) {
 	node, err := a.Queries.CreateNode(context.Background(), models.CreateNodeParams{
 		Owner:  user.ID,
 		Name:   name,
-		Parent: parent.ID,
+		Parent: uuid.NullUUID{UUID: parent.ID, Valid: parent.ID != uuid.Nil},
 	})
 	if err != nil {
 		return models.Node{}, fmt.Errorf("failed to create node: %w", err)
@@ -56,7 +56,7 @@ func (a *App) getNodeFromPath(user models.User, path string) (models.Node, error
 	}
 
 	// for each segment, get node by owner, name, and parentID
-	var parentID pgtype.UUID
+	var parentID uuid.UUID
 	var node models.Node
 	var err error // declare outside of loop to avoid shadowing parent
 	for _, segment := range segments {
@@ -65,7 +65,7 @@ func (a *App) getNodeFromPath(user models.User, path string) (models.Node, error
 			models.GetNodeByOwnerNameParentParams{
 				Owner:  user.ID,
 				Name:   segment,
-				Parent: parentID,
+				Parent: uuid.NullUUID{UUID: parentID, Valid: parentID != uuid.Nil},
 			},
 		)
 		if err != nil {

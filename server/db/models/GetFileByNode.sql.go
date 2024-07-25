@@ -8,7 +8,7 @@ package models
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 const getFileByNode = `-- name: GetFileByNode :one
@@ -18,8 +18,8 @@ WHERE "node" = $1
 LIMIT 1
 `
 
-func (q *Queries) GetFileByNode(ctx context.Context, node pgtype.UUID) (File, error) {
-	row := q.db.QueryRow(ctx, getFileByNode, node)
+func (q *Queries) GetFileByNode(ctx context.Context, node uuid.UUID) (File, error) {
+	row := q.db.QueryRowContext(ctx, getFileByNode, node)
 	var i File
 	err := row.Scan(&i.ID, &i.Node, &i.Content)
 	return i, err

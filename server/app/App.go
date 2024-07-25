@@ -1,7 +1,8 @@
 package app
 
 import (
-	"github.com/jackc/pgx/v5"
+	"database/sql"
+
 	"pjm.dev/sfs/db/models"
 )
 
@@ -11,10 +12,10 @@ type App struct {
 	Auth0   Auth0er
 }
 
-func New(config Config, conn *pgx.Conn, auth0 Auth0er) App {
-	return App{Config: config, Queries: models.New(conn), Auth0: auth0}
+func New(config Config, db *sql.DB, auth0 Auth0er) App {
+	return App{Config: config, Queries: models.New(db), Auth0: auth0}
 }
 
-func (a *App) SetDatabase(conn *pgx.Conn) {
-	a.Queries = models.New(conn)
+func (a *App) SetDatabase(db *sql.DB) {
+	a.Queries = models.New(db)
 }

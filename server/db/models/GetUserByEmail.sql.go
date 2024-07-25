@@ -17,7 +17,7 @@ LIMIT 1
 `
 
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (User, error) {
-	row := q.db.QueryRow(ctx, getUserByEmail, email)
+	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
 	var i User
 	err := row.Scan(&i.ID, &i.Email, &i.Auth0ID)
 	return i, err

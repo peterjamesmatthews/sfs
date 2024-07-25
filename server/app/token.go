@@ -9,7 +9,6 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 	"pjm.dev/sfs/db/models"
 )
 
@@ -21,7 +20,7 @@ func (a *App) getTokenFromAuthorization(auth string) string {
 func (a *App) GetTokensForUser(user models.User) (string, string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
 		Issuer:    a.Config.JWT_Issuer,
-		Subject:   uuid.UUID(user.ID.Bytes).String(),
+		Subject:   user.ID.String(),
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour)),
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	})
@@ -33,7 +32,7 @@ func (a *App) GetTokensForUser(user models.User) (string, string, error) {
 
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, &jwt.RegisteredClaims{
 		Issuer:    a.Config.JWT_Issuer,
-		Subject:   uuid.UUID(user.ID.Bytes).String(),
+		Subject:   user.ID.String(),
 		ExpiresAt: jwt.NewNumericDate(time.Now().Add(14 * 24 * time.Hour)), // two weeks
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	})
@@ -77,14 +76,14 @@ func (a *App) getUserFromToken(tokenString string) (models.User, error) {
 	}
 
 	// get user's id from subject subject
-	id := new(pgtype.UUID)
+	var id uuid.UUID
 	err = id.Scan(sub)
 	if err != nil {
 		return models.User{}, fmt.Errorf("failed to scan user ID from access token: %w", err)
 	}
 
 	// get user by id
-	user, err := a.Queries.GetUserByID(context.Background(), *id)
+	user, err := a.Queries.GetUserByID(context.Background(), id)
 	if err != nil {
 		return models.User{}, fmt.Errorf("failed to get user by ID: %w", err)
 	}
@@ -127,14 +126,14 @@ func (a *App) refreshTokens(refresh string) (string, string, error) {
 	}
 
 	// get id from user
-	id := new(pgtype.UUID)
+	var id uuid.UUID
 	err = id.Scan(sub)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to scan user ID from refresh token: %w", err)
 	}
 
 	// get user by id
-	user, err := a.Queries.GetUserByID(context.Background(), *id)
+	user, err := a.Queries.GetUserByID(context.Background(), id)
 	if err != nil {
 		return "", "", fmt.Errorf("failed to get user by ID: %w", err)
 	}

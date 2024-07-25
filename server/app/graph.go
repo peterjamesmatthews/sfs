@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/uuid"
 	"pjm.dev/sfs/db/models"
 	"pjm.dev/sfs/graph"
 )
@@ -14,7 +13,7 @@ func (a *App) getUserFromGraphUser(graphUser graph.User) (models.User, error) {
 }
 
 func (a *App) getGraphUser(user models.User) graph.User {
-	return graph.User{ID: uuid.UUID(user.ID.Bytes).String(), Email: user.Email}
+	return graph.User{ID: user.ID.String(), Email: user.Email}
 }
 
 func (a *App) getGraphTokens(access string, refresh string) graph.Tokens {
@@ -22,12 +21,12 @@ func (a *App) getGraphTokens(access string, refresh string) graph.Tokens {
 }
 
 func (a *App) getGraphFolder(node models.Node) graph.Folder {
-	return graph.Folder{ID: uuid.UUID(node.ID.Bytes).String(), Name: node.Name}
+	return graph.Folder{ID: node.ID.String(), Name: node.Name}
 }
 
 func (a *App) getGraphFile(node models.Node, file models.File) graph.File {
 	return graph.File{
-		ID:      uuid.UUID(file.ID.Bytes).String(),
+		ID:      node.ID.String(),
 		Name:    node.Name,
 		Content: string(file.Content),
 	}

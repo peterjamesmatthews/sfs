@@ -2,19 +2,16 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/jackc/pgx/v5"
 	m "github.com/stretchr/testify/mock"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -141,23 +138,4 @@ func newPostgresContainer(t *testing.T) *postgres.PostgresContainer {
 	})
 
 	return container
-}
-
-// dumpDatabase returns a string result of the pg_dump command on a given database.
-//
-// If an error occurs, this function calls t.Fatalf with the error message.
-func dumpDatabase(t *testing.T, db *pgx.Conn) string {
-	cmd := exec.Command(
-		"pg_dump",
-		"-d", db.Config().Database,
-		"-h", db.Config().Host,
-		"-p", fmt.Sprintf("%d", db.Config().Port),
-		"-U", db.Config().User,
-	)
-	cmd.Env = append(cmd.Environ(), "PGPASSWORD="+db.Config().Password)
-	output, err := cmd.Output()
-	if err != nil {
-		t.Fatalf("failed to dump database: %v", err)
-	}
-	return string(output)
 }

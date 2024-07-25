@@ -8,7 +8,7 @@ package models
 import (
 	"context"
 
-	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/google/uuid"
 )
 
 const createNode = `-- name: CreateNode :one
@@ -18,13 +18,13 @@ RETURNING id, owner, name, parent
 `
 
 type CreateNodeParams struct {
-	Owner  pgtype.UUID
+	Owner  uuid.UUID
 	Name   string
-	Parent pgtype.UUID
+	Parent uuid.NullUUID
 }
 
 func (q *Queries) CreateNode(ctx context.Context, arg CreateNodeParams) (Node, error) {
-	row := q.db.QueryRow(ctx, createNode, arg.Owner, arg.Name, arg.Parent)
+	row := q.db.QueryRowContext(ctx, createNode, arg.Owner, arg.Name, arg.Parent)
 	var i Node
 	err := row.Scan(
 		&i.ID,

@@ -7,8 +7,6 @@ package models
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -19,11 +17,11 @@ RETURNING id, email, auth0_id
 
 type CreateUserParams struct {
 	Email   string
-	Auth0ID pgtype.Text
+	Auth0ID string
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.Email, arg.Auth0ID)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.Auth0ID)
 	var i User
 	err := row.Scan(&i.ID, &i.Email, &i.Auth0ID)
 	return i, err

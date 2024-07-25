@@ -1,6 +1,7 @@
 package integration
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -18,12 +19,12 @@ func TestGetTokensFromAuth0(t *testing.T) {
 	defer server.Close()
 
 	token := "mock-new-user-token"
-	id := "mock-new-user-id"
+	auth0ID := "mock-new-user-auth0-id"
 	email := "mock-new-user-email"
 
 	mock.
 		On("GetIDAndEmailFromToken", token).
-		Return(id, email, nil)
+		Return(auth0ID, email, nil)
 
 	url, err := url.Parse(server.URL + "/graph")
 	if err != nil {
@@ -79,9 +80,11 @@ func TestGetTokensFromAuth0(t *testing.T) {
 		// perform assertions on mock
 		mock.AssertExpectations(t)
 
-		// perform assertions on database
-		dump := dumpDatabase(t, stack.Database)
-		assert.Contains(t, dump, id, "user ID missing from database dump: %s", dump)
-		assert.Contains(t, dump, email, "user email missing from database dump: %s", dump)
+		// assert user is in database
+		user, err := stack.App.Queries.GetUserByEmail(context.Background(), email)
+		assert.NoError(t, err, "failed to get user from database: %v", err)
+		// assert user has correct auth0ID and email
+		assert.Equal(t, auth0ID, user.Auth0ID, "unexpected auth0ID")
+		assert.Equal(t, email, user.Email, "unexpected email")
 	}
 }

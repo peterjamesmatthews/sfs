@@ -1,10 +1,10 @@
 package config
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 
-	"github.com/jackc/pgx/v5"
 	"pjm.dev/sfs/app"
 	"pjm.dev/sfs/auth0"
 	"pjm.dev/sfs/db"
@@ -14,7 +14,7 @@ import (
 
 type Stack struct {
 	App      app.App
-	Database *pgx.Conn
+	Database *sql.DB
 	Server   http.Handler
 }
 
