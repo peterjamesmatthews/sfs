@@ -1,7 +1,7 @@
 CREATE TABLE public.user (
   id UUID NOT NULL UNIQUE PRIMARY KEY DEFAULT gen_random_uuid(),
   email VARCHAR NOT NULL UNIQUE,
-  auth0_id VARCHAR
+  auth0_id VARCHAR NOT NULL
 );
 CREATE TABLE node (
   id UUID NOT NULL UNIQUE PRIMARY KEY DEFAULT gen_random_uuid(),
